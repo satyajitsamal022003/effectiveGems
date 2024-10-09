@@ -1,0 +1,233 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Order;
+use DateTime;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\OrderStatusUpdated;
+use App\Mail\OrderRequestToCustomer;
+
+
+class OrderController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+
+    public function index()
+    {
+        return view('admin.orders.list');
+    }
+    public function getOrdersData(Request $request)
+    {
+
+        $draw = intval($request->input('draw'));
+        $length = intval($request->input('length'));
+        $pageNo = intval($request->input('start'));
+        $skip = $pageNo;
+        $searchValue = $request->input('search.value');
+        $category = $request->input('category');
+        $sortByName = $request->input('sortByName') ? $request->input('sortByName') : 'asc'; // Default sorting order
+
+        // Base query to fetch orders and eager load order items and their related products
+        $query = Order::with(['items.productDetails']); // Eager load order items and product details
+
+        // Apply search filtering if needed
+        if (!empty($searchValue)) {
+            $query->where('firstName', 'LIKE', '%' . $searchValue . '%');
+        }
+
+        // Apply filtering by category if applicable
+        if (!empty($category)) {
+            $query->where('orderApproved', $category);
+        }
+
+        // Get the total filtered records count
+        $totalFilteredRecords = $query->count();
+
+        // Apply sorting by 'firstName' and pagination
+        $orders = $query->orderBy('created_at', 'desc') // Apply sorting
+            ->skip($skip)
+            ->take($length)
+            ->get();
+
+        // Get the total record count without filtering
+        $totalRecords = Order::count();
+
+        // Map the orders to include a custom index and return the data
+
+        $data = $orders->map(function ($order, $key) use ($pageNo) {
+            $order->DT_RowIndex = $pageNo + $key + 1;
+            $specificDate = new DateTime($order->created_at);
+            $order->created_at = $specificDate->format('Y-m-d');
+            $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
+            // You can add extra details here if needed
+            foreach ($order->items as $key => $item) {
+                $item->productDetails->image = asset($item->productDetails->image1);
+            }
+            return $order;
+        });
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFilteredRecords,
+            'data' => $data
+        ]);
+    }
+
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(string $id)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+  public function changeStatus(Request $req)
+    {
+        $orderId = $req->orderId;
+        $orderApproved = $req->orderApproved; // 1 for approved, 0 for canceled
+        $cancellationReason = $req->cancellationReason;
+        $order = Order::find($orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+        
+         // Update the order status
+        $order->orderApproved = $orderApproved;
+        if ($orderApproved == 0 && !empty($cancellationReason)) {
+            // Save the cancellation reason if the order is canceled
+            $order->cancellation_reason = $cancellationReason; // Ensure you have this field in your orders table
+        }
+        $order->save();
+
+        // Prepare response
+        $response = response()->json(['message' => 'Order status updated']);
+
+        // Send email after response
+        $this->sendOrderStatusEmail($order, $orderApproved, $cancellationReason);
+
+        // Return the response immediately
+        return $response;
+    }
+
+    protected function sendOrderStatusEmail(Order $order, $orderApproved, $cancellationReason = null)
+    {
+        if ($orderApproved == 1) {
+            Mail::to($order->email)->send(new OrderStatusUpdated($order, 'approved'));
+        } else {
+            Mail::to($order->email)->send(new OrderStatusUpdated($order, 'canceled',$cancellationReason));
+        }
+    }
+
+
+
+    public function requestToCustomer(Request $request)
+    {
+        $order = Order::find($request->orderId); // Fetch the order by ID
+        $message = $request->message; // Get the message from the request
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Ensure that the message is always a string
+        if (is_array($message)) {
+            $message = implode(', ', $message); // Convert array to a comma-separated string
+        } elseif (is_object($message)) {
+            $message = json_encode($message); // Convert object to a JSON string
+        }
+        
+        $order->request_to_customer = $message;
+        $order->save();
+
+        // Send the email using the Mailable
+        Mail::to($order->email)->send(new OrderRequestToCustomer($order, $message));
+
+        return response()->json(['message' => 'Request sent successfully!']);
+    }
+
+
+
+
+    public function acceptOrder($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return redirect()->back()->with('message', 'Order not found');
+        }
+
+        // Approve the order
+        $order->orderApproved = 1; // Assuming 1 means approved
+        $order->save();
+
+        // Optionally, send an email to confirm acceptance
+        Mail::to($order->email)->send(new OrderStatusUpdated($order, 'approved'));
+
+        return redirect()->back()->with('message', 'Order has been approved.');
+    }
+
+    public function cancelOrder($id)
+    {
+        $order = Order::find($id);
+
+        if (!$order) {
+            return redirect()->back()->with('message', 'Order not found');
+        }
+
+        // Cancel the order
+        $order->orderApproved = 0; // Assuming 0 means canceled
+        $order->save();
+
+        // Optionally, send an email to confirm cancellation
+        Mail::to($order->email)->send(new OrderStatusUpdated($order, 'canceled'));
+
+        return redirect()->back()->with('message', 'Order has been canceled.');
+    }
+}

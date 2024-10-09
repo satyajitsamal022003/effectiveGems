@@ -1,0 +1,101 @@
+@extends('user.layout')
+@section('content')
+    <section class="container">
+        <div class="as_breadcrum_wrapper" style="background-image: url('/user/assets/images/breadcrum-img-1.jpg');">
+            <div class="row">
+                <div class="col-lg-12 text-center">
+                    <h1>Sub category</h1>
+                    <ul class="breadcrumb">
+                        <li><a href="/">Home</a></li>
+                        <li>{{ $category->subCategoryName }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="as_blog_wrapper as_padderBottom40">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12 col-md-12 text-center">
+                    <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
+                        @foreach ($subcategoryproducts as $subcat)
+                            <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+                                <div class="as_product_box">
+                                    <a href="{{ route('user.productdetails', $subcat->id) }}" class="as_product_img">
+                                        <img src="{{ asset($subcat->image1) }}" alt="{{ $subcat->productName }}"
+                                            class="img-responsive">
+                                    </a>
+                                    <div class="as_product_detail">
+                                        <h4 class="as_subheading">{{ $subcat->productName }}</h4>
+                                        <span class="as_price">
+                                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                                            <span style="text-decoration: line-through;">{{ $subcat->priceMRP }}</span>
+                                            <span>{{ $subcat->priceB2C }} / {{ $subcat->price_type }}</span>
+                                        </span>
+                                        <div class="space-between">
+                                            <a href="{{ route('user.productdetails', $subcat->id) }}"
+                                                class="as_btn_cart"><span>View Details</span></a>
+                                            <a href="javascript:;" class="enquire_btn" data-bs-toggle="modal"
+                                                data-bs-target="#enquire_modal"><span>Order Now</span></a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            <div class="pagination-bottom" data-aos="fade-up">
+                <nav>
+                    <ul class="pagination justify-content-center">
+                        {{-- Previous Page Link --}}
+                        @if ($subcategoryproducts->onFirstPage())
+                            <li class="page-item disabled">
+                                <span class="page-link">&laquo;</span>
+                            </li>
+                        @else
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $subcategoryproducts->previousPageUrl() }}"
+                                    rel="prev">&laquo;</a>
+                            </li>
+                        @endif
+
+                        {{-- Pagination Elements --}}
+                        @foreach ($subcategoryproducts->links()->elements as $element)
+                            {{-- "Three Dots" Separator --}}
+                            @if (is_string($element))
+                                <li class="page-item disabled"><span class="page-link">{{ $element }}</span></li>
+                            @endif
+
+                            {{-- Array Of Links --}}
+                            @if (is_array($element))
+                                @foreach ($element as $page => $url)
+                                    @if ($page == $subcategoryproducts->currentPage())
+                                        <li class="page-item active"><span class="page-link">{{ $page }}</span>
+                                        </li>
+                                    @else
+                                        <li class="page-item"><a class="page-link"
+                                                href="{{ $url }}">{{ $page }}</a></li>
+                                    @endif
+                                @endforeach
+                            @endif
+                        @endforeach
+
+                        {{-- Next Page Link --}}
+                        @if ($subcategoryproducts->hasMorePages())
+                            <li class="page-item">
+                                <a class="page-link" href="{{ $subcategoryproducts->nextPageUrl() }}"
+                                    rel="next">&raquo;</a>
+                            </li>
+                        @else
+                            <li class="page-item disabled">
+                                <span class="page-link">&raquo;</span>
+                            </li>
+                        @endif
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </section>
+@endsection
