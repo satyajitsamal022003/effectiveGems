@@ -122,7 +122,7 @@
                 <div class="container">
                     <div class="main-menu">
                         <div class="mobile-logo">
-                            <a href="index.html"><img src="{{ url('/') }}/user/assets/images/logo.png"></a>
+                            <a href="{{route('user.index')}}"><img src="{{ url('/') }}/user/assets/images/logo.png"></a>
                         </div>
                         <div class="mobile_btn">
                             <i class="fas fa-bars"></i>

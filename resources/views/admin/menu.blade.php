@@ -46,7 +46,7 @@
                              class="fa-solid fa-users-line"></i><span>Testimonial</span></a>
                  </li>
                  <li class="">
-                    <a href="https://new.effectivegems.com/admin/order#"><i class="fa-solid fa-cart-shopping"></i><span>Order</span></a>
+                    <a href="/admin/order"><i class="fa-solid fa-cart-shopping"></i><span>Order</span></a>
                  </li>
                  <li class="submenu">
                      <a href="#"><i class="fa-solid fa-gear"></i> <span>System</span> <span
