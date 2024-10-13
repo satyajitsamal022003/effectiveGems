@@ -6,7 +6,7 @@
                 <div class="col-lg-12 text-center">
                     <h1>Category</h1>
                     <ul class="breadcrumb">
-                        <li><a href="{{route('user.index')}}">Home</a></li>
+                        <li><a href="{{ route('user.index') }}">Home</a></li>
                         <li>{{ $category->categoryName }}</li>
                     </ul>
                 </div>
@@ -80,8 +80,8 @@
                                         <div class="space-between">
                                             <a href="{{ route('user.productdetails', $subcat->id) }}"
                                                 class="as_btn_cart"><span>View Details</span></a>
-                                            <a href="javascript:;" class="enquire_btn" data-bs-toggle="modal"
-                                                data-bs-target="#enquire_modal"><span>Order Now</span></a>
+                                            <a href="javascript:;" class="enquire_btn"
+                                                onclick="buyNow({{ $subcat->id }})"><span>Order Now</span></a>
                                         </div>
                                     </div>
                                 </div>
@@ -90,7 +90,7 @@
                     </div>
                 </div>
             </div>
-           <div class="pagination-bottom" data-aos="fade-up">
+            <div class="pagination-bottom" data-aos="fade-up">
                 <nav>
                     <ul class="pagination justify-content-center">
                         {{-- Previous Page Link --}}
@@ -100,58 +100,63 @@
                             </li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $subcategoryproducts->previousPageUrl() }}" rel="prev">&laquo;</a>
+                                <a class="page-link" href="{{ $subcategoryproducts->previousPageUrl() }}"
+                                    rel="prev">&laquo;</a>
                             </li>
                         @endif
-            
+
                         {{-- Pagination Elements --}}
                         @php
                             $currentPage = $subcategoryproducts->currentPage();
                             $lastPage = $subcategoryproducts->lastPage();
                             $showDots = false;
                         @endphp
-            
+
                         {{-- Show first few pages --}}
                         @for ($i = 1; $i <= min(4, $lastPage); $i++)
                             @if ($i == $currentPage)
                                 <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
                             @else
-                                <li class="page-item"><a class="page-link" href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
+                                <li class="page-item"><a class="page-link"
+                                        href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
                             @endif
                         @endfor
-            
+
                         {{-- Show dots if current page is greater than 5 --}}
                         @if ($currentPage > 5)
                             <li class="page-item disabled"><span class="page-link">...</span></li>
                         @endif
-            
+
                         {{-- Show previous and current pages --}}
                         @for ($i = max(5, $currentPage - 2); $i <= min($currentPage + 2, $lastPage - 1); $i++)
                             @if ($i == $currentPage)
                                 <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
                             @else
-                                <li class="page-item"><a class="page-link" href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
+                                <li class="page-item"><a class="page-link"
+                                        href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
                             @endif
                         @endfor
-            
+
                         {{-- Show dots if current page is less than last page - 3 --}}
                         @if ($currentPage < $lastPage - 3)
                             <li class="page-item disabled"><span class="page-link">...</span></li>
                         @endif
-            
+
                         {{-- Show last few pages --}}
                         @for ($i = max($lastPage - 2, 1); $i <= $lastPage; $i++)
                             @if ($i == $currentPage)
                                 <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
                             @else
-                                <li class="page-item"><a class="page-link" href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
+                                <li class="page-item"><a class="page-link"
+                                        href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
                             @endif
                         @endfor
-            
+
                         {{-- Next Page Link --}}
                         @if ($subcategoryproducts->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $subcategoryproducts->nextPageUrl() }}" rel="next">&raquo;</a>
+                                <a class="page-link" href="{{ $subcategoryproducts->nextPageUrl() }}"
+                                    rel="next">&raquo;</a>
                             </li>
                         @else
                             <li class="page-item disabled">
@@ -169,4 +174,30 @@
 
         </div>
     </section>
+    <script>
+        function buyNow(proId) {
+            var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val()) || 1;
+            var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
+            var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('addToCart') }}",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    product_id: proId,
+                    quantity: quantity,
+                    isActive: isActive,
+                    isCert: isCert,
+                },
+                success: function(response) {
+                    $(".cartCount").text(response.totalCartItems);
+                    window.location.href = '/checkout';
+                },
+                error: function(xhr, status, error) {
+                    console.error("An error occurred: " + error);
+                },
+            });
+        }
+    </script>
 @endsection

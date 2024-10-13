@@ -36,8 +36,7 @@
                                         <div class="space-between">
                                             <a href="{{ route('user.productdetails', $subcat->id) }}"
                                                 class="as_btn_cart"><span>View Details</span></a>
-                                            <a href="javascript:;" class="enquire_btn" data-bs-toggle="modal"
-                                                data-bs-target="#enquire_modal"><span>Order Now</span></a>
+                                            <a href="javascript:;" class="enquire_btn" onclick="buyNow({{ $subcat->id }})"><span>Order Now</span></a>
                                         </div>
                                     </div>
                                 </div>
@@ -98,4 +97,30 @@
             </div>
         </div>
     </section>
+    <script>
+        function buyNow(proId) {
+          var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val()) || 1;
+          var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
+          var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
+  
+          $.ajax({
+              type: "POST",
+              url: "{{ route('addToCart') }}",
+              data: {
+                  _token: "{{ csrf_token() }}",
+                  product_id: proId,
+                  quantity: quantity,
+                  isActive: isActive,
+                  isCert: isCert,
+              },
+              success: function(response) {
+                  $(".cartCount").text(response.totalCartItems);
+                  window.location.href = '/checkout';
+              },
+              error: function(xhr, status, error) {
+                  console.error("An error occurred: " + error);
+              },
+          });
+      }
+      </script>
 @endsection
