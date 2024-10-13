@@ -389,7 +389,8 @@
                                                 @if ($cartItem->productdetails->categoryId == 1)
                                                     <div class="quantity-select mt-2">
                                                         <select name="quantityDd" id="quantity-{{ $cartItem->id }}" class="form-select form-control"
-                                                            onchange="return changeQuantity({{ $cartItem->id }},'1','1')">
+                                                            onchange="return changeQuantity({{ $cartItem->id }},'1','1')" required>
+                                                            <option value=" " selected disabled>--Select(Carat/Ratti)--</option>
                                                             @for ($i = $cartItem->productdetails->min_product_qty; $i <= $cartItem->productdetails->max_product_qty; $i += 0.5)
                                                                 <option value="{{ $i }}"
                                                                     {{ $i == $cartItem->quantity ? 'selected' : '' }}>

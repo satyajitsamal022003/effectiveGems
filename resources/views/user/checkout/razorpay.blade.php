@@ -11,7 +11,7 @@
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
         const options = {
-            "key": "{{ env('RAZORPAY_KEY', 'rzp_test_hklhkcWoskzEBC') }}", // Razorpay Key ID
+            "key": "{{ env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T') }}", // Razorpay Key ID
             "amount": "{{ isset($razorpayOrderId) ? $subtotal : 0 }}", // Amount in paisa
             "currency": "INR",
             "name": "Your Company Name",

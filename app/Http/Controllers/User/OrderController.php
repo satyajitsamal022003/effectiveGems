@@ -133,7 +133,7 @@ class OrderController extends Controller
                 $orderItem->amount = $value->quantity * $value->productDetails->priceB2B;
                 $orderItem->save();
             }
-            $api = new Api(env('RAZORPAY_KEY', 'rzp_test_hklhkcWoskzEBC'), env('RAZORPAY_SECRET', 'POHvwfH01SddHJrxLFSCCcVJ'));
+            $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
             $razorpayOrderData = [
                 'receipt'         => 'orderId-' . $orderId, // Your internal order ID as receipt ID
                 'amount'          => $subtotal * 100,

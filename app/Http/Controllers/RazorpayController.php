@@ -47,7 +47,7 @@ class RazorpayController extends Controller
      */
     public function storePayment(Request $request)
     {
-        $api = new Api(env('RAZORPAY_KEY', 'rzp_test_hklhkcWoskzEBC'), env('RAZORPAY_SECRET', 'POHvwfH01SddHJrxLFSCCcVJ'));
+        $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
         $orderId = $request->orderId;
         // Order creation in Razorpay
         $order = $api->order->create(array(
@@ -68,7 +68,7 @@ class RazorpayController extends Controller
     public function paymentCallback(Request $request)
     {
         $ip = $request->getClientIp();
-        $api = new Api(env('RAZORPAY_KEY', 'rzp_test_hklhkcWoskzEBC'), env('RAZORPAY_SECRET', 'POHvwfH01SddHJrxLFSCCcVJ'));
+        $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
         $order = Order::find($request->orderId);
         $order->paymentCompleted = 1;
         $order->transactionId = $request->razorpay_payment_id;
