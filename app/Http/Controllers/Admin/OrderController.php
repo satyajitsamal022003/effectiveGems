@@ -62,7 +62,7 @@ class OrderController extends Controller
         $data = $orders->map(function ($order, $key) use ($pageNo) {
             $order->DT_RowIndex = $pageNo + $key + 1;
             $specificDate = new DateTime($order->created_at);
-            $order->created_at = $specificDate->format('Y-m-d');
+            $order->orderDate = $specificDate->format('d-m-Y h:iA');
             $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
             // You can add extra details here if needed
             foreach ($order->items as $key => $item) {

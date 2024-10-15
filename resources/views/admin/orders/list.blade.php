@@ -183,7 +183,7 @@ function openCancelModal(orderId) {
                         searchable: false
                     },
                     {
-                        data: 'created_at', // Order Date
+                        data: 'orderDate', // Order Date
                         name: 'orderDate'
                     },
                     {
@@ -300,9 +300,10 @@ function openCancelModal(orderId) {
 
                 // Set Order Details
                 modal.find('#modalOrderId').text(order.id);
-                modal.find('#modalOrderDate').text(new Date(order.created_at).toLocaleDateString());
+                modal.find('#modalOrderDate').text(order.orderDate);
                 modal.find('#modalCustId').text(order.userId || 'N/A');
                 modal.find('#modalCustName').text(order.name || 'N/A');
+                modal.find('.modal-body').empty();
 
                 // Assuming you only display the first item, you could loop through all items if needed
                 if (order.items.length > 0) {

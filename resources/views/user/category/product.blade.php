@@ -100,63 +100,50 @@
                             </li>
                         @else
                             <li class="page-item">
-                                <a class="page-link" href="{{ $subcategoryproducts->previousPageUrl() }}"
-                                    rel="prev">&laquo;</a>
+                                <a class="page-link" href="{{ $subcategoryproducts->previousPageUrl() }}" rel="prev">&laquo;</a>
                             </li>
                         @endif
-
-                        {{-- Pagination Elements --}}
+            
                         @php
                             $currentPage = $subcategoryproducts->currentPage();
                             $lastPage = $subcategoryproducts->lastPage();
-                            $showDots = false;
                         @endphp
-
-                        {{-- Show first few pages --}}
-                        @for ($i = 1; $i <= min(4, $lastPage); $i++)
-                            @if ($i == $currentPage)
-                                <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
-                            @else
-                                <li class="page-item"><a class="page-link"
-                                        href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
-                            @endif
-                        @endfor
-
-                        {{-- Show dots if current page is greater than 5 --}}
-                        @if ($currentPage > 5)
+            
+                        {{-- Show first page --}}
+                        @if ($lastPage > 1)
+                            <li class="page-item {{ $currentPage === 1 ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $subcategoryproducts->url(1) }}">1</a>
+                            </li>
+                        @endif
+            
+                        {{-- Show dots after first page if needed --}}
+                        @if ($currentPage > 3)
                             <li class="page-item disabled"><span class="page-link">...</span></li>
                         @endif
-
-                        {{-- Show previous and current pages --}}
-                        @for ($i = max(5, $currentPage - 2); $i <= min($currentPage + 2, $lastPage - 1); $i++)
-                            @if ($i == $currentPage)
-                                <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
-                            @else
-                                <li class="page-item"><a class="page-link"
-                                        href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
-                            @endif
+            
+                        {{-- Show pages around current page --}}
+                        @for ($i = max(2, $currentPage - 2); $i <= min($currentPage + 2, $lastPage - 1); $i++)
+                            <li class="page-item {{ $i === $currentPage ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a>
+                            </li>
                         @endfor
-
-                        {{-- Show dots if current page is less than last page - 3 --}}
-                        @if ($currentPage < $lastPage - 3)
+            
+                        {{-- Show dots before the last page if needed --}}
+                        @if ($currentPage < $lastPage - 2)
                             <li class="page-item disabled"><span class="page-link">...</span></li>
                         @endif
-
-                        {{-- Show last few pages --}}
-                        @for ($i = max($lastPage - 2, 1); $i <= $lastPage; $i++)
-                            @if ($i == $currentPage)
-                                <li class="page-item active"><span class="page-link">{{ $i }}</span></li>
-                            @else
-                                <li class="page-item"><a class="page-link"
-                                        href="{{ $subcategoryproducts->url($i) }}">{{ $i }}</a></li>
-                            @endif
-                        @endfor
-
+            
+                        {{-- Show last page --}}
+                        @if ($lastPage > 1)
+                            <li class="page-item {{ $currentPage === $lastPage ? 'active' : '' }}">
+                                <a class="page-link" href="{{ $subcategoryproducts->url($lastPage) }}">{{ $lastPage }}</a>
+                            </li>
+                        @endif
+            
                         {{-- Next Page Link --}}
                         @if ($subcategoryproducts->hasMorePages())
                             <li class="page-item">
-                                <a class="page-link" href="{{ $subcategoryproducts->nextPageUrl() }}"
-                                    rel="next">&raquo;</a>
+                                <a class="page-link" href="{{ $subcategoryproducts->nextPageUrl() }}" rel="next">&raquo;</a>
                             </li>
                         @else
                             <li class="page-item disabled">
@@ -166,6 +153,9 @@
                     </ul>
                 </nav>
             </div>
+            
+            
+            
 
 
 
