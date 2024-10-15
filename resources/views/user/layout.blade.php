@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Home | Effective Gems</title>
+    <title>@yield('title', 'Home | Effective Gems')</title>
     <link rel="canonical" href="index.html" />
     <meta name="description" content="">
     <meta name="metakeyword" content="">
@@ -96,8 +96,9 @@
                                 </div>
                             </div>
                             <!--cart for desktop start-->
-                            <div class="header-cart for-desktop"><a href="#" id="cartLink" onclick="if (parseInt(document.querySelector('.cartCount').textContent) > 0) { window.location.href = '/cart'; } else { alert('Your cart is empty!'); }"><i class="fa-light fa-cart-shopping"></i><span
-                                        class="cartCount">0</span></a></div>
+                            <div class="header-cart for-desktop"><a href="#" id="cartLink"
+                                    onclick="if (parseInt(document.querySelector('.cartCount').textContent) > 0) { window.location.href = '/cart'; } else { alert('Your cart is empty!'); }"><i
+                                        class="fa-light fa-cart-shopping"></i><span class="cartCount">0</span></a></div>
                             <!--cart for desktop end-->
                         </div>
 
@@ -122,7 +123,8 @@
                 <div class="container">
                     <div class="main-menu">
                         <div class="mobile-logo">
-                            <a href="{{route('user.index')}}"><img src="{{ url('/') }}/user/assets/images/logo.png"></a>
+                            <a href="{{ route('user.index') }}"><img
+                                    src="{{ url('/') }}/user/assets/images/logo.png"></a>
                         </div>
                         <div class="mobile_btn">
                             <i class="fas fa-bars"></i>
@@ -130,33 +132,37 @@
                         <div class="main_menu inline-menu">
                             <div class="as_info_detail mobile-none">
                                 <div class="as_logo">
-                                    <a href="{{route('user.index')}}">
+                                    <a href="{{ route('user.index') }}">
                                         <img src="{{ url('/') }}/user/assets/images/logo708a.png?=1"
                                             alt="">
                                     </a>
                                 </div>
                             </div>
-                         <ul class="menu-section">
-                            <li><a href="{{ route('user.index') }}" class="active">Home</a></li>
-                        
-                        @php
-                            // Fetch categories where onTop = 1
-                            $layoutcategories = \App\Models\Category::where('status',1)->where('onTop', 1)->get();
-                        @endphp
-                            @foreach($layoutcategories as $category)
-                                <li class="mega_menu_dropdown mega_menu_demo_2 has_dropdown" data-category-id="{{ $category->id }}">
-                                    <a href="{{ route('user.categorywiseproduct', $category->id) }}">{{ $category->categoryName }}</a>
-                                    <span class="arrow-icon"><i class="fas fa-angle-down"></i></span>
-                                    
-                                    {{-- Submenu container to be populated via AJAX --}}
-                                    <div class="mega_menu sub_menu container" id="category-{{ $category->id }}">
-                                        <div class="loading-spinner">Loading Please Wait...</div>
-                                    </div>
-                                </li>
-                            @endforeach
-                        
-                            <li><a href="{{ route('user.index') }}">View All Categories</a></li>
-                        </ul>
+                            <ul class="menu-section">
+                                <li><a href="{{ route('user.index') }}" class="active">Home</a></li>
+
+                                @php
+                                    // Fetch categories where onTop = 1
+                                    $layoutcategories = \App\Models\Category::where('status', 1)
+                                        ->where('onTop', 1)
+                                        ->get();
+                                @endphp
+                                @foreach ($layoutcategories as $category)
+                                    <li class="mega_menu_dropdown mega_menu_demo_2 has_dropdown"
+                                        data-category-id="{{ $category->id }}">
+                                        <a
+                                            href="{{ route('user.categorywiseproduct', $category->id) }}">{{ $category->categoryName }}</a>
+                                        <span class="arrow-icon"><i class="fas fa-angle-down"></i></span>
+
+                                        {{-- Submenu container to be populated via AJAX --}}
+                                        <div class="mega_menu sub_menu container" id="category-{{ $category->id }}">
+                                            <div class="loading-spinner">Loading Please Wait...</div>
+                                        </div>
+                                    </li>
+                                @endforeach
+
+                                <li><a href="{{ route('user.index') }}">View All Categories</a></li>
+                            </ul>
 
 
                         </div>
@@ -173,10 +179,17 @@
                                 <div class="search-bg"></div>
                                 <div class="search-form">
                                     <div class="container">
-                                        <form action="#" method="get">
-                                            <div class="form">
-                                                <input type="text" id="search" name="q"
-                                                    placeholder="Type here to search...">
+                                        <form action="{{ route('searchProducts') }}" method="POST">
+                                            @csrf
+                                            <div class="form row">
+                                                <input type="hidden" name="catId" value="@yield('catId')">
+                                                <input type="hidden" name="subCatId" value="@yield('subCatId')">
+                                                <div class="col-10"> <input type="text" id="search"
+                                                        name="search" placeholder="Type here to search..."></div>
+                                                <div class="col-2">
+                                                    <button type="submit" class="as_btn">Search</button>
+                                                </div>
+
                                             </div>
                                         </form>
                                         <div class="closed_btn"><label for="search"><img
@@ -187,10 +200,11 @@
                             </div>
                         </div>
                         <!--search section end-->
-                        
+
                         <!--cart for mobile start-->
-                        <div class="header-cart for-mobile"><a href="#" id="cartLink" onclick="if (parseInt(document.querySelector('.cartCount').textContent) > 0) { window.location.href = '/cart'; } else { alert('Your cart is empty!'); }"><i class="fa-light fa-cart-shopping"></i><span
-                                        class="cartCount">0</span></a></div>
+                        <div class="header-cart for-mobile"><a href="#" id="cartLink"
+                                onclick="if (parseInt(document.querySelector('.cartCount').textContent) > 0) { window.location.href = '/cart'; } else { alert('Your cart is empty!'); }"><i
+                                    class="fa-light fa-cart-shopping"></i><span class="cartCount">0</span></a></div>
                         <!--cart for mobile end-->
                     </div>
                 </div>
@@ -247,7 +261,7 @@
                                 <div class="as_footer_widget">
                                     <h3 class="as_footer_heading">Quick Links</h3>
                                     <ul>
-                                        <li><a href="{{route('user.index')}}"> Home</a></li>
+                                        <li><a href="{{ route('user.index') }}"> Home</a></li>
                                         <li><a href="testimonial.html">Testimonial</a></li>
                                         <li><a href="faq.html"> FAQ</a></li>
                                         <li><a href="product.html"> Product</a></li>
@@ -261,23 +275,29 @@
                                     <ul>
                                         @php
                                             // Fetch categories where onFooter = 1
-                                            $footerCategories = \App\Models\Category::where('status',1)->where('onFooter', 1)->get();
+                                            $footerCategories = \App\Models\Category::where('status', 1)
+                                                ->where('onFooter', 1)
+                                                ->get();
                                         @endphp
-                                        
+
                                         {{-- Loop through the first half of categories --}}
-                                        @foreach($footerCategories->take(5) as $category)
-                                            <li><a href="{{ route('user.categorywiseproduct', $category->id) }}">{{ $category->categoryName }}</a></li>
+                                        @foreach ($footerCategories->take(5) as $category)
+                                            <li><a
+                                                    href="{{ route('user.categorywiseproduct', $category->id) }}">{{ $category->categoryName }}</a>
+                                            </li>
                                         @endforeach
                                     </ul>
                                 </div>
                             </div>
-                            
+
                             <div class="col-lg-2 col-md-2 col-sm-12 col-12">
                                 <div class="as_footer_widget mt_top">
                                     <ul>
                                         {{-- Loop through the second half of categories --}}
-                                        @foreach($footerCategories->slice(5) as $category)
-                                            <li><a href="{{ route('user.categorywiseproduct', $category->id) }}">{{ $category->categoryName }}</a></li>
+                                        @foreach ($footerCategories->slice(5) as $category)
+                                            <li><a
+                                                    href="{{ route('user.categorywiseproduct', $category->id) }}">{{ $category->categoryName }}</a>
+                                            </li>
                                         @endforeach
                                     </ul>
                                 </div>
@@ -307,12 +327,13 @@
                         </div>
                     </div>
 
-                   <div class="middle-link-footer">
-                        <?php $cou = count(App\Models\Page::where('status',1)->get()); $xx = 0; ?>
-                        @foreach(App\Models\Page::where('status',1)->whereNotIn('id',[57])->get() as $pb)
-                            <a href="/pages/{{$pb->seoUrl}}">{{$pb->pageName}}</a> 
+                    <div class="middle-link-footer">
+                        <?php $cou = count(App\Models\Page::where('status', 1)->get());
+                        $xx = 0; ?>
+                        @foreach (App\Models\Page::where('status', 1)->whereNotIn('id', [57])->get() as $pb)
+                            <a href="/pages/{{ $pb->seoUrl }}">{{ $pb->pageName }}</a>
                             <?php $xx++; ?>
-                            @if($cou > $xx)
+                            @if ($cou > $xx)
                                 <span>||</span>
                             @endif
                         @endforeach
@@ -465,30 +486,31 @@
         });
     </script>
     <!--tab end-->
-    
+
     <script>
-       $(document).ready(function() {
-        $('.mega_menu_dropdown').hover(function() {
-            var categoryId = $(this).data('category-id');
-            var targetDiv = $('#category-' + categoryId);
-    
-            // Check if products are already loaded
-            if (!targetDiv.hasClass('products-loaded')) {
-                $.ajax({
-                    url: '/layout-category-products/' + categoryId, // Backend route to fetch products
-                    method: 'GET',
-                    success: function(response) {
-                        // Populate the mega_menu with product data
-                        targetDiv.html(response).addClass('products-loaded');
-                    },
-                    error: function(xhr, status, error) {
-                        targetDiv.html('<p>Error loading products.</p>');
-                    }
-                });
-            }
+        $(document).ready(function() {
+            $('.mega_menu_dropdown').hover(function() {
+                var categoryId = $(this).data('category-id');
+                var targetDiv = $('#category-' + categoryId);
+
+                // Check if products are already loaded
+                if (!targetDiv.hasClass('products-loaded')) {
+                    $.ajax({
+                        url: '/layout-category-products/' +
+                            categoryId, // Backend route to fetch products
+                        method: 'GET',
+                        success: function(response) {
+                            // Populate the mega_menu with product data
+                            targetDiv.html(response).addClass('products-loaded');
+                        },
+                        error: function(xhr, status, error) {
+                            targetDiv.html('<p>Error loading products.</p>');
+                        }
+                    });
+                }
+            });
         });
-    });
-</script>
+    </script>
 
 
 </body>

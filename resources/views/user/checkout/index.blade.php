@@ -548,7 +548,7 @@
         var quantity = parseFloat($(`input[id="quantity-${id}"], select[id="quantity-${id}"]`).val());
         var newQuantity = operation == 2 ? quantity + 1 : quantity - 1;
         if (selectedQuantity)
-            newQuantity = $('select[name="quantityDd"]').val();
+            newQuantity = $(`select[id="quantity-${id}"]`).val();
         $.ajax({
             type: "POST",
             url: "{{ route('changeQuantity') }}",

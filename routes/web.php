@@ -101,6 +101,7 @@ Route::get('/category-products/{id}', [IndexController::class, 'categorywiseprod
 Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name('user.subCategory');
 Route::get('/products-details/{prodid}', [IndexController::class, 'productdetails'])->name('user.productdetails');
 Route::get('/layout-category-products/{id}', [IndexController::class, 'getProductsForCategory']);
+Route::post('/searchProduct', [IndexController::class, 'searchProducts'])->name('searchProducts');
 
 
 // Cart 

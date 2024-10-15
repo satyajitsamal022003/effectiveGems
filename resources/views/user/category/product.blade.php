@@ -1,5 +1,7 @@
 @extends('user.layout')
 @section('content')
+@section('title', $category->categoryName . ' | Effective Gems')
+@section('catId', $category->id)
     <section class="container">
         <div class="as_breadcrum_wrapper" style="background-image: url('/user/assets/images/breadcrum-img-1.jpg');">
             <div class="row">
@@ -95,9 +97,7 @@
                     <ul class="pagination justify-content-center">
                         {{-- Previous Page Link --}}
                         @if ($subcategoryproducts->onFirstPage())
-                            <li class="page-item disabled">
-                                <span class="page-link">&laquo;</span>
-                            </li>
+                            {{-- Don't render the button if it's on the first page --}}
                         @else
                             <li class="page-item">
                                 <a class="page-link" href="{{ $subcategoryproducts->previousPageUrl() }}" rel="prev">&laquo;</a>
@@ -144,10 +144,6 @@
                         @if ($subcategoryproducts->hasMorePages())
                             <li class="page-item">
                                 <a class="page-link" href="{{ $subcategoryproducts->nextPageUrl() }}" rel="next">&raquo;</a>
-                            </li>
-                        @else
-                            <li class="page-item disabled">
-                                <span class="page-link">&raquo;</span>
                             </li>
                         @endif
                     </ul>

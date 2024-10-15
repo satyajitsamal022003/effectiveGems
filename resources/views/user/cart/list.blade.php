@@ -90,7 +90,7 @@
                                         <div class="quantity">
                                             @if ($cartItem->productdetails->categoryId == 1)
                                                 <div class="quantity-select mt-2">
-                                                    <select name="quantityDd" id="quantityDd" class="form-select"
+                                                    <select name="quantityDd" id="quantityDd-{{ $cartItem->id }}" class="form-select"
                                                         onchange="return changeQuantity({{ $cartItem->id }},'1','1')">
                                                         @for ($i = $cartItem->productdetails->min_product_qty; $i <= $cartItem->productdetails->max_product_qty; $i += 0.5)
                                                             <option value="{{ $i }}"
@@ -196,10 +196,10 @@
     };
     const changeQuantity = (id, operation, selectedQuantity) => {
 
-        var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());
+        var quantity = parseFloat($(`input[id="quantity-${id}"], select[id="quantityDd-${id}"]`).val());
         var newQuantity = operation == 2 ? quantity + 1 : quantity - 1;
         if (selectedQuantity)
-            newQuantity = $('select[name="quantityDd"]').val();
+            newQuantity = $(`select[id="quantityDd-${id}"]`).val();
 
         // Calculate the courier price
         var courierPrice = 0;
