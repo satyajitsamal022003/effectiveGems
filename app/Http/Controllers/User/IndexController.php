@@ -32,11 +32,11 @@ class IndexController extends Controller
         $subCatId = $request->subCatId;
         $search = $request->search;
         if ($catId)
-            $this->categorywiseproduct($catId, $search);
+            return $this->categorywiseproduct($catId, $search);
         elseif ($subCatId)
-            $this->subCategory($subCatId, $search);
+            return $this->subCategory($subCatId, $search);
         else
-            $this->subCategory2($search);
+            return $this->subCategory2($search);
     }
     public function index()
     {
@@ -96,12 +96,17 @@ class IndexController extends Controller
             ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
             ->paginate(8); // Paginate the result
 
-        if ($search)
+        if ($search) {
             $subcategoryproducts = Product::where('categoryId', $id)
                 ->where('status', 1) // Filter by status
                 ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END")->where('productName', 'like', '%' . $search . '%') // Main category products first
                 ->paginate(8); // Paginate t
+            return view('user.category.searchProducts', compact(
 
+                'subcategoryproducts',
+                'search'
+            ));
+        }
 
 
 
@@ -127,11 +132,17 @@ class IndexController extends Controller
         $toSkip = ($pageNo - 1) * $itemsPerPage;
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
         $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->paginate(8);
-        if ($search)
+        if ($search) {
             $subcategoryproducts = Product::where('subCategoryId', $id)
                 ->where('status', 1)
                 ->where('productName', 'like', '%' . $search . '%')
                 ->paginate(8);
+            return view('user.category.searchProducts', compact(
+
+                'subcategoryproducts',
+                'search'
+            ));
+        }
 
         $category = SubCategory::find($id);
 
@@ -147,16 +158,16 @@ class IndexController extends Controller
         $itemsPerPage = 8; // Number of items per page
         $toSkip = ($pageNo - 1) * $itemsPerPage;
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
-        $subcategoryproducts = Product::where('subCategoryId', $id)
-            ->where('status', 1)
+        $subcategoryproducts = Product::where('status', 1)
             ->where('productName', 'like', '%' . $search . '%')
             ->paginate(8);
 
         $category = SubCategory::find(1);
 
-        return view('user.category.subCategory', compact(
+        return view('user.category.searchProducts', compact(
             'category',
             'subcategoryproducts',
+            'search'
         ));
     }
 

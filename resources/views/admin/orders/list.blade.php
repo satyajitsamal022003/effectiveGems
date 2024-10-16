@@ -68,6 +68,32 @@
                         </div>
                     </div>
                 </div>
+                <div class="order-list-header">
+                    <h6>Customer Information</h6>
+                    <div class="row">
+                        <div class="col-lg-5 col-md-5 col-12">
+                            <p>Customer Email : <span id="modalCustEmail"></span> </p>
+                            <p>Customer Mobile : <span id="modalCustMobile"></span> </p>
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-12">
+                            <p class="text-right">Delivery address : <span id="modalCustDel"></span></p>
+                            <p class="text-right">Billing Address : <span id="modalCustBil"></span></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="order-list-header">
+                    <h6>Payments Details</h6>
+                    <div class="row">
+                        <div class="col-lg-5 col-md-5 col-12">
+                            <p>Transaction id : <span id="modalTranId"></span> </p>
+                            <p>Mode of paymemt : <span id="modalPaymentMode"></span> </p>
+                        </div>
+                        <div class="col-lg-7 col-md-7 col-12">
+                            <p class="text-right">Date and time : <span id="modalDatenTime"></span></p>
+                            <p class="text-right">Payment status : <span id="modalPaymentStatus"></span></p>
+                        </div>
+                    </div>
+                </div>
                 <div class="modal-body">
 
                 </div>
@@ -93,69 +119,75 @@
         </div>
     </div>
     <!-- customer request -->
- <!-- Modal -->
-<div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="requestModalLabel">Request to Customer</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <!-- Modal -->
+    <div class="modal fade" id="requestModal" tabindex="-1" role="dialog" aria-labelledby="requestModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="requestModalLabel">Request to Customer</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="requestForm"> <!-- Add form here -->
+                    <div class="modal-body">
+                        <textarea id="requestMessage" class="form-control" rows="4" placeholder="Enter your message here..." required></textarea>
+                        <input type="hidden" id="orderId" name="orderId" value="">
+                        <!-- Ensure name attribute for form submission -->
+                        @csrf <!-- CSRF Token -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Send Request</button>
+                        <!-- Change to type="submit" -->
+                    </div>
+                </form>
             </div>
-            <form id="requestForm"> <!-- Add form here -->
-                <div class="modal-body">
-                    <textarea id="requestMessage" class="form-control" rows="4" placeholder="Enter your message here..." required></textarea>
-                    <input type="hidden" id="orderId" name="orderId" value=""> <!-- Ensure name attribute for form submission -->
-                    @csrf <!-- CSRF Token -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Send Request</button> <!-- Change to type="submit" -->
-                </div>
-            </form>
         </div>
     </div>
-</div>
 
-<!-- Cancel reason modal -->
-<div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="cancelModalLabel">Reason For Cancellation</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
+    <!-- Cancel reason modal -->
+    <div class="modal fade" id="cancelModal" tabindex="-1" role="dialog" aria-labelledby="cancelModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Reason For Cancellation</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form id="cancelForm"> <!-- Add form here -->
+                    <div class="modal-body">
+                        <textarea id="cancelmessage" class="form-control" rows="4" placeholder="Enter your message here..." required></textarea>
+                        <input type="hidden" id="orderId" name="orderId" value="">
+                        <!-- Ensure name attribute for form submission -->
+                        @csrf <!-- CSRF Token -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-danger">Send Cancellation</button>
+                        <!-- Change to type="submit" -->
+                    </div>
+                </form>
             </div>
-            <form id="cancelForm"> <!-- Add form here -->
-                <div class="modal-body">
-                    <textarea id="cancelmessage" class="form-control" rows="4" placeholder="Enter your message here..." required></textarea>
-                    <input type="hidden" id="orderId" name="orderId" value=""> <!-- Ensure name attribute for form submission -->
-                    @csrf <!-- CSRF Token -->
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-danger">Send Cancellation</button> <!-- Change to type="submit" -->
-                </div>
-            </form>
         </div>
     </div>
-</div>
 
-<script>
-    function openRequestModal(orderId) {
-    $('#orderId').val(orderId); // Set order ID in the hidden input
-    $('#requestMessage').val(''); // Clear any previous message
-    $('#requestModal').modal('show'); // Show the modal
-}
+    <script>
+        function openRequestModal(orderId) {
+            $('#orderId').val(orderId); // Set order ID in the hidden input
+            $('#requestMessage').val(''); // Clear any previous message
+            $('#requestModal').modal('show'); // Show the modal
+        }
 
-function openCancelModal(orderId) {
-    $('#orderId').val(orderId); // Set order ID in the hidden input
-    $('#cancelmessage').val(''); // Clear any previous message
-    $('#cancelModal').modal('show'); // Show the modal
-}
-</script>
+        function openCancelModal(orderId) {
+            $('#orderId').val(orderId); // Set order ID in the hidden input
+            $('#cancelmessage').val(''); // Clear any previous message
+            $('#cancelModal').modal('show'); // Show the modal
+        }
+    </script>
     <script>
         // Declare the table variable in the global scope
         var table;
@@ -303,6 +335,35 @@ function openCancelModal(orderId) {
                 modal.find('#modalOrderDate').text(order.orderDate);
                 modal.find('#modalCustId').text(order.userId || 'N/A');
                 modal.find('#modalCustName').text(order.name || 'N/A');
+                // Assuming `order` is the data you posted above
+                modal.find('#modalCustEmail').text(order.email || 'N/A');
+                modal.find('#modalCustMobile').text(order.phoneNumber || 'N/A');
+
+                // Delivery Address
+                let deliveryAddress =
+                    `${order.address || ''}, ${order.city || ''}, ${order.state || ''}, ${order.country || ''}, ${order.zipcode || ''}`;
+                modal.find('#modalCustDel').text(deliveryAddress.trim() || 'N/A');
+
+                // Billing Address
+                if (order.sameBillingAddress === 1) {
+                    // Same as shipping address
+                    modal.find('#modalCustBil').text(deliveryAddress.trim() || 'N/A');
+                } else {
+                    let billingAddress =
+                        `${order.billingaddress || ''}, ${order.billingcity || ''}, ${order.billingstate || ''}, ${order.billingcountry || ''}, ${order.billingzipcode || ''}`;
+                    modal.find('#modalCustBil').text(billingAddress.trim() || 'N/A');
+                }
+
+                // Transaction ID and Payment Mode (use placeholders if missing)
+                modal.find('#modalTranId').text(order.transactionId || 'N/A');
+                modal.find('#modalPaymentMode').text(order.paymentMode || 'N/A');
+
+                // Date and Time of the order
+                modal.find('#modalDatenTime').text(order.orderDate || 'N/A');
+
+                // Payment Status (use a placeholder, example: if paymentCompleted = 1, show "Completed")
+                let paymentStatus = order.paymentCompleted ? 'Completed' : 'Pending';
+                modal.find('#modalPaymentStatus').text(paymentStatus);
                 modal.find('.modal-body').empty();
 
                 // Assuming you only display the first item, you could loop through all items if needed
@@ -376,59 +437,61 @@ function openCancelModal(orderId) {
         });
     </script>
     <script>
-    $(document).ready(function() {
-        $('#requestForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
+        $(document).ready(function() {
+            $('#requestForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
 
-            const orderId = $('#orderId').val();
-            const message = $('#requestMessage').val();
+                const orderId = $('#orderId').val();
+                const message = $('#requestMessage').val();
 
-            $.ajax({
-                url: '{{ route('admin.order.requestToCustomer') }}', // Directly use the route helper
-                type: 'POST',
-                data: {
-                    orderId: orderId,
-                    message: message,
-                    _token: $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token is included
-                },
-                success: function(response) {
-                    alert(response.message);
-                    $('#requestModal').modal('hide');
-                },
-                error: function(xhr) {
-                    alert(xhr.responseJSON.message);
-                }
+                $.ajax({
+                    url: '{{ route('admin.order.requestToCustomer') }}', // Directly use the route helper
+                    type: 'POST',
+                    data: {
+                        orderId: orderId,
+                        message: message,
+                        _token: $('meta[name="csrf-token"]').attr(
+                            'content') // Ensure CSRF token is included
+                    },
+                    success: function(response) {
+                        alert(response.message);
+                        $('#requestModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseJSON.message);
+                    }
+                });
             });
         });
-    });
-    
-    $(document).ready(function() {
-        $('#cancelForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
 
-            const orderId = $('#orderId').val();
-            const cancellationReason  = $('#cancelmessage').val();
+        $(document).ready(function() {
+            $('#cancelForm').on('submit', function(e) {
+                e.preventDefault(); // Prevent default form submission
 
-            $.ajax({
-                url: '{{ route('admin.order.changeStatus') }}', // Directly use the route helper
-                type: 'POST',
-                data: {
-                    orderId: orderId,
-                    orderApproved: 0,
-                    cancellationReason : cancellationReason ,
-                    _token: $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token is included
-                },
-                success: function(response) {
-                    alert(response.message);
-                    $('#cancelModal').modal('hide');
-                },
-                error: function(xhr) {
-                    alert(xhr.responseJSON.message);
-                }
+                const orderId = $('#orderId').val();
+                const cancellationReason = $('#cancelmessage').val();
+
+                $.ajax({
+                    url: '{{ route('admin.order.changeStatus') }}', // Directly use the route helper
+                    type: 'POST',
+                    data: {
+                        orderId: orderId,
+                        orderApproved: 0,
+                        cancellationReason: cancellationReason,
+                        _token: $('meta[name="csrf-token"]').attr(
+                            'content') // Ensure CSRF token is included
+                    },
+                    success: function(response) {
+                        alert(response.message);
+                        $('#cancelModal').modal('hide');
+                    },
+                    error: function(xhr) {
+                        alert(xhr.responseJSON.message);
+                    }
+                });
             });
         });
-    });
-</script>
+    </script>
 
     <!--end modal-->
 @endsection

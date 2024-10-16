@@ -90,8 +90,9 @@
                                         <div class="quantity">
                                             @if ($cartItem->productdetails->categoryId == 1)
                                                 <div class="quantity-select mt-2">
-                                                    <select name="quantityDd" id="quantityDd-{{ $cartItem->id }}" class="form-select"
-                                                        onchange="return changeQuantity({{ $cartItem->id }},'1','1')">
+                                                    <select name="quantityDd" id="quantityDd-{{ $cartItem->id }}"
+                                                        class="form-select"
+                                                        onchange="return changeQuantity({{ $cartItem->id }},'1','1','{{ $cartItem->productDetails->courierType->courier_price }}','{{ $cartItem->productDetails->courierTypeId }}')">
                                                         @for ($i = $cartItem->productdetails->min_product_qty; $i <= $cartItem->productdetails->max_product_qty; $i += 0.5)
                                                             <option value="{{ $i }}"
                                                                 {{ $i == $cartItem->quantity ? 'selected' : '' }}>
@@ -102,13 +103,13 @@
                                                 </div>
                                             @else
                                                 <span class="minus"
-                                                    onclick="return changeQuantity({{ $cartItem->id }},'1')"><i
+                                                    onclick="return changeQuantity({{ $cartItem->id }},'1','0','{{ $cartItem->productDetails->courierType->courier_price }}','{{ $cartItem->productDetails->courierTypeId }}')"><i
                                                         class="fa-regular fa-minus"></i></span>
                                                 <input type="number" id="quantity-{{ $cartItem->id }}"
                                                     value="{{ $cartItem->quantity }}" min="1" name="quantity"
                                                     readonly>
                                                 <span class="plus"
-                                                    onclick="return changeQuantity({{ $cartItem->id }},'2')"><i
+                                                    onclick="return changeQuantity({{ $cartItem->id }},'2','0','{{ $cartItem->productDetails->courierType->courier_price }}','{{ $cartItem->productDetails->courierTypeId }}')"><i
                                                         class="fa-regular fa-plus"></i></span>
                                             @endif
 
@@ -159,7 +160,7 @@
                         </div>
                         <div class="safe-checkout">
                             <h5>Guarantee Safe Checkout</h5>
-                            <img src="{{url('/')}}/user/assets/images/payment-option.png" alt="payment-option">
+                            <img src="{{ url('/') }}/user/assets/images/payment-option.png" alt="payment-option">
                         </div>
                     </div>
                 </div>
@@ -194,21 +195,20 @@
         }
 
     };
-    const changeQuantity = (id, operation, selectedQuantity) => {
+    const changeQuantity = (id, operation, selectedQuantity, productPrice, courierTypeId) => {
 
         var quantity = parseFloat($(`input[id="quantity-${id}"], select[id="quantityDd-${id}"]`).val());
         var newQuantity = operation == 2 ? quantity + 1 : quantity - 1;
-        if (selectedQuantity)
+        if (selectedQuantity && selectedQuantity != 0)
             newQuantity = $(`select[id="quantityDd-${id}"]`).val();
 
         // Calculate the courier price
         var courierPrice = 0;
-        var productPrice = {{ $cartItem->productDetails->courierType->courier_price }};
         console.log(productPrice);
-        
 
-        if ({{ $cartItem->productDetails->courierTypeId }} != 1 &&
-            {{ $cartItem->productDetails->courierTypeId }} != 2) {
+
+        if (courierTypeId != 1 &&
+            courierTypeId != 2) {
             courierPrice = productPrice * newQuantity; // Update courier price based on quantity
         } else {
             courierPrice = productPrice; // Default price when condition doesn't match

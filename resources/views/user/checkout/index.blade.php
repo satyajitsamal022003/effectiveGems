@@ -33,13 +33,13 @@
                                         </div>
                                     </div>
                                     <!--guest login area end-->
-    
+
                                 </div>
                             </div>
-    
+
                         </div>
                         <!--customer area end-->
-    
+
                         <!--shipping area start-->
                         <div class="shipping-area">
                             <div class="panel-info">
@@ -124,20 +124,21 @@
                                                             <select name="country" required class="form-select form-control"
                                                                 id="f-name" aria-label="Default select example">
                                                                 <option value="1" selected>India</option>
-                                        
+
                                                             </select>
                                                         </div>
-    
+
                                                         <div class="col-lg-6 col-md-6 col-12">
                                                             <label for="state-name">State:</label>
-                                                            <select name="state" required class="form-select form-control" id="state-name"
-                                                                aria-label="Default select example">
+                                                            <select name="state" required class="form-select form-control"
+                                                                id="state-name" aria-label="Default select example">
                                                                 <option selected disabled>Choose State</option>
                                                                 @foreach ($states as $state)
-                                                                    <option value="{{ $state->id }}">{{ $state->stateName }}
+                                                                    <option value="{{ $state->id }}">
+                                                                        {{ $state->stateName }}
                                                                     </option>
                                                                 @endforeach
-    
+
                                                             </select>
                                                         </div>
                                                     </div>
@@ -164,7 +165,8 @@
                                                 <div class="form-group">
                                                     <div class="row">
                                                         <div class="col-lg-12 col-md-12 col-12">
-                                                            <label for="address_2">Apartment/Suite/Building (Optional)</label>
+                                                            <label for="address_2">Apartment/Suite/Building
+                                                                (Optional)</label>
                                                             <input name="appartment" type="text" id="address_2"
                                                                 class="form-control" value="">
                                                         </div>
@@ -183,23 +185,25 @@
                                             <div class="mt-2 flex_box">
                                                 <input type="checkbox" id="billing_information" name="billing_1"
                                                     value="">
-                                                <label for="billing_information">Save this information for next time</label>
+                                                <label for="billing_information">Save this information for next
+                                                    time</label>
                                             </div>
                                             <div class="mt-0 flex_box">
                                                 <input type="checkbox" id="billing_same_address" name="billing_1"
                                                     value="">
-                                                <label for="billing_same_address">My billing address is the same as my shipping
+                                                <label for="billing_same_address">My billing address is the same as my
+                                                    shipping
                                                     address.</label>
                                             </div>
-    
+
                                         </div>
-    
+
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <!--shipping area end-->
-    
+
                         <!--billing area start-->
                         <div class="billing-area mt-3">
                             <div class="panel-info">
@@ -209,40 +213,40 @@
                                 <div class="radio-check-box">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="sameAddress" value="1"
-                                            id="same_address" onchange="$('.billingAddress').hide()" checked>
+                                            id="same_address" onchange="$('.billingAddress').hide()" checked >
                                         <label class="form-check-label" for="same_address">
                                             Same as shipping address
                                         </label>
                                     </div>
-    
-                                    <!--<div class="form-check mt-0">-->
-                                    <!--    <input class="form-check-input" onchange="$('.billingAddress').show()" value="0"-->
-                                    <!--        type="radio" name="sameAddress" id="different_address">-->
-                                    <!--    <label class="form-check-label" for="different_address">-->
-                                    <!--        Use a different billing address-->
-                                    <!--    </label>-->
-                                    <!--</div>-->
+
+                                    <div class="form-check mt-0">
+                                        <input class="form-check-input" onchange="$('.billingAddress').show()"
+                                            value="0" type="radio" name="sameAddress" id="different_address">
+                                        <label class="form-check-label" for="different_address">
+                                            Use a different billing address
+                                        </label>
+                                    </div>
                                 </div>
-    
+
                                 <!--after click Use a different billing address then show this section-->
-                                <div class="shipping-section" style="display: none">
+                                <div class="shipping-section billingAddress" style="display: none">
                                     <div class="form-area">
                                         <div method="post" action="">
                                             <div class="form-group">
                                                 <div class="row">
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="f-name">First Name:</label>
-                                                        <input type="text" name="" id="f-name"
-                                                            class="form-control" value="" />
+                                                        <input type="text" name="billingfirstName" id="f-name"
+                                                            class="form-control" value="" required/>
                                                     </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="f-name">Middle Name:</label>
-                                                        <input type="text" name="" id="f-name"
+                                                        <input type="text" name="billingmiddleName" id="f-name"
                                                             class="form-control" value="" />
                                                     </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="l-name">Last Name:</label>
-                                                        <input type="text" name="" id="l-name"
+                                                        <input type="text" name="billinglastName" id="l-name"
                                                             class="form-control" value="" />
                                                     </div>
                                                 </div>
@@ -251,13 +255,13 @@
                                                 <div class="row">
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="email_2">Email Address:</label>
-                                                        <input type="email" name="" id="email_2"
+                                                        <input type="email" name="billingamount" id="email_2"
                                                             class="form-control" value="" />
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="p-no">Phone Number:</label>
-                                                        <input type="tel" maxlength="10" name="" id="p-no"
-                                                            class="form-control" value="" />
+                                                        <input type="tel" maxlength="10" name="billingphoneNumber"
+                                                            id="p-no" class="form-control" value="" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -265,19 +269,19 @@
                                                 <div class="row">
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="f-name">Country/Region:</label>
-                                                        <select class="form-select form-control" id="f-name"
-                                                            aria-label="Default select example">
+                                                        <select class="form-select form-control" name="billingcountry"
+                                                            id="f-name" aria-label="Default select example">
                                                             <option selected disabled>Choose Country</option>
                                                             <option value="1">India</option>
                                                             <option value="2">United States</option>
                                                             <option value="3">Netherlands</option>
                                                         </select>
                                                     </div>
-    
+
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="state-name">State:</label>
-                                                        <select class="form-select form-control" id="state-name"
-                                                            aria-label="Default select example">
+                                                        <select class="form-select form-control" name="billingstate"
+                                                            id="state-name" aria-label="Default select example">
                                                             <option selected disabled>Choose State</option>
                                                             <option value="1">Odisha</option>
                                                             <option value="2">Andhra Pradesh</option>
@@ -290,17 +294,17 @@
                                                 <div class="row">
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="city-name">City:</label>
-                                                        <input type="text" name="" id="city-name"
+                                                        <input type="text" name="billingcity" id="city-name"
                                                             class="form-control" value="" />
                                                     </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="postal-code">Zip / Postal Code:</label>
-                                                        <input type="text" name="" id="postal-code"
+                                                        <input type="text" name="billingzipcode" id="postal-code"
                                                             class="form-control" value="" />
                                                     </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="landmark">Landmark:</label>
-                                                        <input type="text" name="" id="landmark"
+                                                        <input type="text" name="billinglandmark" id="landmark"
                                                             class="form-control" value="" />
                                                     </div>
                                                 </div>
@@ -309,7 +313,7 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-12">
                                                         <label for="address_2">Apartment/Suite/Building (Optional)</label>
-                                                        <input type="text" name="" id="address_2"
+                                                        <input type="text" name="billingappartment" id="address_2"
                                                             class="form-control" value="">
                                                     </div>
                                                 </div>
@@ -318,7 +322,7 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-12 col-12">
                                                         <label for="address_1">Address:</label>
-                                                        <input type="text" name="" id="address_2"
+                                                        <input type="text" name="billingaddress" id="address_2"
                                                             class="form-control" value="">
                                                     </div>
                                                 </div>
@@ -332,7 +336,7 @@
                             </div>
                         </div>
                         <!--billing area end-->
-    
+
                         <!--payment area start-->
                         <div class="payment-area">
                             <div class="panel-info">
@@ -340,7 +344,7 @@
                             </div>
                             <div class="inline-shipping">
                                 <div class="radio-check-box">
-    
+
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="flexRadioDefault"
                                             id="razorpay_secure" checked>
@@ -348,17 +352,19 @@
                                             Razorpay Secure (UPI, Cards, Wallets, NetBanking)
                                         </label>
                                     </div>
-                                    <p>After clicking “Pay now”, you will be redirected to Razorpay Secure (UPI, Cards, Wallets,
+                                    <p>After clicking “Pay now”, you will be redirected to Razorpay Secure (UPI, Cards,
+                                        Wallets,
                                         NetBanking) to complete your purchase securely.</p>
-    
+
                                     <div class="mt-3">
                                         <div class="panel-info">
                                             <div class="panel-heading">Terms and Conditions</div>
                                         </div>
                                         <div class="check-box-conditions mt-2">
-                                            <input type="checkbox" id="term_condition" name="term-condition" value="">
-                                            <label for="term_condition">Excepteur sint occaecat cupidatat non proident, sunt
-                                                in culpa qui officia deserunt mollit anim id est laborum.</label>
+                                            <input type="checkbox" id="term_condition" name="term-condition"
+                                                value="">
+                                            <label for="term_condition">By using this service, you agree to our Terms and
+                                                Conditions.</label>
                                         </div>
                                     </div>
                                     <div class="main-btn mt-3">
@@ -388,9 +394,12 @@
                                             <div class="quantity-option">
                                                 @if ($cartItem->productdetails->categoryId == 1)
                                                     <div class="quantity-select mt-2">
-                                                        <select name="quantityDd" id="quantity-{{ $cartItem->id }}" class="form-select form-control"
-                                                            onchange="return changeQuantity({{ $cartItem->id }},'1','1')" required>
-                                                            <option value=" " selected disabled>--Select(Carat/Ratti)--</option>
+                                                        <select name="quantityDd" id="quantity-{{ $cartItem->id }}"
+                                                            class="form-select form-control"
+                                                            onchange="return changeQuantity({{ $cartItem->id }},'1','1')"
+                                                            required>
+                                                            <option value=" " selected disabled>
+                                                                --Select(Carat/Ratti)--</option>
                                                             @for ($i = $cartItem->productdetails->min_product_qty; $i <= $cartItem->productdetails->max_product_qty; $i += 0.5)
                                                                 <option value="{{ $i }}"
                                                                     {{ $i == $cartItem->quantity ? 'selected' : '' }}>
@@ -429,7 +438,7 @@
                                                     {{ $cartItem->totalPrice }}
                                                 </span>
                                             </h6>
-                                           
+
                                             <div class="extra-feature">
                                                 <div class="extra-feature-list">
                                                     @if ($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 1)
