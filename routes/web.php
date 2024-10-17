@@ -132,6 +132,9 @@ Route::resource('checkout', OrderController::class);
 
 //order request and cancel
 Route::post('/request-to-customer', [AdminOrderController::class, 'requestToCustomer'])->name('order.request');
+Route::post('/store-courier-details', [AdminOrderController::class, 'courierdetails'])->name('order.courierdetails');
+Route::post('/store-delivery-details', [AdminOrderController::class, 'deliverydetails'])->name('order.deliverydetails');
+Route::post('/invoice-upload', [AdminOrderController::class, 'invoiceupload'])->name('order.invoiceupload');
 Route::get('/order/accept/{id}', [AdminOrderController::class, 'acceptOrder'])->name('order.accept');
 Route::get('/order/cancel/{id}', [AdminOrderController::class, 'cancelOrder'])->name('order.cancel');
 

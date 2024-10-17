@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\OrderStatusUpdated;
 use App\Mail\OrderRequestToCustomer;
+use App\Mail\OrderCourierDetails;
+use App\Mail\OrderdeliveryDetails;
+use App\Mail\OrderinvoiceDetails;
 
 
 class OrderController extends Controller
@@ -127,7 +130,7 @@ class OrderController extends Controller
     {
         //
     }
-  public function changeStatus(Request $req)
+    public function changeStatus(Request $req)
     {
         $orderId = $req->orderId;
         $orderApproved = $req->orderApproved; // 1 for approved, 0 for canceled
@@ -137,8 +140,8 @@ class OrderController extends Controller
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
-        
-         // Update the order status
+
+        // Update the order status
         $order->orderApproved = $orderApproved;
         if ($orderApproved == 0 && !empty($cancellationReason)) {
             // Save the cancellation reason if the order is canceled
@@ -161,7 +164,7 @@ class OrderController extends Controller
         if ($orderApproved == 1) {
             Mail::to($order->email)->send(new OrderStatusUpdated($order, 'approved'));
         } else {
-            Mail::to($order->email)->send(new OrderStatusUpdated($order, 'canceled',$cancellationReason));
+            Mail::to($order->email)->send(new OrderStatusUpdated($order, 'canceled', $cancellationReason));
         }
     }
 
@@ -182,8 +185,9 @@ class OrderController extends Controller
         } elseif (is_object($message)) {
             $message = json_encode($message); // Convert object to a JSON string
         }
-        
+
         $order->request_to_customer = $message;
+        $order->orderApproved = 3;
         $order->save();
 
         // Send the email using the Mailable
@@ -191,6 +195,103 @@ class OrderController extends Controller
 
         return response()->json(['message' => 'Request sent successfully!']);
     }
+
+    public function courierdetails(Request $request)
+    {
+        $order = Order::find($request->orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        if ($order->invoiceDetails == null) {
+            return response()->json(['message' => 'Please upload invoice first'], 400);
+        }
+
+        $courierDetails = [
+            'dispatchDate' => $request->dispatchDate,
+            'courierName' => $request->courierName,
+            'referenceNo' => $request->referenceNo,
+            'estimateDeliveryDate' => $request->estimateDeliveryDate
+        ];
+
+        $order->courierdetails = json_encode($courierDetails);
+
+        $order->orderApproved = 4;
+
+        $order->save();
+
+        $message = "Here are your courier details:\n"
+            . "Dispatch Date: " . $courierDetails['dispatchDate'] . "\n"
+            . "Courier Name: " . $courierDetails['courierName'] . "\n"
+            . "Reference No: " . $courierDetails['referenceNo'] . "\n"
+            . "Estimated Date of Delivery: " . $courierDetails['estimateDeliveryDate'];
+
+        Mail::to($order->email)->send(new OrderCourierDetails($order, $message));
+
+        return response()->json(['message' => 'Courier Details Added Successfully!']);
+    }
+
+    public function deliverydetails(Request $request)
+    {
+        $order = Order::find($request->orderId);
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        $deliveryDetails = [
+            'deliverydate' => $request->deliverydate,
+            'receivedby' => $request->receivedby,
+        ];
+
+        $order->deliverydetails = json_encode($deliveryDetails);
+
+        $order->orderApproved = 5;
+
+        $order->save();
+
+        $message = "Here are your Delivery details:\n"
+            . "Delivery Date: " . $deliveryDetails['deliverydate'] . "\n"
+            . "Receiver Name: " . $deliveryDetails['receivedby'] . "\n";
+
+        Mail::to($order->email)->send(new OrderdeliveryDetails($order, $message));
+
+        return response()->json(['message' => 'Order Details Added Successfully!']);
+    }
+
+    
+
+    public function invoiceupload(Request $request)
+    {
+        $order = Order::find($request->orderId);
+    
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+    
+        if ($request->hasFile('invoiceupload')) {
+            $file = $request->file('invoiceupload');
+            $filename = time() . '_' . $file->getClientOriginalName();
+    
+            $file->move(public_path('uploads'), $filename);
+    
+            $order->invoiceDetails = $filename;
+        } else {
+            return response()->json(['message' => 'No invoice file uploaded'], 400);
+        }
+    
+        // Save the order details in the database
+        $order->save();
+    
+        // Send the email with the attached invoice PDF
+        Mail::to($order->email)->send(new OrderinvoiceDetails($order, $filename));
+    
+        return response()->json(['message' => 'Order Details and Invoice Added Successfully!']);
+    }
+    
+
+
 
 
 
@@ -222,7 +323,7 @@ class OrderController extends Controller
         }
 
         // Cancel the order
-        $order->orderApproved = 0; // Assuming 0 means canceled
+        $order->orderApproved = 2; // Assuming 0 means canceled
         $order->save();
 
         // Optionally, send an email to confirm cancellation

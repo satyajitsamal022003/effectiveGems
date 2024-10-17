@@ -175,19 +175,162 @@
         </div>
     </div>
 
-    <script>
-        function openRequestModal(orderId) {
-            $('#orderId').val(orderId); // Set order ID in the hidden input
-            $('#requestMessage').val(''); // Clear any previous message
-            $('#requestModal').modal('show'); // Show the modal
-        }
+<!-- Courier Details -->
+<div class="modal fade" id="couriermodal" tabindex="-1" role="dialog" aria-labelledby="couriermodalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="couriermodalLabel">Enter Courier Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="courierform">
+                <div class="modal-body">
+                <input type="hidden" id="orderId" name="orderId" value="">
+                    <div class="form-group">
+                        <label for="dispatchDate">Dispatch Date</label>
+                        <input type="date" id="dispatchDate" name="dispatchDate" class="form-control" required>
+                    </div>
 
-        function openCancelModal(orderId) {
-            $('#orderId').val(orderId); // Set order ID in the hidden input
-            $('#cancelmessage').val(''); // Clear any previous message
-            $('#cancelModal').modal('show'); // Show the modal
-        }
-    </script>
+                    <div class="form-group">
+                        <label for="courierName">Courier Name</label>
+                        @php($couriers = App\Models\Couriername::where('status', 1)->get())
+                        <select id="courierName" name="courierName" class="form-control" required>
+                            <option value="">Select</option>
+                            @foreach($couriers as $courier)
+                                <option value="{{ $courier->id }}">{{ $courier->name }}</option>
+                            @endforeach
+                        </select>
+
+                    </div>
+
+                    <div class="form-group">
+                        <label for="referenceNo">Reference No</label>
+                        <input type="text" id="referenceNo" name="referenceNo" class="form-control" placeholder="Enter Reference No" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="estimateDeliveryDate">Estimate Date of Delivery</label>
+                        <input type="date" id="estimateDeliveryDate" name="estimateDeliveryDate" class="form-control" required>
+                    </div>
+
+                    <input type="hidden" id="orderId" name="orderId" value="">
+
+                    @csrf <!-- CSRF Token -->
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-warning">Save</button> <!-- Change to type="submit" -->
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<!-- end courier details -->
+
+<!-- Delivery Details -->
+<div class="modal fade" id="deliverymodal" tabindex="-1" role="dialog" aria-labelledby="deliverymodalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deliverymodalLabel">Enter Delivery Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="deliveryform">
+                <div class="modal-body">
+                <input type="hidden" id="orderId" name="orderId" value="">
+                    <div class="form-group">
+                        <label for="deliverydate">Delivery On Date</label>
+                        <input type="date" id="deliverydate" name="deliverydate" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="receivedby">Received By</label>
+                        <input type="text" id="receivedby" name="receivedby" class="form-control" placeholder="Enter Receivers name" required>
+                    </div>
+
+                    <input type="hidden" id="orderId" name="orderId" value="">
+
+                    @csrf <!-- CSRF Token -->
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-warning">Save</button> <!-- Change to type="submit" -->
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<!-- end Delivery Detials -->
+
+<!-- Upload Invoice -->
+<div class="modal fade" id="invoicemodal" tabindex="-1" role="dialog" aria-labelledby="invoicemodalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="invoicemodalLabel">Upload Invoice PDF</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="invoiceform" enctype="multipart/form-data">
+                <div class="modal-body">
+                <input type="hidden" id="orderId" name="orderId" value="">
+                    <div class="form-group">
+                        <label for="invoiceupload">Upload</label>
+                        <input type="file" id="invoiceupload" name="invoiceupload" class="form-control" required>
+                    </div>
+                    <input type="hidden" id="orderId" name="orderId" value="">
+
+                    @csrf <!-- CSRF Token -->
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">upload</button> <!-- Change to type="submit" -->
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+ <!-- end invoice modal -->
+
+<script>
+    function openRequestModal(orderId) {
+    $('#orderId').val(orderId); // Set order ID in the hidden input
+    $('#requestMessage').val(''); // Clear any previous message
+    $('#requestModal').modal('show'); // Show the modal
+}
+
+function openCancelModal(orderId) {
+    $('#orderId').val(orderId); // Set order ID in the hidden input
+    $('#cancelmessage').val(''); // Clear any previous message
+    $('#cancelModal').modal('show'); // Show the modal
+}
+
+function openCourierDetailsModal(orderId) {
+    $('#orderId').val(orderId); // Set order ID in the hidden input
+    $('#courierMessage').val(''); // Clear any previous message
+    $('#couriermodal').modal('show'); // Show the modal
+}
+
+function openDeliveryDetailsModal(orderId) {
+    $('#orderId').val(orderId); // Set order ID in the hidden input
+    $('#deliverymodal').modal('show'); // Show the modal
+}
+function openInvoiceModal(orderId) {
+    $('#orderId').val(orderId); // Set order ID in the hidden input
+    $('#invoicemodal').modal('show'); // Show the modal
+}
+</script>
     <script>
         // Declare the table variable in the global scope
         var table;
@@ -255,16 +398,37 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, full, meta) {
-                            return `
-                            <a href="#" title="Approve" onclick="return toggleOnStatus(${data},1)" class="btn btn-sm bg-success mr-2">
-                                <i class="fa-regular fa-check"></i>
-                            </a>
-                            <a href="#" title="Cancel" onclick="openCancelModal(${data})" class="btn btn-sm bg-danger mr-2">
-                                <i class="fa-regular fa-xmark"></i>
-                            </a>
-                             <a href="#" title="Request To Customer" onclick="openRequestModal(${data})" class="btn btn-sm bg-info mr-2">
-                                <i class="fa-regular fa-person-circle-question"></i>
-                            </a>`;
+                            if (full.orderApproved == 0) {
+                                return `
+                                    <a href="#" title="Approve" onclick="return toggleOnStatus(${data},1)" class="btn btn-sm bg-success mr-2">
+                                        <i class="fa-regular fa-check"></i>
+                                    </a>
+                                    <a href="#" title="Cancel" onclick="openCancelModal(${data})" class="btn btn-sm bg-danger mr-2">
+                                        <i class="fa-regular fa-xmark"></i>
+                                    </a>
+                                    <a href="#" title="Request To Customer" onclick="openRequestModal(${data})" class="btn btn-sm bg-info mr-2">
+                                        <i class="fa-regular fa-person-circle-question"></i>
+                                    </a>`;
+                            } else if (full.orderApproved == 1) {
+                                return `
+                                    <a href="#" title="Enter Courier Details" onclick="openCourierDetailsModal(${data})" class="btn btn-sm bg-warning mr-2">
+                                        <i class="fa-regular fa-truck"></i>
+                                    </a>
+                                    <a href="#" title="Enter PDF Copy of Invoice" onclick="openInvoiceModal(${data})" class="btn btn-sm bg-secondary mr-2">
+                                        <i class="fa-regular fa-file-pdf"></i>
+                                    </a>`;
+                            } else if (full.orderApproved == 4) {
+                                return `
+                                    <a href="#" title="Enter Your Delivery Details" onclick="openDeliveryDetailsModal(${data})" class="btn btn-sm bg-primary mr-2">
+                                        <i class="fa-regular fa-box"></i>
+                                    </a>`;
+                            }
+                            else if (full.orderApproved == 5) {
+                                return '';
+                            } 
+                             else {
+                                return '';
+                            }
                         }
                     }
                 ]
@@ -471,27 +635,122 @@
                 const orderId = $('#orderId').val();
                 const cancellationReason = $('#cancelmessage').val();
 
-                $.ajax({
-                    url: '{{ route('admin.order.changeStatus') }}', // Directly use the route helper
-                    type: 'POST',
-                    data: {
-                        orderId: orderId,
-                        orderApproved: 0,
-                        cancellationReason: cancellationReason,
-                        _token: $('meta[name="csrf-token"]').attr(
-                            'content') // Ensure CSRF token is included
-                    },
-                    success: function(response) {
-                        alert(response.message);
-                        $('#cancelModal').modal('hide');
-                    },
-                    error: function(xhr) {
-                        alert(xhr.responseJSON.message);
-                    }
-                });
+            $.ajax({
+                url: '{{ route('admin.order.changeStatus') }}', // Directly use the route helper
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    orderApproved: 0,
+                    cancellationReason : cancellationReason ,
+                    _token: $('meta[name="csrf-token"]').attr('content') // Ensure CSRF token is included
+                },
+                success: function(response) {
+                    alert(response.message);
+                    $('#cancelModal').modal('hide');
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON.message);
+                }
             });
         });
-    </script>
+    });
+
+    $(document).ready(function() {
+        $('#courierform').on('submit', function(e) {
+            e.preventDefault();
+
+            const orderId = $('#orderId').val();
+            const dispatchDate = $('#dispatchDate').val();
+            const courierName = $('#courierName').val();
+            const referenceNo = $('#referenceNo').val();
+            const estimateDeliveryDate = $('#estimateDeliveryDate').val();
+
+            $.ajax({
+                url: '{{ route('order.courierdetails') }}',
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    dispatchDate: dispatchDate,
+                    courierName: courierName,
+                    referenceNo: referenceNo,
+                    estimateDeliveryDate: estimateDeliveryDate,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    alert(response.message);
+                    $('#couriermodal').modal('hide');
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON.message);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        $('#deliveryform').on('submit', function(e) {
+            e.preventDefault();
+
+            const orderId = $('#orderId').val();
+            const deliverydate = $('#deliverydate').val();
+            const receivedby = $('#receivedby').val();
+
+            $.ajax({
+                url: '{{ route('order.deliverydetails') }}',
+                type: 'POST',
+                data: {
+                    orderId: orderId,
+                    deliverydate: deliverydate,
+                    receivedby: receivedby,
+                    _token: $('meta[name="csrf-token"]').attr('content')
+                },
+                success: function(response) {
+                    alert(response.message);
+                    $('#deliverymodal').modal('hide');
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON.message);
+                }
+            });
+        });
+    });
+
+    $(document).ready(function() {
+        $('#invoiceform').on('submit', function(e) {
+            e.preventDefault(); // Prevent form submission
+
+            // Create a new FormData object
+            var formData = new FormData(this); // 'this' refers to the form itself
+            formData.append('orderId', $('#orderId').val());
+
+            $.ajax({
+                url: '{{ route('order.invoiceupload') }}',
+                type: 'POST',
+                data: formData, // Send the FormData object containing the file
+                processData: false, // Prevent jQuery from processing the data
+                contentType: false, // Prevent jQuery from setting the content-type header
+                success: function(response) {
+                    alert(response.message);
+                    $('#invoicemodal').modal('hide'); // Close the modal on success
+                },
+                error: function(xhr) {
+                    alert(xhr.responseJSON.message);
+                }
+            });
+        });
+    });
+
+</script>
+
+<script>
+    // Set the min attribute to today's date
+    document.addEventListener('DOMContentLoaded', function() {
+        var today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+        document.getElementById('dispatchDate').setAttribute('min', today); // Set the min attribute
+        document.getElementById('estimateDeliveryDate').setAttribute('min', today);
+        document.getElementById('deliverydate').setAttribute('min', today);
+    });
+</script>
 
     <!--end modal-->
 @endsection
