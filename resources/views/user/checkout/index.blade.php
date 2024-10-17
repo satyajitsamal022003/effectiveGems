@@ -237,7 +237,7 @@
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="f-name">First Name:</label>
                                                         <input type="text" name="billingfirstName" id="f-name"
-                                                            class="form-control" value="" required/>
+                                                            class="form-control" value=""/>
                                                     </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="f-name">Middle Name:</label>
