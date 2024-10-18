@@ -69,10 +69,15 @@ class RazorpayController extends Controller
     {
         $ip = $request->getClientIp();
         $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
-        $paymentDetails = $api->payment->fetch($request->razorpay_payment_id);
-        $paymentMode = $paymentDetails['method'];  // Razorpay returns the payment method (card, netbanking, etc.)
+
+
         $order = Order::find($request->orderId);
-        $order->paymentMode = $paymentMode;
+        try {
+            $paymentDetails = $api->payment->fetch($request->razorpay_payment_id);
+            $paymentMode = $paymentDetails['method'];
+            $order->paymentMode = $paymentMode;
+        } catch (\Throwable $th) {
+        }
         $order->paymentCompleted = 1;
         $order->transactionId = $request->razorpay_payment_id;
         $order->save();

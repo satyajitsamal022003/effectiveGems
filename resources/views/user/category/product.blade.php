@@ -1,6 +1,6 @@
 @extends('user.layout')
 @section('content')
-@section('title', $category->categoryName . ' | Effective Gems')
+@section('title', !empty($category->seoUrl) ? $category->seoUrl . ' | Effective Gems' : $category->categoryName . ' | Effective Gems')
 @section('catId', $category->id)
     <section class="container">
         <div class="as_breadcrum_wrapper" style="background-image: url('/user/assets/images/breadcrum-img-1.jpg');">

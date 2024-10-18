@@ -103,6 +103,8 @@ class OrderController extends Controller
             $order->billingappartment = $request->billingappartment;
             $order->billingaddress = $request->billingaddress;
         }
+        $dateTime = new \DateTime("now", new \DateTimeZone("Asia/Kolkata"));
+        $order->created_at = $dateTime;
         $order->shippingAmount = $request->shippingAmount;
         $order->sameBillingAddress = $request->sameAddress;
         $order->promoCode = $request->promoCode;

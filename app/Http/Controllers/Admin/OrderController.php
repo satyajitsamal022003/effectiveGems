@@ -52,7 +52,7 @@ class OrderController extends Controller
         $totalFilteredRecords = $query->count();
 
         // Apply sorting by 'firstName' and pagination
-        $orders = $query->orderBy('created_at', 'desc') // Apply sorting
+        $orders = $query->orderBy('created_at', 'desc')->where('paymentCompleted',1) // Apply sorting
             ->skip($skip)
             ->take($length)
             ->get();
