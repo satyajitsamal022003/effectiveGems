@@ -88,6 +88,14 @@
                                     <div class="col-lg-12 col-12">
                                         <div class="shipping-section">
                                             <div method="post" action="">
+                                                <div class="col-lg-12 col-md-12 col-12">
+                                                    <label for="f-name">Country/Region:</label>
+                                                    <select name="country" required class="form-select form-control"
+                                                        id="f-name" aria-label="Default select example">
+                                                        <option value="1" selected>India</option>
+
+                                                    </select>
+                                                </div>
                                                 <div class="form-group">
                                                     <div class="row">
                                                         <div class="col-lg-4 col-md-6 col-12">
@@ -109,56 +117,10 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="row">
-                                                        <div class="col-lg-12 col-md-6 col-12">
-                                                            <label for="p-no">Phone Number:</label>
-                                                            <input type="number" required type="tel" maxlength="10"
-                                                                name="phoneNumber" id="p-no" class="form-control"
-                                                                value="" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="row">
-                                                        <div class="col-lg-6 col-md-6 col-12">
-                                                            <label for="f-name">Country/Region:</label>
-                                                            <select name="country" required class="form-select form-control"
-                                                                id="f-name" aria-label="Default select example">
-                                                                <option value="1" selected>India</option>
-
-                                                            </select>
-                                                        </div>
-
-                                                        <div class="col-lg-6 col-md-6 col-12">
-                                                            <label for="state-name">State:</label>
-                                                            <select name="state" required class="form-select form-control"
-                                                                id="state-name" aria-label="Default select example">
-                                                                <option selected disabled>Choose State</option>
-                                                                @foreach ($states as $state)
-                                                                    <option value="{{ $state->id }}">
-                                                                        {{ $state->stateName }}
-                                                                    </option>
-                                                                @endforeach
-
-                                                            </select>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <div class="row">
-                                                        <div class="col-lg-4 col-md-6 col-12">
-                                                            <label for="city-name">City:</label>
-                                                            <input name="city" required type="text" name=""
-                                                                id="city-name" class="form-control" value="" />
-                                                        </div>
-                                                        <div class="col-lg-4 col-md-6 col-12">
-                                                            <label for="postal-code">Zip / Postal Code:</label>
-                                                            <input name="zipcode" required type="number" name=""
-                                                                id="postal-code" class="form-control" value="" />
-                                                        </div>
-                                                        <div class="col-lg-4 col-md-6 col-12">
-                                                            <label for="landmark">Landmark:</label>
-                                                            <input name="landmark" required type="text" name=""
-                                                                id="landmark" class="form-control" value="" />
+                                                        <div class="col-lg-12 col-md-12 col-12">
+                                                            <label for="address_1">Address:</label>
+                                                            <input name="address" required type="text" name=""
+                                                                id="address_2" class="form-control" value="">
                                                         </div>
                                                     </div>
                                                 </div>
@@ -174,13 +136,52 @@
                                                 </div>
                                                 <div class="form-group">
                                                     <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-12">
-                                                            <label for="address_1">Address:</label>
-                                                            <input name="address" required type="text" name=""
-                                                                id="address_2" class="form-control" value="">
+                                                        <div class="col-lg-6 col-md-6 col-12">
+                                                            <label for="landmark">Landmark:</label>
+                                                            <input name="landmark" required type="text" name=""
+                                                                id="landmark" class="form-control" value="" />
+                                                        </div>
+                                                        <div class="col-lg-6 col-md-6 col-12">
+                                                            <label for="city-name">City:</label>
+                                                            <input name="city" required type="text" name=""
+                                                                id="city-name" class="form-control" value="" />
+                                                        </div>
+                                                        <div class="col-lg-8 col-md-6 col-12">
+                                                            <label for="state-name">State:</label>
+                                                            <select name="state" required
+                                                                class="form-select form-control" id="state-name"
+                                                                aria-label="Default select example">
+                                                                <option selected disabled>Choose State</option>
+                                                                @foreach ($states as $state)
+                                                                    <option value="{{ $state->id }}">
+                                                                        {{ $state->stateName }}
+                                                                    </option>
+                                                                @endforeach
+
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="col-lg-4 col-md-6 col-12">
+                                                            <label for="postal-code">Zip / Postal Code:</label>
+                                                            <input name="zipcode" required type="number" name=""
+                                                                id="postal-code" class="form-control" value="" />
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="row">
+                                                        <div class="col-lg-12 col-md-6 col-12">
+                                                            <label for="p-no">Phone Number:</label>
+                                                            <input type="number" required type="tel" maxlength="10"
+                                                                name="phoneNumber" id="p-no" class="form-control"
+                                                                value="" />
                                                         </div>
                                                     </div>
                                                 </div>
+
+
+
                                             </div>
                                             <div class="mt-2 flex_box">
                                                 <input type="checkbox" id="billing_information" name="billing_1"
@@ -213,7 +214,7 @@
                                 <div class="radio-check-box">
                                     <div class="form-check">
                                         <input class="form-check-input" type="radio" name="sameAddress" value="1"
-                                            id="same_address" onchange="$('.billingAddress').hide()" checked >
+                                            id="same_address" onchange="$('.billingAddress').hide()" checked>
                                         <label class="form-check-label" for="same_address">
                                             Same as shipping address
                                         </label>
@@ -234,10 +235,27 @@
                                         <div method="post" action="">
                                             <div class="form-group">
                                                 <div class="row">
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <div class="col-lg-12 col-md-12 col-12">
+                                                                <label for="f-name">Country/Region:</label>
+                                                                <select class="form-select form-control"
+                                                                    name="billingcountry" id="f-name"
+                                                                    aria-label="Default select example">
+                                                                    <option selected disabled>Choose Country</option>
+                                                                    <option value="1">India</option>
+                                                                    <option value="2">United States</option>
+                                                                    <option value="3">Netherlands</option>
+                                                                </select>
+                                                            </div>
+
+
+                                                        </div>
+                                                    </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="f-name">First Name:</label>
                                                         <input type="text" name="billingfirstName" id="f-name"
-                                                            class="form-control" value=""/>
+                                                            class="form-control" value="" />
                                                     </div>
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="f-name">Middle Name:</label>
@@ -249,73 +267,8 @@
                                                         <input type="text" name="billinglastName" id="l-name"
                                                             class="form-control" value="" />
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-6 col-12">
-                                                        <label for="email_2">Email Address:</label>
-                                                        <input type="email" name="billingamount" id="email_2"
-                                                            class="form-control" value="" />
-                                                    </div>
-                                                    <div class="col-lg-6 col-md-6 col-12">
-                                                        <label for="p-no">Phone Number:</label>
-                                                        <input type="tel" maxlength="10" name="billingphoneNumber"
-                                                            id="p-no" class="form-control" value="" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-lg-6 col-md-6 col-12">
-                                                        <label for="f-name">Country/Region:</label>
-                                                        <select class="form-select form-control" name="billingcountry"
-                                                            id="f-name" aria-label="Default select example">
-                                                            <option selected disabled>Choose Country</option>
-                                                            <option value="1">India</option>
-                                                            <option value="2">United States</option>
-                                                            <option value="3">Netherlands</option>
-                                                        </select>
-                                                    </div>
 
-                                                    <div class="col-lg-6 col-md-6 col-12">
-                                                        <label for="state-name">State:</label>
-                                                        <select class="form-select form-control" name="billingstate"
-                                                            id="state-name" aria-label="Default select example">
-                                                            <option selected disabled>Choose State</option>
-                                                            <option value="1">Odisha</option>
-                                                            <option value="2">Andhra Pradesh</option>
-                                                            <option value="3">Delhi</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-lg-4 col-md-6 col-12">
-                                                        <label for="city-name">City:</label>
-                                                        <input type="text" name="billingcity" id="city-name"
-                                                            class="form-control" value="" />
-                                                    </div>
-                                                    <div class="col-lg-4 col-md-6 col-12">
-                                                        <label for="postal-code">Zip / Postal Code:</label>
-                                                        <input type="text" name="billingzipcode" id="postal-code"
-                                                            class="form-control" value="" />
-                                                    </div>
-                                                    <div class="col-lg-4 col-md-6 col-12">
-                                                        <label for="landmark">Landmark:</label>
-                                                        <input type="text" name="billinglandmark" id="landmark"
-                                                            class="form-control" value="" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="form-group">
-                                                <div class="row">
-                                                    <div class="col-lg-12 col-md-12 col-12">
-                                                        <label for="address_2">Apartment/Suite/Building (Optional)</label>
-                                                        <input type="text" name="billingappartment" id="address_2"
-                                                            class="form-control" value="">
-                                                    </div>
+
                                                 </div>
                                             </div>
                                             <div class="form-group">
@@ -327,6 +280,66 @@
                                                     </div>
                                                 </div>
                                             </div>
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-12 col-md-12 col-12">
+                                                        <label for="address_2">Apartment/Suite/Building
+                                                            (Optional)</label>
+                                                        <input type="text" name="billingappartment" id="address_2"
+                                                            class="form-control" value="">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group">
+                                                <div class="row">
+                                                    <div class="col-lg-6 col-md-6 col-12">
+                                                        <label for="landmark">Landmark:</label>
+                                                        <input type="text" name="billinglandmark" id="landmark"
+                                                            class="form-control" value="" />
+                                                    </div>
+                                                    <div class="col-lg-6 col-md-6 col-12">
+                                                        <label for="city-name">City:</label>
+                                                        <input type="text" name="billingcity" id="city-name"
+                                                            class="form-control" value="" />
+                                                    </div>
+                                                    <div class="col-lg-8 col-md-6 col-12">
+                                                        <label for="state-name">State:</label>
+                                                        <select class="form-select form-control" name="billingstate"
+                                                            id="state-name" aria-label="Default select example">
+                                                            <option selected disabled>Choose State</option>
+                                                            @foreach ($states as $state)
+                                                                <option value="{{ $state->id }}">
+                                                                    {{ $state->stateName }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-lg-4 col-md-6 col-12">
+                                                        <label for="postal-code">Zip / Postal Code:</label>
+                                                        <input type="text" name="billingzipcode" id="postal-code"
+                                                            class="form-control" value="" />
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <div class="row">
+                                                            <div class="col-lg-6 col-md-6 col-12">
+                                                                <label for="email_2">Email Address:</label>
+                                                                <input type="email" name="billingamount" id="email_2"
+                                                                    class="form-control" value="" />
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-12">
+                                                                <label for="p-no">Phone Number:</label>
+                                                                <input type="tel" maxlength="10"
+                                                                    name="billingphoneNumber" id="p-no"
+                                                                    class="form-control" value="" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
                                         </div>
                                         <div class="main-btn mt-3">
                                             <button type="submit" class="as_btn"><span>Continue</span></button>
