@@ -1,6 +1,7 @@
 @extends('user.layout')
 @section('content')
-@section('title', $category->subCategoryName . ' | Effective Gems')
+@section('title', !empty($category->metaTitle) ? $category->metaTitle . ' | Effective Gems' : $category->subCategoryName . ' |
+    Effective Gems')
 
 @section('subCatId', $category->id)
 
