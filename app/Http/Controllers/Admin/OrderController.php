@@ -204,9 +204,9 @@ class OrderController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
-        if ($order->invoiceDetails == null) {
-            return response()->json(['message' => 'Please upload invoice first'], 400);
-        }
+        // if ($order->invoiceDetails == null) {
+        //     return response()->json(['message' => 'Please upload invoice first'], 400);
+        // }
 
         $courierDetails = [
             'dispatchDate' => $request->dispatchDate,
