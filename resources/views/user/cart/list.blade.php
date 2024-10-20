@@ -43,9 +43,9 @@
                                                 Delivery Charges Apply <i class="fa-solid fa-indian-rupee-sign"></i>
                                                 <span id="courierPrice-{{ $cartItem->id }}">
                                                     @if ($cartItem->productDetails->courierTypeId != 1 && $cartItem->productDetails->courierTypeId != 2)
-                                                        {{ $cartItem->productDetails->courierType->courier_price * $cartItem->quantity }}
+                                                        {{ $cartItem->deliveryPrice }}
                                                     @else
-                                                        {{ $cartItem->productDetails->courierType->courier_price }}
+                                                        {{ $cartItem->deliveryPrice }}
                                                     @endif
                                                 </span>
                                             </p>
@@ -207,16 +207,16 @@
         console.log(productPrice);
 
 
-        if (courierTypeId != 1 &&
-            courierTypeId != 2) {
-            courierPrice = productPrice * newQuantity; // Update courier price based on quantity
-        } else {
-            courierPrice = productPrice; // Default price when condition doesn't match
-        }
+        // if (courierTypeId != 1 &&
+        //     courierTypeId != 2) {
+        //     courierPrice = productPrice * newQuantity; // Update courier price based on quantity
+        // } else {
+        //     courierPrice = productPrice; // Default price when condition doesn't match
+        // }
 
         // Update the courier price display
         // Assuming you have an element to show the courier price, e.g., a span with a class `courierPrice`
-        $(`#courierPrice-${id}`).text(courierPrice);
+        // $(`#courierPrice-${id}`).text(courierPrice);
 
         $.ajax({
             type: "POST",
@@ -231,6 +231,7 @@
                 // alert(response.message);
 
                 $('.subTotal').text(response.subtotal);
+                $(`#courierPrice-${id}`).text(response.itemDeliveryPrice);
 
                 $('#itemTotal-' + id).text(response.itemTotal);
                 // toastr.success(response.message);

@@ -54,6 +54,7 @@
                             <div class="as_product_box product-details-page">
                                 <div class="as_product_detail details-height">
                                     <h4 class="as_subheading" data-aos="fade-up">{{ $productdetails->productName }}</h4>
+                                    <input type="hidden" id="productCategory" value="{{ $productdetails->categoryId }}">
 
                                     <div class="main-price">
                                         <span class="as_price" data-aos="fade-up">
@@ -80,7 +81,7 @@
                                                 Free
                                             @else
                                                 <i class="fa-solid fa-indian-rupee-sign"></i>
-                                                <span id="delivery-cost">{{ $couriertype->courier_price }}</span>
+                                                <span id="delivery-cost">{{ $productdetails->deliveryPrice }}</span>
                                             @endif
                                         @else
                                             Not available

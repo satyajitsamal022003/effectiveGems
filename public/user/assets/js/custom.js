@@ -324,37 +324,38 @@ $(window).on("load", function () {
     $(".as_loader").addClass("hide");
 });
 
-
 $(document).ready(function () {
-    const handleQuantityChange = (quantity) => {    
+    const handleQuantityChange = (quantity) => {
+        const productCategory = parseInt($("#productCategory").val());
         const courierType = parseInt($("#courierTypeId").val());
         const courierPrice = parseInt($("#courierPrice").val());
         const delPriceDisplay = $("#delivery-cost");
         const priceDisplay = $("#product-price-total");
         const productPrice = parseInt($("#productPrice").val());
-       let deliveryPrice = 0;
+        let deliveryPrice = 0;
 
         // Calculate delivery price based on courier type
-        if (courierType != 1 && courierType != 2) {
+        if (courierType != 1 && courierType != 2 && productCategory != 1) {
             deliveryPrice = courierPrice * quantity; // Multiply delivery price by quantity
         } else {
             deliveryPrice = courierPrice; // Directly add delivery price when courierType is 1 or 2
         }
         delPriceDisplay.text(deliveryPrice);
-        
-         // Calculate extras (activation and certification)
+
+        // Calculate extras (activation and certification)
         let extraPrice = 0;
         if ($("#activationCheckbox").is(":checked")) {
             extraPrice += parseInt($("#activationCheckbox").data("price")) || 0;
         }
         if ($("#certificationCheckbox").is(":checked")) {
-            extraPrice += parseInt($("#certificationCheckbox").data("price")) || 0;
+            extraPrice +=
+                parseInt($("#certificationCheckbox").data("price")) || 0;
         }
-        
+
         const totalPrice = productPrice * quantity + deliveryPrice + extraPrice;
         priceDisplay.text(totalPrice);
     };
-    
+
     $("#quantityDd").change(() => {
         const count = $("#quantityDd").val();
         handleQuantityChange(count);
@@ -380,16 +381,15 @@ $(document).ready(function () {
         handleQuantityChange(count);
         return false;
     });
-    
-     // Trigger recalculation on checkbox change for activation/certification
+
+    // Trigger recalculation on checkbox change for activation/certification
     $("#activationCheckbox, #certificationCheckbox").change(function () {
         const count = $("#quantityDd").val() || 1; // Use current quantity
         handleQuantityChange(count);
     });
-    
+
     const initialQuantity = parseInt($("#quantityDd").val()) || 1;
     handleQuantityChange(initialQuantity);
-
 });
 /*quantity end*/
 
@@ -398,4 +398,3 @@ $(document).ready(function () {
         $(".new-address").toggle();
     });
 });
-

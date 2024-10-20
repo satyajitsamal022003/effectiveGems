@@ -9,6 +9,7 @@ use App\Models\Certification;
 use App\Models\Couriertype;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use App\Models\State;
 use Illuminate\Http\Request;
 use Razorpay\Api\Api;
@@ -41,18 +42,23 @@ class OrderController extends Controller
         $totalDelPrice = 0;
         $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
+            $product = Product::find($item->product_id);
 
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4) {
+                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
                     $deliveryPrice = $deliveryPrice * $item->quantity;
                 }
-            } else
-                $deliveryPrice = 0;
+            }
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
-            $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            if ($product->categoryId != 1) {
+                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            } else {
+                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+            }
         });
         $total = $subtotal - $totalDelPrice;
         $states = State::all();

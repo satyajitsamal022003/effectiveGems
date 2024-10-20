@@ -460,7 +460,7 @@
 
                                                     @elseif($cartItem->productDetails->activation)
                                                         ({{ $cartItem->productDetails->activation->amount ?? 'N/A' }})
-                                                        <input type="checkbox" id="activation" name="is_act"
+                                                        <input type="checkbox" id="activation" name="is_act-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_act_selected ? 'checked' : '' }}
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
@@ -476,7 +476,7 @@
 
                                                     @elseif($cartItem->productDetails->certification)
                                                         ({{ $cartItem->productDetails->certification->amount ?? 'N/A' }})
-                                                        <input type="checkbox" id="certificate" name="is_cert"
+                                                        <input type="checkbox" id="certificate" name="is_cert-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_cert_selected ? 'checked' : '' }}
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
@@ -597,8 +597,8 @@
         });
     }
     const onSetChange = (id, act, cert) => {
-        var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
-        var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
+        var isActive = $(`input[name="is_act-${id}"]`).is(':checked') ? $(`input[name="is_act-${id}"]`).val() : 0;
+        var isCert = $(`input[name="is_cert-${id}"]`).is(':checked') ? $(`input[name="is_cert-${id}"]`).val() : 0;
         if (act == "Free" || act == "N/A")
             act = 0;
         if (cert == "Free" || cert == "N/A")

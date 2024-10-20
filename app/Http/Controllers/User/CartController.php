@@ -33,21 +33,25 @@ class CartController extends Controller
         // Calculate subtotal
         $totalDelPrice = 0;
         $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
+            $product = Product::find($item->product_id);
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
 
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4) {
+                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
                     $deliveryPrice = $deliveryPrice * $item->quantity;
                 }
-            } else
-                $deliveryPrice = 0;
+            }
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
-            $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            if ($product->categoryId != 1) {
+                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            } else {
+                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+            }
         });
-
 
         return view('user.cart.list', compact('cartItems', 'subtotal', 'totalDelPrice'));
     }
@@ -68,18 +72,24 @@ class CartController extends Controller
         $totalDelPrice = 0;
         $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
+            $product = Product::find($item->product_id);
 
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4) {
+                if ($courierType->id == 3 || $courierType->id == 4  && $product->categoryId != 1) {
                     $deliveryPrice = $deliveryPrice * $item->quantity;
                 }
             } else
                 $deliveryPrice = 0;
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
-            $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            if ($product->categoryId != 1) {
+                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            } else {
+                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+            }
         });
         $totalCartItems = CartItem::where("cart_id", $cart->id)->count();
 
@@ -155,14 +165,22 @@ class CartController extends Controller
         $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
         $subtotal =   $cartItems->sum(function ($item) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
+            $product = Product::find($item->product_id);
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4) {
+                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
                     $deliveryPrice = $deliveryPrice * $item->quantity;
                 }
             } else
                 $deliveryPrice = 0;
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+
+            if ($product->categoryId != 1) {
+                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            } else {
+                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+            }
         });
 
         return response()->json([
@@ -186,10 +204,10 @@ class CartController extends Controller
 
         $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
-
+            $product = Product::find($item->product_id);
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4) {
+                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
                     $deliveryPrice = $deliveryPrice * $item->quantity;
                 }
             } else
@@ -197,7 +215,14 @@ class CartController extends Controller
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
             $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            // return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            if ($item->categoryId != 1) {
+                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            } else {
+                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+            }
         });
         $total = $subtotal - $totalDelPrice;
         return response()->json([
@@ -222,12 +247,13 @@ class CartController extends Controller
             $cart = Cart::find($cartItem->cart_id);
             $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
             $totalDelPrice = 0;
-            $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice, &$cartItemId, &$itemTotal,&$itemDeliveryPrice) {
+            $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice, &$cartItemId, &$itemTotal, &$itemDeliveryPrice) {
                 $courierType = Couriertype::find($item->productDetails->courierTypeId);
+                $product = Product::find($item->product_id);
 
                 if ($courierType) {
                     $deliveryPrice = $courierType->courier_price;
-                    if ($courierType->id == 3 || $courierType->id == 4) {
+                    if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
                         $deliveryPrice = $deliveryPrice * $item->quantity;
                     }
                 } else
@@ -235,13 +261,28 @@ class CartController extends Controller
                 $totalDelPrice += $deliveryPrice;
                 $item->deliveryPrice = $deliveryPrice;
 
-                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-                if ($item->id == $cartItemId) {
-                    $itemTotal = $item->totalPrice;
-                    $itemDeliveryPrice = $deliveryPrice;
-                }
+                // $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
 
-                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+
+                if ($product->categoryId != 1) {
+                    $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                    if ($item->id == $cartItemId) {
+                        $itemTotal = $item->totalPrice;
+                        $itemDeliveryPrice = $deliveryPrice;
+                    }
+                    return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                } else {
+                    $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                    if ($item->id == $cartItemId) {
+                        $itemTotal = $item->totalPrice;
+                        $itemDeliveryPrice = $deliveryPrice;
+                    }
+                    return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                }
+                // if ($item->id == $cartItemId) {
+                //     $itemTotal = $item->totalPrice;
+                //     $itemDeliveryPrice = $deliveryPrice;
+                // }
             });
             $total = $subtotal - $totalDelPrice;
             return response()->json([
@@ -282,12 +323,12 @@ class CartController extends Controller
             $cart = Cart::find($cartItem->cart_id);
             $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
             $totalDelPrice = 0;
-            $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice, &$cartItem, &$itemTotal,&$itemDeliveryPrice) {
+            $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice, &$cartItem, &$itemTotal, &$itemDeliveryPrice) {
                 $courierType = Couriertype::find($item->productDetails->courierTypeId);
-
+                $product = Product::find($item->product_id);
                 if ($courierType) {
                     $deliveryPrice = $courierType->courier_price;
-                    if ($courierType->id == 3 || $courierType->id == 4) {
+                    if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
                         $deliveryPrice = $deliveryPrice * $item->quantity;
                     }
                 } else
@@ -295,12 +336,23 @@ class CartController extends Controller
                 $totalDelPrice += $deliveryPrice;
                 $item->deliveryPrice = $deliveryPrice;
 
-                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-                if ($item->id == $cartItem->id) {
-                    $itemTotal = $item->totalPrice;
-                    $itemDeliveryPrice = $deliveryPrice;
+                // $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+
+                if ($product->categoryId != 1) {
+                    $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                    if ($item->id == $cartItem->id) {
+                        $itemTotal = $item->totalPrice;
+                        $itemDeliveryPrice = $deliveryPrice;
+                    }
+                    return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                } else {
+                    $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                    if ($item->id == $cartItem->id) {
+                        $itemTotal = $item->totalPrice;
+                        $itemDeliveryPrice = $deliveryPrice;
+                    }
+                    return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
                 }
-                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
             });
             $total = $subtotal - $totalDelPrice;
 
@@ -310,6 +362,7 @@ class CartController extends Controller
                 'total' => $total,
                 'totalDelPrice' => $totalDelPrice,
                 'itemDeliveryPrice' => $itemDeliveryPrice,
+                'itemTotal' => $itemTotal,
             ]);
         }
     }
