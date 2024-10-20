@@ -341,14 +341,12 @@ function openInvoiceModal(orderId) {
             }
 
             // Initialize the DataTable and assign it to the global variable
-            table = $('#ordersTable').DataTable({
+            table = $('#ordersTable').DataTable({ 
                 processing: true,
                 serverSide: true,
                 ajax: {
                     url: "{{ route('admin.order.data') }}", // Update the route for orders
                     data: function(d) {
-                        d.sortByName = $('#sortByName').val(); // Send sorting order
-                        d.category = $('#category').val(); // Send filtering category
                     }
                 },
                 columns: [{
@@ -434,13 +432,6 @@ function openInvoiceModal(orderId) {
                 ]
             });
 
-            $('#sortByName').on('change', function() {
-                table.ajax.reload(); // Reload table with selected sorting order
-            });
-
-            $('#category').on('change', function() {
-                table.ajax.reload(); // Reload table with selected category
-            });
         });
 
         function toggleOnStatus(orderId, status) {

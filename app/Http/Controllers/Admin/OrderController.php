@@ -32,33 +32,40 @@ class OrderController extends Controller
         $pageNo = intval($request->input('start'));
         $skip = $pageNo;
         $searchValue = $request->input('search.value');
-        $category = $request->input('category');
-        $sortByName = $request->input('sortByName') ? $request->input('sortByName') : 'asc'; // Default sorting order
-
+        // $category = $request->input('category');
         // Base query to fetch orders and eager load order items and their related products
         $query = Order::with(['items.productDetails']); // Eager load order items and product details
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {
-            $query->where('firstName', 'LIKE', '%' . $searchValue . '%');
+            $query->where(function ($query) use ($searchValue) {
+                $query->where('firstName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('middleName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('lastName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('userId', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('amount', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('ip', 'LIKE', '%' . $searchValue . '%');
+            });
         }
 
+
         // Apply filtering by category if applicable
-        if (!empty($category)) {
-            $query->where('orderApproved', $category);
-        }
+        // if (!empty($category)) {
+        //     $query->where('orderApproved', $category);
+        // }
 
         // Get the total filtered records count
         $totalFilteredRecords = $query->count();
 
-        // Apply sorting by 'firstName' and pagination
-        $orders = $query->orderBy('created_at', 'desc')->where('paymentCompleted',1) // Apply sorting
+        // Apply pagination
+        $orders = $query->where('paymentCompleted', 1) // Filter by payment completed
+            ->orderBy('created_at', 'desc')
             ->skip($skip)
             ->take($length)
             ->get();
 
         // Get the total record count without filtering
-        $totalRecords = Order::count();
+        $totalRecords = Order::where('paymentCompleted', 1)->count();
 
         // Map the orders to include a custom index and return the data
 
@@ -260,36 +267,36 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order Details Added Successfully!']);
     }
 
-    
+
 
     public function invoiceupload(Request $request)
     {
         $order = Order::find($request->orderId);
-    
+
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
-    
+
         if ($request->hasFile('invoiceupload')) {
             $file = $request->file('invoiceupload');
             $filename = time() . '_' . $file->getClientOriginalName();
-    
+
             $file->move(public_path('uploads'), $filename);
-    
+
             $order->invoiceDetails = $filename;
         } else {
             return response()->json(['message' => 'No invoice file uploaded'], 400);
         }
-    
+
         // Save the order details in the database
         $order->save();
-    
+
         // Send the email with the attached invoice PDF
         Mail::to($order->email)->send(new OrderinvoiceDetails($order, $filename));
-    
+
         return response()->json(['message' => 'Order Details and Invoice Added Successfully!']);
     }
-    
+
 
 
 

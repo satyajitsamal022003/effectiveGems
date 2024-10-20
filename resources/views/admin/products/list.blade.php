@@ -10,7 +10,7 @@
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
                             <li class="breadcrumb-item active">Manage Products</li>
-                        </ul>
+                        </ul> 
                     </div>
                     <div class="panel-heading col-md-2">
                         <a href="{{ route('admin.addproduct') }}" class="btn btn-block btn-primary">Add Products</a>

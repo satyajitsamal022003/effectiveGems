@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
 
-    public function addproduct()
+    public function addproduct() 
     {
         $categories = Category::where('status', 1)->get();
         $products = Product::where('status', 1)->orderBy('id', 'desc')->get();
