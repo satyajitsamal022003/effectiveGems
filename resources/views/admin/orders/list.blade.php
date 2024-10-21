@@ -592,8 +592,8 @@
 
                 // Tracking Information
                 // Replace with actual tracking details if available in your data
-                modal.find('.tracking-info p:nth-child(2)').text(
-                    'Tracking Number: Z06066552'); // Placeholder
+                // modal.find('.tracking-info p:nth-child(2)').text(
+                //     'Tracking Number: Z06066552'); // Placeholder
 
                 // Subtotal and total
                 modal.find('#modalSubTotal').text(order.amount || 'N/A');
