@@ -488,7 +488,7 @@
                 console.log(order); // You can check the order data in the console for debugging
 
                 var modal = $(this);
-                const trackingInfo = order?.courierdetails ? JSON.parse(order?.courierDetails) : null;
+                const trackingInfo = order?.courierdetails ? JSON.parse(order?.courierdetails) : null;
                 if(trackingInfo){
                     modal.find('.courierName').text(trackingInfo.courierName);
                     modal.find('.trackingNumber').text(trackingInfo.referenceNo);
