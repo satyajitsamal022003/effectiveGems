@@ -12,7 +12,7 @@ use App\Mail\OrderRequestToCustomer;
 use App\Mail\OrderCourierDetails;
 use App\Mail\OrderdeliveryDetails;
 use App\Mail\OrderinvoiceDetails;
-
+use App\Models\Couriername;
 
 class OrderController extends Controller
 {
@@ -338,4 +338,16 @@ class OrderController extends Controller
 
         return redirect()->back()->with('message', 'Order has been canceled.');
     }
+
+    public function getCourierName(Request $request)
+{
+    $courier = Couriername::find($request->courier_id);
+
+    if ($courier) {
+        return response()->json(['courierName' => $courier->name]);
+    }
+
+    return response()->json(['courierName' => 'Unknown'], 404);
+}
+
 }

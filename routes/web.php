@@ -137,6 +137,8 @@ Route::post('/store-delivery-details', [AdminOrderController::class, 'deliveryde
 Route::post('/invoice-upload', [AdminOrderController::class, 'invoiceupload'])->name('order.invoiceupload');
 Route::get('/order/accept/{id}', [AdminOrderController::class, 'acceptOrder'])->name('order.accept');
 Route::get('/order/cancel/{id}', [AdminOrderController::class, 'cancelOrder'])->name('order.cancel');
+Route::get('/get-courier-name', [AdminOrderController::class, 'getCourierName'])->name('order.getCourierName');
+
 
 
 

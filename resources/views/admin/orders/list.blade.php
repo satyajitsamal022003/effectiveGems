@@ -393,8 +393,16 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, full, meta) {
-                            return data == 1 ? 'Approved' : 'Not-Approved';
+                        switch(data) {
+                            case 1:
+                                return 'Approved';
+                            case 2:
+                                return 'Canceled';
+                            default:
+                                return 'Approved';
                         }
+                    }
+
                     },
                     {
                         data: 'id', // Action buttons
@@ -490,7 +498,16 @@
                 var modal = $(this);
                 const trackingInfo = order?.courierdetails ? JSON.parse(order?.courierdetails) : null;
                 if(trackingInfo){
-                    modal.find('.courierName').text(trackingInfo.courierName);
+                    $.ajax({
+                        url: '/get-courier-name', // Update this URL to your correct route
+                        method: 'GET',
+                        data: { courier_id: trackingInfo.courierName },
+                        success: function(response) {
+                            // Assuming the response contains the actual courier name
+                            modal.find('.courierName').text(response.courierName);
+                        }
+                    });
+                    // modal.find('.courierName').text(trackingInfo.courierName);
                     modal.find('.trackingNumber').text(trackingInfo.referenceNo);
                     modal.find('.dispatchDate').text(trackingInfo.dispatchDate);
 
@@ -560,7 +577,9 @@
                     <a href="#" class="order-list-img"><img src="${item.product_details.image || 'assets/img/default.jpg'}" alt="image"></a>
                     <div class="order-text">
                         <a href="#"><span>${item.product_details.productName}</span></a>
+                        <a href="#"></a>
                         <p>QTY : <span>${item.quantity}</span> pcs</p>
+                        <p>Price : <span>${item.product_details.priceB2C}</span></p>
                     </div>
                 </div>
                 <div class="order-list-info">
