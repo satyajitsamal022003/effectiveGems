@@ -58,14 +58,14 @@ class OrderController extends Controller
         $totalFilteredRecords = $query->count();
 
         // Apply pagination
-        $orders = $query->where('paymentCompleted', 1) // Filter by payment completed
+        $orders = $query // Filter by payment completed
             ->orderBy('created_at', 'desc')
             ->skip($skip)
             ->take($length)
             ->get();
 
         // Get the total record count without filtering
-        $totalRecords = Order::where('paymentCompleted', 1)->count();
+        $totalRecords = Order::count();
 
         // Map the orders to include a custom index and return the data
 

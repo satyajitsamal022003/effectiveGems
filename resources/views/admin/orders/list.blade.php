@@ -509,7 +509,17 @@
                     });
                     // modal.find('.courierName').text(trackingInfo.courierName);
                     modal.find('.trackingNumber').text(trackingInfo.referenceNo);
-                    modal.find('.dispatchDate').text(trackingInfo.dispatchDate);
+                    if (trackingInfo.dispatchDate) {
+                        // Convert the dispatch date to the desired format
+                        let dispatchDate = new Date(trackingInfo.dispatchDate);
+                        let formattedDate = ('0' + dispatchDate.getDate()).slice(-2) + '-' + 
+                                            ('0' + (dispatchDate.getMonth() + 1)).slice(-2) + '-' + 
+                                            dispatchDate.getFullYear();
+
+                        // Display the formatted date in the modal
+                        modal.find('.dispatchDate').text(formattedDate);
+                    }
+
 
                 }
                 // Set Order Details
