@@ -46,84 +46,54 @@ class IndexController extends Controller
     }
 
     public function categorywiseproduct($id, $search = null)
-    {
-        // Pagination setup
-        $pageNo = request()->get('page', 1);
-        $itemsPerPage = 8; // Number of items per page
-        $toSkip = ($pageNo - 1) * $itemsPerPage;
+{
+    // Pagination setup
+    $pageNo = request()->get('page', 1);
+    $itemsPerPage = 8; // Number of items per page
+    $toSkip = ($pageNo - 1) * $itemsPerPage;
 
+    // Fetch subcategory IDs
+    $subcat = SubCategory::where('categoryId', $id)->where('status', 1)->get();
+    $subcategoryIds = $subcat->pluck('id');
 
-        $subcategoriesCount = SubCategory::where('categoryId', $id)->where('status', 1)->count();
+    // Fetch subcategories
+    $subcategories = SubCategory::where('categoryId', $id)->where('status', 1)->get();
 
+    // Fetch the products, order by main category products first, then by product id to ensure consistency
+    $subcategoryproducts = Product::where('categoryId', $id)
+        ->where('status', 1) // Filter by status
+        ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
+        ->orderBy('id', 'asc') // Ensure unique ordering by id
+        ->paginate(8); // Paginate the result
 
-        // Fetch subcategory IDs
-        $subcat = SubCategory::where('categoryId', $id)->where('status', 1)->get();
-        $subcategoryIds = $subcat->pluck('id');
-
-        // Find the max number of products to set the longest pagination length
-
-        // Adjust subcategories pagination
-        $subcategories = SubCategory::where('categoryId', $id)->where('status', 1)->get();
-        // $subcategoriesMaxPage = ceil($subcategoriesCount / $itemsPerPage);
-
-        // if ($pageNo <= $subcategoriesMaxPage) {
-        //     // Normal pagination for subcategories
-        //     $subcategories = $subcategories->skip($toSkip)->take($itemsPerPage)->get();
-        // } else {
-        //     // Repeat the last page of subcategories once the max page is reached
-        //     $lastPageToSkip = ($subcategoriesMaxPage - 1) * $itemsPerPage;
-        //     $subcategories = $subcategories->skip($lastPageToSkip)->take($itemsPerPage)->get();
-        // }
-
-        // Adjust main category products pagination
-        // $maincategoryproducts = Product::where('categoryId', $id)->where('status', 1);
-        // $maincategoryMaxPage = ceil($maincategoryproductsCount / $itemsPerPage);
-
-        // if ($pageNo <= $maincategoryMaxPage) {
-        //     // Normal pagination for main category products
-        //     $maincategoryproducts = $maincategoryproducts->skip($toSkip)->take($itemsPerPage)->get();
-        // } else {
-        //     // Repeat the last page of main category products
-        //     $lastPageToSkip = ($maincategoryMaxPage - 1) * $itemsPerPage;
-        //     $maincategoryproducts = $maincategoryproducts->skip($lastPageToSkip)->take($itemsPerPage)->get();
-        // }
-
-        // Adjust subcategory products pagination
-        // $subcategoryproducts = Product::whereIn('categoryId', $subcategoryIds)->orWhere('categoryId', $id)->where('status', 1)->paginate(8);
-
+    // If there's a search query, modify the product search and apply the same ordering
+    if ($search) {
         $subcategoryproducts = Product::where('categoryId', $id)
             ->where('status', 1) // Filter by status
+            ->where('productName', 'like', '%' . $search . '%') // Search by product name
             ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
+            ->orderBy('id', 'asc') // Ensure unique ordering by id
             ->paginate(8); // Paginate the result
 
-        if ($search) {
-            $subcategoryproducts = Product::where('categoryId', $id)
-                ->where('status', 1) // Filter by status
-                ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END")->where('productName', 'like', '%' . $search . '%') // Main category products first
-                ->paginate(8); // Paginate t
-            return view('user.category.searchProducts', compact(
-
-                'subcategoryproducts',
-                'search'
-            ));
-        }
-
-
-
-
-
-
-
-        // Fetch the category details
-        $category = Category::find($id);
-
-        return view('user.category.product', compact(
-            'subcategories',
-            'category',
+        // Return the search view with products
+        return view('user.category.searchProducts', compact(
             'subcategoryproducts',
-            'pageNo',
+            'search'
         ));
     }
+
+    // Fetch the category details
+    $category = Category::find($id);
+
+    // Return the category product view with subcategories and products
+    return view('user.category.product', compact(
+        'subcategories',
+        'category',
+        'subcategoryproducts',
+        'pageNo',
+    ));
+}
+
     public function subCategory($id, $search = null)
     {
         // Pagination setup
