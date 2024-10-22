@@ -22,6 +22,7 @@
                 <div class="col-6">
                     <label for="sortOrder">Category:</label>
                     <select id="category" class="form-control">
+                        <option value="" selected>-Select a category-</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
                         @endforeach

@@ -256,7 +256,7 @@
                                     </div>
                                    <div class="form-group row">
                                         <label class="col-form-label col-md-4">
-                                            <button class="btn btn-primary" type="button" id="nextButton">Next</button>
+                                            <button class="btn btn-primary" type="button" id="nextButton">Update</button>
                                         </label>
                                     </div>
                                 </div>
@@ -413,7 +413,7 @@
                                     <div class="form-group row">
                                         <label class="col-form-label col-md-4">
                                             <a href="#product_tab" data-toggle="tab"><button class="btn btn-info">Previous</button></a>
-                                            <button class="btn btn-primary" type="button" id="nextButton2">Next</button>
+                                            <button class="btn btn-primary" type="button" id="nextButton2">Update</button>
                                         </label>
                                     </div>
                                 </div>
