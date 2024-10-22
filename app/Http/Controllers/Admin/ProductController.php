@@ -12,7 +12,7 @@ use Illuminate\Support\Str;
 class ProductController extends Controller
 {
 
-    public function addproduct() 
+    public function addproduct()
     {
         $categories = Category::where('status', 1)->get();
         $products = Product::where('status', 1)->orderBy('id', 'desc')->get();
@@ -119,7 +119,7 @@ class ProductController extends Controller
         return view('admin.products.edit', compact('categories', 'productsData', 'product'));
     }
 
-   public function updateproduct(Request $request, $id)
+    public function updateproduct(Request $request, $id)
     {
         $request->validate([
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -151,7 +151,7 @@ class ProductController extends Controller
         } else {
             $productData['image2'] = $product->image2; // Retain existing image2 if no new file uploaded
         }
-        
+
         // Handle image3
         if ($request->hasFile('image3')) {
             $productData['image3'] = $this->uploadFile($request, 'image3', 'product');
@@ -166,6 +166,54 @@ class ProductController extends Controller
         $product->update($productData);
 
         return redirect()->route('admin.listproduct')->with('message', 'Product updated successfully!');
+    }
+    public function updateproductPartly(Request $request, $id)
+    {
+        $request->validate([
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $product = Product::findOrFail($id);
+        $productData = $request->except(['_token']);
+        $productData['updated_at'] = now();
+
+        // Handle the icon
+        if ($request->hasFile('icon')) {
+            $productData['icon'] = $this->uploadFile($request, 'icon', 'producticon');
+        } else {
+            $productData['icon'] = $product->icon; // Retain existing icon if no new file uploaded
+        }
+
+        // Handle image1
+        if ($request->hasFile('image1')) {
+            $productData['image1'] = $this->uploadFile($request, 'image1', 'product');
+        } else {
+            $productData['image1'] = $product->image1; // Retain existing image1 if no new file uploaded
+        }
+
+        // Handle image2
+        if ($request->hasFile('image2')) {
+            $productData['image2'] = $this->uploadFile($request, 'image2', 'product');
+        } else {
+            $productData['image2'] = $product->image2; // Retain existing image2 if no new file uploaded
+        }
+
+        // Handle image3
+        if ($request->hasFile('image3')) {
+            $productData['image3'] = $this->uploadFile($request, 'image3', 'product');
+        } else {
+            $productData['image3'] = $product->image3; // Retain existing image3 if no new file uploaded
+        }
+
+        $productData['is_variant'] = $request->is_variant ? 1 : 0;
+        $productData['variant'] = $request->filled('variant') ? json_encode($request->variant) : null;
+        $productData['seoUrl'] = Str::slug($request->productName);
+
+        $product->update($productData);
+
+        return response()->json(["status" => true]);
     }
 
     private function uploadFile(Request $request, $fieldName, $path)
