@@ -562,6 +562,7 @@
 
                 // Assuming you only display the first item, you could loop through all items if needed
                 if (order.items.length > 0) {
+                    foundCourierTypeId2 = false;
                     // Loop through each item in order.items
                     order.items.forEach(function(item) {
                         let deliveryPrice = 0;
@@ -571,24 +572,34 @@
                             ); // Assume this function gets the courier type object
                             if (courierType) {
                                 deliveryPrice = courierType.courier_price;
+                                if (courierType.id === 2) {
+                                    if (!foundCourierTypeId2) {
+                                        foundCourierTypeId2 =
+                                            true; // Mark the first occurrence
+                                    } else {
+                                        deliveryPrice =
+                                            0; // Subsequent occurrences of courierTypeId 2 set delivery price to 0
+                                    }
+                                }
                                 if (courierType.id === 3 || courierType.id === 4) {
                                     deliveryPrice *= item
                                         .quantity; // Adjust delivery price based on quantity
                                 }
                             }
                         }
-                        let subtotal = 0;
+
                         // Calculate subtotal for the item
-                        if (item.product_details.categoryId !== 1) {
-                            // For categoryId not equal to 1
-                             subtotal = (item.product_details.priceB2C + item.activation + item
+                        let subtotal;
+                        console.log(item.product_details);
+                        
+                        if (item.product_details.categoryId != 1) {
+                            // For categories other than 1
+                            subtotal = (item.product_details.priceB2C + item.activation + item
                                 .certificate) * item.quantity + deliveryPrice;
-                            item.totalPrice = subtotal; // Set totalPrice on the item object
                         } else {
-                            // For categoryId equal to 1
-                             subtotal = (item.product_details.priceB2C) * item.quantity +
+                            // For category 1
+                            subtotal = (item.product_details.priceB2C * item.quantity) +
                                 deliveryPrice + item.activation + item.certificate;
-                            item.totalPrice = subtotal; // Set totalPrice on the item object
                         }
 
                         // Create a new order list element
