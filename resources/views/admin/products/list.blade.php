@@ -218,6 +218,7 @@
             var table = $('#ProductTable').DataTable({
                 processing: true,
                 serverSide: true,
+                pageLength: 100,
                 ajax: {
                     url: "{{ route('admin.products.data') }}",
                     data: function(d) {

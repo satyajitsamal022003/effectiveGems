@@ -459,12 +459,13 @@
                                                     @elseif($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 2)
 
                                                     @elseif($cartItem->productDetails->activation)
-                                                        ({{ $cartItem->productDetails->activation->amount ?? 'N/A' }})
+                                                        
                                                         <input type="checkbox" id="activation" name="is_act-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_act_selected ? 'checked' : '' }}
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
-                                                        <label for="activation"> Activation</label>
+                                                        <label for="activation"> Activation({{ $cartItem->productDetails->activation->amount ? '+' . $cartItem->productDetails->activation->amount : 'N/A' }})
+                                                        </label>
                                                     @else
                                                     @endif
 
@@ -475,12 +476,12 @@
                                                     @elseif($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
 
                                                     @elseif($cartItem->productDetails->certification)
-                                                        ({{ $cartItem->productDetails->certification->amount ?? 'N/A' }})
                                                         <input type="checkbox" id="certificate" name="is_cert-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_cert_selected ? 'checked' : '' }}
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
-                                                        <label for="certificate"> Certificate</label>
+                                                        <label for="certificate"> Certificate({{ $cartItem->productDetails->certification->amount ? '+' . $cartItem->productDetails->certification->amount : 'N/A' }})
+                                                        </label>
                                                     @else
                                                     @endif
 

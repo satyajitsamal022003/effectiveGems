@@ -59,9 +59,9 @@
                                                         <input type="checkbox" id="activation" value="1" name="is_act"
                                                             {{ $cartItem->is_act_selected == 1 ? 'checked' : '' }}
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
-                                                        <label for="activation"> Activation
-                                                            ({{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 'Free' }})
-                                                        </label>
+                                                            <label for="activation"> Activation
+                                                                ({{ $cartItem->productDetails->activation ? '+' . $cartItem->productDetails->activation->amount : 'Free' }})
+                                                            </label>
                                                     @else
                                                     @endif
 
@@ -74,10 +74,10 @@
                                                     @elseif($cartItem->productDetails->certification)
                                                         <input type="checkbox" id="certificate" name="is_cert"
                                                             value="1"
-                                                            {{ $cartItem->is_cert_selected == 1 ? 'checked' : '' }}
+                                                            {{ $cartItem->is_cert_selected == 1 ? 'checked' : '' }} 
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
                                                         <label for="certificate"> Certificate
-                                                            ({{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 'Free' }})
+                                                            ({{ $cartItem->productDetails->certification ? '+' .  $cartItem->productDetails->certification->amount : 'Free' }})
                                                         </label>
                                                     @else
                                                     @endif
