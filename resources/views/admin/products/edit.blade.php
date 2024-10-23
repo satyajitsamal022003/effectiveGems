@@ -741,49 +741,109 @@
             const formData = new FormData();
 
             // Append form values
-            formData.append('productName', $('input[name="productName"]').val());
-            formData.append('variantName', $('input[name="variantName"]').val());
-            formData.append('categoryId', $('input[name="categoryId"]').val());
-            formData.append('subCategoryId', $('input[name="subCategoryId"]').val());
-            formData.append('sortOrder', $('input[name="sortOrder"]').val());
-            formData.append('sortOrderSubCategory', $('input[name="sortOrderSubCategory"]').val());
-            formData.append('sortOrderCategory', $('input[name="sortOrderCategory"]').val());
-            formData.append('sortOrderPopular', $('input[name="sortOrderPopular"]').val());
-            formData.append('price_type', $('input[name="price_type"]').val());
-            formData.append('priceMRP', $('input[name="priceMRP"]').val());
-            formData.append('priceB2C', $('input[name="priceB2C"]').val());
-            formData.append('min_product_qty', $('input[name="min_product_qty"]').val());
-            formData.append('max_product_qty', $('input[name="max_product_qty"]').val());
-            formData.append('out_of_stock', $('input[name="out_of_stock"]').val());
-            formData.append('certificationId', $('input[name="certificationId"]').val());
-            formData.append('activationId', $('input[name="activationId"]').val());
-            formData.append('courierTypeId', $('input[name="courierTypeId"]').val());
-            formData.append('is_variant', $('input[name="is_variant"]').val());
-            formData.append('variant', $('input[name="variant"]').val());
-            formData.append('metaTitle', $('input[name="metaTitle"]').val());
-            formData.append('metaDescription', $('input[name="metaDescription"]').val());
-            formData.append('seoUrl', $('input[name="seoUrl"]').val());
-            formData.append('metaKeyword', $('input[name="metaKeyword"]').val());
+            const fields = [
+                'productName',
+                'variantName',
+                'categoryId',
+                'subCategoryId',
+                'sortOrder',
+                'sortOrderSubCategory',
+                'sortOrderCategory',
+                'sortOrderPopular',
+                'price_type',
+                'priceMRP',
+                'priceB2C',
+                'min_product_qty',
+                'max_product_qty',
+                'out_of_stock',
+                'certificationId',
+                'activationId',
+                'courierTypeId',
+                'is_variant',
+                'variant',
+                'metaTitle',
+                'metaDescription',
+                'seoUrl',
+                'metaKeyword'
+            ];
+
+            fields.forEach(field => {
+                const value = $(`input[name="${field}"]`).val();
+                if (value !== undefined && value !== null) {
+                    formData.append(field, value);
+                }
+            });
+
 
             // Add CSRF token
             formData.append('_token', '{{ csrf_token() }}');
 
             // Make the AJAX request
-            $.ajax({
-                type: "POST",
-                url: "{{ route('admin.updateProductPartly', $product->id) }}",
-                data: formData,
-                contentType: false, // Important for file uploads
-                processData: false, // Prevent jQuery from converting the data into a query string
-                success: function(response) {
-                    return true;
-                    toastr.success('Updated');
+            try {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('admin.updateProductPartly', $product->id) }}",
+                    data: formData,
+                    contentType: false, // Important for file uploads
+                    processData: false, // Prevent jQuery from converting the data into a query string
+                    success: function(response) {
+                        toastr.success('Updated');
+                        return true;
 
-                },
-                error: function(xhr, status, error) {
-                    toastr.error('An error occurred: ' + error);
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error('An error occurred: ' + error);
+                    }
+                });
+            } catch (error) {
+                return false;
+            }
+            return true;
+
+        }
+        const updateProductImages = () => {
+            // Create a FormData object
+            const formData = new FormData();
+
+            // Append file inputs
+            const fileFields = [
+                'icon',
+                'image1',
+                'image2',
+                'image3'
+            ];
+
+            fileFields.forEach(field => {
+                const fileInput = $(`input[name="${field}"]`)[0]; // Get the file input element
+                if (fileInput.files.length > 0) { // Check if a file is selected
+                    formData.append(field, fileInput.files[0]); // Append the first file
                 }
             });
+
+            // Add CSRF token
+            formData.append('_token', '{{ csrf_token() }}');
+
+            // Make the AJAX request
+            try {
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('admin.updateProductPartly', $product->id) }}", // Adjust the route accordingly
+                    data: formData,
+                    contentType: false, // Important for file uploads
+                    processData: false, // Prevent jQuery from converting the data into a query string
+                    success: function(response) {
+                        toastr.success('Images updated successfully!');
+                        return true;
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error('An error occurred: ' + error);
+                    }
+                });
+            } catch (error) {
+                return false;
+            }
+            return true;
+
         }
     </script>
 
@@ -817,6 +877,7 @@
             // If all required fields are valid, proceed to the next tab
 
             if (allValid) {
+
                 if (updateProductPartly()) {
                     var nextTabLink = document.querySelector('a[href="#product_image_tab"]');
                     var nextTab = new bootstrap.Tab(nextTabLink);
@@ -845,9 +906,11 @@
 
             // If all required fields are valid, proceed to the next tab
             if (allValid) {
-                var nextTabLink = document.querySelector('a[href="#product_description_tab"]');
-                var nextTab = new bootstrap.Tab(nextTabLink);
-                nextTab.show();
+                if (updateProductImages()) {
+                    var nextTabLink = document.querySelector('a[href="#product_description_tab"]');
+                    var nextTab = new bootstrap.Tab(nextTabLink);
+                    nextTab.show();
+                }
             } else {
                 alert('Please fill all required fields.');
             }
