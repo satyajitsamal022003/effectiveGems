@@ -454,9 +454,8 @@
 
                                             <div class="extra-feature">
                                                 <div class="extra-feature-list">
-                                                    @if ($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 1)
-                                                        Activation: (Free)
-                                                    @elseif($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 2)
+                                                    @if ($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 2)
+                                                   
 
                                                     @elseif($cartItem->productDetails->activation)
                                                         ({{ $cartItem->productDetails->activation->amount ?? 'N/A' }})
@@ -465,14 +464,11 @@
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
                                                         <label for="activation"> Activation</label>
-                                                    @else
                                                     @endif
 
                                                 </div>
                                                 <div class="extra-feature-list">
-                                                    @if ($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 1)
-                                                        Certification: (Free)
-                                                    @elseif($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
+                                                    @if ($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
 
                                                     @elseif($cartItem->productDetails->certification)
                                                         ({{ $cartItem->productDetails->certification->amount ?? 'N/A' }})
@@ -481,7 +477,6 @@
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
                                                         <label for="certificate"> Certificate</label>
-                                                    @else
                                                     @endif
 
                                                 </div>

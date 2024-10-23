@@ -1,17 +1,24 @@
 @extends('user.layout')
 @section('content')
-@section('title', !empty($productdetails->metaTitle) ? $productdetails->metaTitle : $productdetails->productName  . ' | Effective Gems')
+@section('title',
+    !empty($productdetails->metaTitle)
+    ? $productdetails->metaTitle
+    : $productdetails->productName .
+    ' |
+    Effective Gems')
     <section class="container">
         <div class="as_breadcrum_wrapper" style="background-image: url('/user/assets/images/breadcrum-img-1.jpg');">
             <div class="row">
                 <div class="col-lg-12 text-center">
                     <h1>{{ $productdetails->productName }}</h1>
                     <ul class="breadcrumb">
-                        <li><a href="{{route('user.index')}}">Home</a></li>
-                        <li><a href="{{route('user.categorywiseproduct',$productdetails->category->id)}}">{{ $productdetails->category->categoryName }}</a></li>
+                        <li><a href="{{ route('user.index') }}">Home</a></li>
+                        <li><a
+                                href="{{ route('user.categorywiseproduct', $productdetails->category->id) }}">{{ $productdetails->category->categoryName }}</a>
+                        </li>
                         @if ($productdetails->subcategory)
                             <li>
-                                <a href="{{route('user.subCategory', $productdetails->subcategory->id)}}">
+                                <a href="{{ route('user.subCategory', $productdetails->subcategory->id) }}">
                                     {{ $productdetails->subcategory->subCategoryName }}
                                 </a>
                             </li>
@@ -68,7 +75,7 @@
                                         </span>
 
                                     </div>
-                                    
+
 
 
                                     <div class="delivery-cost" data-aos="fade-up">
@@ -88,11 +95,11 @@
                                         @endif
                                     </div>
 
-                              
+
                                     @if ($productdetails->categoryId == 1)
                                         <div class="quantity-select mt-2" data-aos="fade-up">
                                             <select name="quantity" id="quantityDd" class="form-select" required>
-                                                    <option value="">--Select Size (Carat/Ratti)--</option>
+                                                <option value="">--Select Size (Carat/Ratti)--</option>
                                                 @for ($i = $productdetails->min_product_qty; $i <= $productdetails->max_product_qty; $i += 0.5)
                                                     <option value="{{ $i }}">{{ $i }}</option>
                                                 @endfor
@@ -108,44 +115,52 @@
                                                     class="fa-regular fa-plus"></i></span>
                                         </div>
                                     @endif
-                                    
+
 
 
                                     @php
-                                        $activation = App\Models\Activations::where('id', $productdetails->activationId)->first();
-                                        $Certification = App\Models\Certification::where('id', $productdetails->certificationId)->first();
+                                        $activation = App\Models\Activations::where(
+                                            'id',
+                                            $productdetails->activationId,
+                                        )->first();
+                                        $Certification = App\Models\Certification::where(
+                                            'id',
+                                            $productdetails->certificationId,
+                                        )->first();
                                     @endphp
-                                    
+
                                     @if (!($activation && $activation->id == 2) || !($Certification && $Certification->id == 2))
                                         <div class="extra-checkbox" data-aos="fade-up">
-                                            <div class="data-check">
-                                                <label>
-                                                    @if ($activation && $activation->id == 1)
-                                                        Activation: (Free)
-                                                    @elseif($activation)
+                                            @if (!($activation && $activation->id == 2))
+                                                <div class="data-check">
+                                                    <label>
+
                                                         Activation (+{{ $activation->amount ?? 'N/A' }})
-                                                        <input type="checkbox" id="activationCheckbox" name="is_act" value="1" data-price="{{ $activation->amount ?? 0 }}">
+                                                        <input type="checkbox" id="activationCheckbox" name="is_act"
+                                                            value="1" data-price="{{ $activation->amount ?? 0 }}">
                                                         <span class="checkmark"></span>
-                                                    @endif
-                                                </label>
-                                            </div>
-                                            <div class="data-check">
-                                                <label>
-                                                    @if ($Certification && $Certification->id == 1)
-                                                        Certification: (Free)
-                                                    @elseif($Certification)
+                                                    </label>
+                                                </div>
+                                            @endif
+                                            @if (!($Certification && $Certification->id == 2))
+                                                <div class="data-check">
+                                                    <label>
+
                                                         Certification (+{{ $Certification->amount ?? 'N/A' }})
-                                                        <input type="checkbox" id="certificationCheckbox" name="is_cert" value="1" data-price="{{ $Certification->amount ?? 0 }}">
+                                                        <input type="checkbox" id="certificationCheckbox" name="is_cert"
+                                                            value="1" data-price="{{ $Certification->amount ?? 0 }}">
                                                         <span class="checkmark"></span>
-                                                    @endif
-                                                </label>
-                                            </div>
+                                                    </label>
+                                                </div>
+                                            @endif
+
                                         </div>
                                     @endif
 
-                                    
-                                    
-                                     <div class="total-price-details" data-aos="fade-up">
+
+
+
+                                    <div class="total-price-details" data-aos="fade-up">
                                         <span>Total :</span>
 
                                         <input type="hidden" id="productPrice" value="{{ $productdetails->priceB2C }}">
@@ -154,7 +169,7 @@
                                             <span id="product-price-total">{{ $productdetails->priceB2C }}</span>
                                         </span>
                                     </div>
-                                    
+
 
                                     <!--button start-->
                                     <div class="main-btn mt-2 space-between justify-content-start" data-aos="zoom-in">
@@ -169,7 +184,7 @@
                                     </div>
                                     <!--button end-->
 
-                                   <ul class="short-note">
+                                    <ul class="short-note">
                                         {{ strip_tags($productdetails->productDesc1) }}
                                     </ul>
 
@@ -315,7 +330,7 @@
                             </div>
                         </div>
                         <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
-                            @foreach ($popularproducts as $popular) 
+                            @foreach ($popularproducts as $popular)
                                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                                     <div class="as_product_box">
                                         <a href="{{ route('user.productdetails', $popular->id) }}"

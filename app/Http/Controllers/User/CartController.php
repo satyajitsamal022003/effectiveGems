@@ -24,26 +24,50 @@ class CartController extends Controller
 
         // Fetch cart items with product details
         $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
+
         foreach ($cartItems as $key => $value) {
             $activation = Activations::find($value->productDetails->activationId);
             $certification = Certification::find($value->productDetails->certificationId);
             $value['productDetails']['activation'] = $activation;
             $value['productDetails']['certification'] = $certification;
         }
-        // Calculate subtotal
+
+        // Initialize variables for subtotal and delivery price
         $totalDelPrice = 0;
-        $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
+        $subtotal = 0;
+
+        // Flag to check if an item with courierTypeId of 2 has been found
+        $foundCourierTypeId2 = false;
+
+        // Calculate subtotal
+        $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice, &$foundCourierTypeId2) {
             $product = Product::find($item->product_id);
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
 
+            // Determine delivery price
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
+
+                // Check if the current item has courierTypeId of 2
+                if ($courierType->id == 2) {
+                    if (!$foundCourierTypeId2) {
+                        // If this is the first item with courierTypeId 2, keep the delivery price
+                        $foundCourierTypeId2 = true; // Set the flag
+                    } else {
+                        // If another item with courierTypeId 2 is found, set delivery price to 0
+                        $deliveryPrice = 0;
+                    }
+                } elseif ($courierType->id == 3 || ($courierType->id == 4 && $product->categoryId != 1)) {
                     $deliveryPrice = $deliveryPrice * $item->quantity;
                 }
+            } else {
+                $deliveryPrice = 0; // Default to 0 if no courier type is found
             }
+
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
+
+            // Calculate total price based on product category
             if ($product->categoryId != 1) {
                 $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
                 return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
@@ -144,7 +168,7 @@ class CartController extends Controller
                 $product = Product::find($product_id);
                 if ($product->activationId != 1 || $product->activationId != 2) {
                     $activation = Activations::find($product->activationId);
-                    $cartItem->activation = $activation->amount;
+                    $cartItem->activation = $activation->amount == "Free" ? 0 : $activation->amount;
                 } else
                     $cartItem->activation = 0;
             }
@@ -152,7 +176,7 @@ class CartController extends Controller
                 $product = Product::find($product_id);
                 if ($product->certificationId != 1 || $product->certificationId != 2) {
                     $activation = Certification::find($product->certificationId);
-                    $cartItem->certificate = $activation->amount;
+                    $cartItem->certificate = $activation->amount == "Free" ? 0 : $activation->amount;
                 } else
                     $cartItem->certificate = 0;
             }
@@ -309,11 +333,11 @@ class CartController extends Controller
         $itemDeliveryPrice = 0;
 
         if ($req->isActive == 1) {
-            $cartItem->activation = $activation;
+            $cartItem->activation = $activation ==  "Free" ? 0 : $activation;
         } else
             $cartItem->activation = 0;
         if ($req->isCert == 1) {
-            $cartItem->certificate = $certificate;
+            $cartItem->certificate = $certificate == "Free" ? 0 : $certificate;
         } else
             $cartItem->certificate = 0;
 

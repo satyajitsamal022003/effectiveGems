@@ -51,9 +51,8 @@
                                             </p>
                                             <div class="extra-feature">
                                                 <div class="extra-feature-list">
-                                                    @if ($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 1)
-                                                        Activation: (Free)
-                                                    @elseif($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 2)
+                                                    @if ($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 2)
+                                                   
 
                                                     @elseif($cartItem->productDetails->activation)
                                                         <input type="checkbox" id="activation" value="1" name="is_act"
@@ -62,14 +61,12 @@
                                                         <label for="activation"> Activation
                                                             ({{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 'Free' }})
                                                         </label>
-                                                    @else
                                                     @endif
 
                                                 </div>
                                                 <div class="extra-feature-list">
-                                                    @if ($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 1)
-                                                        Certification: (Free)
-                                                    @elseif($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
+                                                    @if ($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
+                                                   
 
                                                     @elseif($cartItem->productDetails->certification)
                                                         <input type="checkbox" id="certificate" name="is_cert"
@@ -79,7 +76,6 @@
                                                         <label for="certificate"> Certificate
                                                             ({{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 'Free' }})
                                                         </label>
-                                                    @else
                                                     @endif
 
                                                 </div>
