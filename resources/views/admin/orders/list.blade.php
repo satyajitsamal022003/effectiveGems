@@ -393,15 +393,15 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, full, meta) {
-                        switch(data) {
-                            case 1:
-                                return 'Approved';
-                            case 2:
-                                return 'Canceled';
-                            default:
-                                return 'Approved';
+                            switch (data) {
+                                case 1:
+                                    return 'Approved';
+                                case 2:
+                                    return 'Canceled';
+                                default:
+                                    return 'Approved';
+                            }
                         }
-                    }
 
                     },
                     {
@@ -497,11 +497,13 @@
 
                 var modal = $(this);
                 const trackingInfo = order?.courierdetails ? JSON.parse(order?.courierdetails) : null;
-                if(trackingInfo){
+                if (trackingInfo) {
                     $.ajax({
                         url: '/get-courier-name', // Update this URL to your correct route
                         method: 'GET',
-                        data: { courier_id: trackingInfo.courierName },
+                        data: {
+                            courier_id: trackingInfo.courierName
+                        },
                         success: function(response) {
                             // Assuming the response contains the actual courier name
                             modal.find('.courierName').text(response.courierName);
@@ -512,9 +514,9 @@
                     if (trackingInfo.dispatchDate) {
                         // Convert the dispatch date to the desired format
                         let dispatchDate = new Date(trackingInfo.dispatchDate);
-                        let formattedDate = ('0' + dispatchDate.getDate()).slice(-2) + '-' + 
-                                            ('0' + (dispatchDate.getMonth() + 1)).slice(-2) + '-' + 
-                                            dispatchDate.getFullYear();
+                        let formattedDate = ('0' + dispatchDate.getDate()).slice(-2) + '-' +
+                            ('0' + (dispatchDate.getMonth() + 1)).slice(-2) + '-' +
+                            dispatchDate.getFullYear();
 
                         // Display the formatted date in the modal
                         modal.find('.dispatchDate').text(formattedDate);
@@ -575,10 +577,19 @@
                                 }
                             }
                         }
-
+                        let subtotal = 0;
                         // Calculate subtotal for the item
-                        const subtotal = (item.product_details.priceB2C + item.activation + item
-                            .certificate) * item.quantity + deliveryPrice;
+                        if (item.product_details.categoryId !== 1) {
+                            // For categoryId not equal to 1
+                             subtotal = (item.product_details.priceB2C + item.activation + item
+                                .certificate) * item.quantity + deliveryPrice;
+                            item.totalPrice = subtotal; // Set totalPrice on the item object
+                        } else {
+                            // For categoryId equal to 1
+                             subtotal = (item.product_details.priceB2C) * item.quantity +
+                                deliveryPrice + item.activation + item.certificate;
+                            item.totalPrice = subtotal; // Set totalPrice on the item object
+                        }
 
                         // Create a new order list element
                         var orderList = `
