@@ -118,7 +118,7 @@ class OrderController extends Controller
             $orderId = $order->id;
             $cart = Cart::where("ip", $ip)->first();
             $cartItems = $cart ? $cart->items()->with('productDetails')->get() : collect();
-            $subtotal =   $cartItems->sum(function ($item) {
+            $subtotal =   $cartItems->sum(function ($item) use ($request) {
                 $courierType = Couriertype::find($item->productDetails->courierTypeId);
                 if ($courierType) {
                     $deliveryPrice = $courierType->courier_price;
@@ -127,7 +127,11 @@ class OrderController extends Controller
                     }
                 } else
                     $deliveryPrice = 0;
+                    if ($item->productDetails->categoryId == 1) {
+                        return ($item->productDetails->priceB2C * $item->quantity) + $item->activation + $item->certificate + $courierType->courier_price;
+                    } else {
                 return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+               }
             });
             foreach ($cartItems as $key => $value) {
                 $orderItem = new OrderItem();

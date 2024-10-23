@@ -458,7 +458,7 @@
                                                    
 
                                                     @elseif($cartItem->productDetails->activation)
-                                                        ({{ $cartItem->productDetails->activation->amount ?? 'N/A' }})
+                                                        
                                                         <input type="checkbox" id="activation" name="is_act-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_act_selected ? 'checked' : '' }}
                                                             value="1"
@@ -471,7 +471,6 @@
                                                     @if ($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
 
                                                     @elseif($cartItem->productDetails->certification)
-                                                        ({{ $cartItem->productDetails->certification->amount ?? 'N/A' }})
                                                         <input type="checkbox" id="certificate" name="is_cert-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_cert_selected ? 'checked' : '' }}
                                                             value="1"

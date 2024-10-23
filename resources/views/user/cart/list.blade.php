@@ -71,10 +71,10 @@
                                                     @elseif($cartItem->productDetails->certification)
                                                         <input type="checkbox" id="certificate" name="is_cert-{{ $cartItem->id }}"
                                                             value="1"
-                                                            {{ $cartItem->is_cert_selected == 1 ? 'checked' : '' }}
+                                                            {{ $cartItem->is_cert_selected == 1 ? 'checked' : '' }} 
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
                                                         <label for="certificate"> Certificate
-                                                            ({{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 'Free' }})
+                                                            ({{ $cartItem->productDetails->certification ? '+' .  $cartItem->productDetails->certification->amount : 'Free' }})
                                                         </label>
                                                     @endif
 

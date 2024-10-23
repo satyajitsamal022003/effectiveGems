@@ -69,21 +69,25 @@
                                                             </select>
                                                         </div>
                                                         <div class="form-group">
-                                                            <label>Sort Order</label>
+                                                            <label><strong>Sort Order</strong></label>
                                                             <div class="row">
                                                                 <div class="col-lg-6">
-                                                                    <input class="form-control" id="" placeholder="Sort Order All Product" name="sortOrder" value="{{old('sortOrder')}}">
+                                                                <label for="sortOrderAllProduct">Sort Order All Product</label>
+                                                                    <input type="number" class="form-control" id="" placeholder="Sort Order All Product" name="sortOrder" value="{{old('sortOrder')}}" min="0">
                                                                 </div>
                                                                 <div class="col-lg-6">
-                                                                    <input class="form-control" id="" placeholder="Sort Order Category" name="sortOrderSubCategory" value="{{old('sortOrderSubCategory')}}">
+                                                                <label for="sortOrderCategory">Sort Order Category</label>
+                                                                    <input type="number" class="form-control" id="" placeholder="Sort Order Category" name="sortOrderSubCategory" value="{{old('sortOrderSubCategory')}}" min="0">
                                                                 </div>
                                                             </div>
                                                             <div class="row mt-3">
                                                                 <div class="col-lg-6">
-                                                                    <input class="form-control" id="" placeholder="Sort Order Sub Category" name="sortOrderCategory" value="{{old('sortOrderCategory')}}">
+                                                                <label for="sortOrderSubCategory">Sort Order Sub Category</label>
+                                                                    <input type="number" class="form-control" id="" placeholder="Sort Order Sub Category" name="sortOrderCategory" value="{{old('sortOrderCategory')}}" min="0">
                                                                 </div>
                                                                 <div class="col-lg-6">
-                                                                    <input class="form-control" id="" placeholder="Sort Order Popular" name="sortOrderPopular" value="{{old('sortOrderPopular')}}">
+                                                                <label for="sortOrderPopular">Sort Order Popular</label>
+                                                                    <input type="number" class="form-control" id="" placeholder="Sort Order Popular" name="sortOrderPopular" value="{{old('sortOrderPopular')}}" min="0">
                                                                 </div>
                                                             </div>
                                                         </div>

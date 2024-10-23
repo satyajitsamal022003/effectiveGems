@@ -24,7 +24,7 @@ class ProductController extends Controller
         $categories = Category::select('categoryName', 'id')->whereNotIn('status', [2])->get();
         return view('admin.products.list', compact('categories'));
     }
-    public function getProductsData(Request $request)
+    public function getProductsData(Request $request) 
     {
         $draw = intval($request->input('draw'));
         $length = intval($request->input('length'));
@@ -71,14 +71,7 @@ class ProductController extends Controller
         ]);
     }
 
-
-
-
-
-
-
-
-    public function storeproduct(Request $request)
+    public function storeproduct(Request $request) 
     {
         $request->validate([
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',

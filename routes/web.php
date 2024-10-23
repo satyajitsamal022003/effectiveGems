@@ -127,8 +127,6 @@ Route::get('/pages/{url}',[IndexController::class,'pages'])->name('pages');
 Route::get('/payment-success', [IndexController::class, 'paymentsuccess'])->name('payment.success');
 Route::get('/payment-failed', [IndexController::class, 'paymentfailed'])->name('payment.failed');
 
-
-
 Route::resource('checkout', OrderController::class);
 
 //order request and cancel

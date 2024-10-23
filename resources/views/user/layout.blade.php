@@ -145,6 +145,7 @@
                                     // Fetch categories where onTop = 1
                                     $layoutcategories = \App\Models\Category::where('status', 1)
                                         ->where('onTop', 1)
+                                        ->orderBy('sortOrder', 'asc')
                                         ->get();
                                 @endphp
                                 @foreach ($layoutcategories as $category)
@@ -277,6 +278,7 @@
                                             // Fetch categories where onFooter = 1
                                             $footerCategories = \App\Models\Category::where('status', 1)
                                                 ->where('onFooter', 1)
+                                                ->orderBy('sortOrder', 'asc')
                                                 ->get();
                                         @endphp
 

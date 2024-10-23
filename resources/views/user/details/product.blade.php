@@ -195,7 +195,7 @@
                                             <h3>Product Variant :</h3>
                                             @foreach ($variants as $variant)
                                                 <div class="variant-item">
-                                                    <h4>{{ $variant }}</h4>
+                                                <h4>{{ $variant->variantName }}<br>₹<strong>{{ $variant->priceB2C }}</strong></h4>
                                                 </div>
                                             @endforeach
                                         </div>
