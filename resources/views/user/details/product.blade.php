@@ -224,9 +224,10 @@
                     <li>{{ $productdetails->productHeading5 ?? 'Payment Method' }}</li>
                 </ul>
                 <div class="resp-tabs-container">
-                    <div>
-                        <p>{{ strip_tags($productdetails->productDesc2) ?? 'No Description Available' }}</p>
-                    </div>
+                <div>
+                    <p>{{ html_entity_decode(strip_tags($productdetails->productDesc2)) ?? 'No Description Available' }}</p>
+                </div>
+
                     <!--tab 1 end-->
                     <div>
                         @if ($productdetails->productDesc3)
