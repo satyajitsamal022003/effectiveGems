@@ -13,6 +13,7 @@ use App\Mail\OrderCourierDetails;
 use App\Mail\OrderdeliveryDetails;
 use App\Mail\OrderinvoiceDetails;
 use App\Models\Couriername;
+use App\Models\Setting;
 
 class OrderController extends Controller
 {
@@ -349,5 +350,26 @@ class OrderController extends Controller
 
     return response()->json(['courierName' => 'Unknown'], 404);
 }
+
+public function addsetting(){
+    $setting = Setting::first();
+    return view('admin.settings',compact('setting'));
+}
+
+public function storesetting(Request $request)
+{
+    // Use updateOrCreate to insert or update the record
+    Setting::updateOrCreate(
+        ['id' => 1], // Replace with the condition for finding an existing record
+        [
+            'header_script' => $request->get('header_script'),
+            'footer_script' => $request->get('footer_script'),
+        ]
+    );
+
+    // Redirect to a specified route with a success message
+    return back()->with('message', 'Setting saved successfully');
+}
+
 
 }

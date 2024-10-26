@@ -62,7 +62,7 @@
                              <a class="" href="#">Order status</a>
                          </li>
                          <li>
-                             <a href="setting.html">Setting</a>
+                             <a href="{{route('admin.settings')}}">Setting</a>
                          </li>
                      </ul>
                  </li>

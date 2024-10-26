@@ -96,6 +96,10 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/certifications-edit/{id}', [CertificationController::class, 'editcertification'])->name('admin.editcertification');
     Route::get('/delete-certifications/{id}', [CertificationController::class, 'deletecertification'])->name('admin.deletecertification');
     Route::post('/update-certifications/{id}', [CertificationController::class, 'updatecertification'])->name('admin.updatecertification');
+
+    //settings
+    Route::get('/add-setting', [AdminOrderController::class, 'addsetting'])->name('admin.settings');
+    Route::post('/store-setting', [AdminOrderController::class, 'storesetting'])->name('admin.storesettings');
 });
 Route::get('/', [IndexController::class, 'index'])->name('user.index');
 Route::get('/category-products/{id}', [IndexController::class, 'categorywiseproduct'])->name('user.categorywiseproduct');

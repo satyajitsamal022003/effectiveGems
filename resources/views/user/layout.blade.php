@@ -9,6 +9,11 @@
     <meta property="og:title" content="Home | Effective Gems" />
     <meta property="og:description" content="" />
     <meta property="og:image" content="thumb/image.html" />
+    <?php
+    $setting = App\Models\Setting::first();
+    echo $setting->header_script;
+    ?>
+
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
