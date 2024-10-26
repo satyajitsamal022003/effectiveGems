@@ -561,7 +561,7 @@
                 modal.find('.modal-body').empty();
 
                 // Assuming you only display the first item, you could loop through all items if needed
-                if (order && order.items && order.items.length > 0) {
+                if (order.items.length > 0) {
                     foundCourierTypeId2 = false;
                     // Loop through each item in order.items
                     order.items.forEach(function(item) {
