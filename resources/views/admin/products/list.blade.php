@@ -10,7 +10,7 @@
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
                             <li class="breadcrumb-item active">Manage Products</li>
-                        </ul> 
+                        </ul>
                     </div>
                     <div class="panel-heading col-md-2">
                         <a href="{{ route('admin.addproduct') }}" class="btn btn-block btn-primary">Add Products</a>
@@ -19,13 +19,20 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-6">
+                <div class="col-3">
                     <label for="sortOrder">Category:</label>
-                    <select id="category" class="form-control">
+                    <select id="category" class="form-control" onchange="getSubCategories(this.value)">
                         <option value="" selected>-Select a category-</option>
                         @foreach ($categories as $category)
                             <option value="{{ $category->id }}">{{ $category->categoryName }}</option>
                         @endforeach
+                    </select>
+                </div>
+                <div class="col-3">
+                    <label for="sortOrder">Sub Category:</label>
+                    <select id="subCategory" class="form-control">
+                        <option value="" selected>-Select a sub-category-</option>
+
                     </select>
                 </div>
                 <div class="col-6">
@@ -224,6 +231,7 @@
                     data: function(d) {
                         d.sortByName = $('#sortByName').val(); // Send the sorting order
                         d.category = $('#category').val(); // Send the sorting order
+                        d.subCategory = $('#subCategory').val(); // Send the sorting order
                     }
                 },
                 columns: [{
@@ -243,7 +251,8 @@
                         searchable: false,
                         render: function(data, type, full, meta) {
                             // If image exists, prepend the path; otherwise, provide a fallback image.
-                            const imageUrl = data ? `{{ asset('/${data}') }}` : `{{ asset('blank.png') }}`;
+                            const imageUrl = data ? `{{ asset('/${data}') }}` :
+                                `{{ asset('blank.png') }}`;
                             return `<img src="${imageUrl}" alt="Product Image" style="height: 35px;" class="img-responsive"/>`;
                         }
                     },
@@ -312,6 +321,34 @@
             $('#category').on('change', function() {
                 table.ajax.reload(); // Reload table with the selected sorting order
             });
+            $('#subCategory').on('change', function() {
+                table.ajax.reload(); // Reload table with the selected sorting order
+            });
         });
+    </script>
+    <script>
+        function getSubCategories(id) {
+            $.ajax({
+                type: "GET",
+                url: `{{ route('user.subCategoryAjax', '') }}/${id}`, // Corrected URL syntax
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                },
+                success: function(response) {
+                    const subCategorySelect = $('#subCategory');
+                    subCategorySelect.empty(); // Clear existing options
+                    subCategorySelect.append('<option value="" selected>-Select a sub-category-</option>');
+
+                    response.forEach(function(subCategory) {
+                        subCategorySelect.append(
+                            `<option value="${subCategory.id}">${subCategory.subCategoryName}</option>`
+                            );
+                    });
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('An error occurred: ' + error);
+                }
+            });
+        }
     </script>
 @endsection

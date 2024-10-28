@@ -34,6 +34,7 @@ class ProductController extends Controller
         $searchValue = $request->input('search.value');
         $searchValue = $request->input('search.value');
         $category = $request->input('category'); // Get the sorting order from the request
+        $subCategory = $request->input('subCategory'); // Get the sorting order from the request
         $sortByName = $request->input('sortByName'); // Get the sorting order from the request
 
         // Default sorting order
@@ -46,6 +47,9 @@ class ProductController extends Controller
         }
         if (!empty($category)) {
             $query->where('categoryId', $category);
+        }
+        if (!empty($subCategory)) {
+            $query->where('subCategoryId', $subCategory);
         }
 
         $totalFilteredRecords = $query->count();
