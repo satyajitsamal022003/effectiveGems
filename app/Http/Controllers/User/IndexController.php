@@ -46,55 +46,55 @@ class IndexController extends Controller
     }
 
     public function categorywiseproduct($id, $search = null)
-{
-    // Pagination setup
-    $pageNo = request()->get('page', 1);
-    $itemsPerPage = 16; // Number of items per page
-    $toSkip = ($pageNo - 1) * $itemsPerPage;
+    {
+        // Pagination setup
+        $pageNo = request()->get('page', 1);
+        $itemsPerPage = 16; // Number of items per page
+        $toSkip = ($pageNo - 1) * $itemsPerPage;
 
-    // Fetch subcategory IDs
-    $subcat = SubCategory::where('categoryId', $id)->where('status', 1)->get();
-    $subcategoryIds = $subcat->pluck('id');
+        // Fetch subcategory IDs
+        $subcat = SubCategory::where('categoryId', $id)->where('status', 1)->get();
+        $subcategoryIds = $subcat->pluck('id');
 
-    // Fetch subcategories 
-    $subcategories = SubCategory::where('categoryId', $id)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
+        // Fetch subcategories 
+        $subcategories = SubCategory::where('categoryId', $id)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
 
-    // Fetch the products, order by main category products first, then by product id to ensure consistency
-    $subcategoryproducts = Product::where('categoryId', $id)
-        ->where('status', 1) // Filter by status
-        ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
-        ->orderBy('sortOrder', 'asc')
-        ->orderBy('created_at', 'asc')
-        ->paginate(16); // Paginate the result
-
-    // If there's a search query, modify the product search and apply the same ordering
-    if ($search) {
+        // Fetch the products, order by main category products first, then by product id to ensure consistency
         $subcategoryproducts = Product::where('categoryId', $id)
             ->where('status', 1) // Filter by status
-            ->where('productName', 'like', '%' . $search . '%') // Search by product name
             ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
             ->orderBy('sortOrder', 'asc')
             ->orderBy('created_at', 'asc')
             ->paginate(16); // Paginate the result
 
-        // Return the search view with products
-        return view('user.category.searchProducts', compact(
+        // If there's a search query, modify the product search and apply the same ordering
+        if ($search) {
+            $subcategoryproducts = Product::where('categoryId', $id)
+                ->where('status', 1) // Filter by status
+                ->where('productName', 'like', '%' . $search . '%') // Search by product name
+                ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
+                ->orderBy('sortOrder', 'asc')
+                ->orderBy('created_at', 'asc')
+                ->paginate(16); // Paginate the result
+
+            // Return the search view with products
+            return view('user.category.searchProducts', compact(
+                'subcategoryproducts',
+                'search'
+            ));
+        }
+
+        // Fetch the category details
+        $category = Category::find($id);
+
+        // Return the category product view with subcategories and products
+        return view('user.category.product', compact(
+            'subcategories',
+            'category',
             'subcategoryproducts',
-            'search'
+            'pageNo',
         ));
     }
-
-    // Fetch the category details
-    $category = Category::find($id);
-
-    // Return the category product view with subcategories and products
-    return view('user.category.product', compact(
-        'subcategories',
-        'category',
-        'subcategoryproducts',
-        'pageNo',
-    ));
-}
 
     public function subCategory($id, $search = null)
     {
@@ -103,12 +103,13 @@ class IndexController extends Controller
         $itemsPerPage = 16; // Number of items per page
         $toSkip = ($pageNo - 1) * $itemsPerPage;
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
-        $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->paginate(16);
+        $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('created_at', 'asc')->paginate(16);
         if ($search) {
             $subcategoryproducts = Product::where('subCategoryId', $id)
                 ->where('status', 1)
                 ->where('productName', 'like', '%' . $search . '%')
-                ->orderBy('sortOrderSubCategory', 'asc')
+                ->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")
                 ->orderBy('created_at', 'asc')
                 ->paginate(16);
             return view('user.category.searchProducts', compact(
@@ -157,7 +158,7 @@ class IndexController extends Controller
         $variants = [];
         $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
         if ($productdetails->variant)
-        $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();
+            $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();
         // dd(count($variants));
         return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype"));
     }
