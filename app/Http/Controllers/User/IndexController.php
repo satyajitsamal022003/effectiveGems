@@ -57,14 +57,19 @@ class IndexController extends Controller
         $subcategoryIds = $subcat->pluck('id');
 
         // Fetch subcategories 
-        $subcategories = SubCategory::where('categoryId', $id)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
+        $subcategories = SubCategory::where('categoryId', $id)
+            ->where('status', 1)
+            ->orderBy('sortOrder', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->get();
 
         // Fetch the products, order by main category products first, then by product id to ensure consistency
         $subcategoryproducts = Product::where('categoryId', $id)
             ->where('status', 1) // Filter by status
             ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
-            ->orderBy('sortOrder', 'asc')
-            ->orderBy('created_at', 'asc')
+            ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
+            ->orderBy('sortOrder', 'asc') // Then order by sortOrder
+            ->orderBy('created_at', 'asc') // Finally order by created_at
             ->paginate(16); // Paginate the result
 
         // If there's a search query, modify the product search and apply the same ordering
@@ -73,8 +78,9 @@ class IndexController extends Controller
                 ->where('status', 1) // Filter by status
                 ->where('productName', 'like', '%' . $search . '%') // Search by product name
                 ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
-                ->orderBy('sortOrder', 'asc')
-                ->orderBy('created_at', 'asc')
+                ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
+                ->orderBy('sortOrder', 'asc') // Then order by sortOrder
+                ->orderBy('created_at', 'asc') // Finally order by created_at
                 ->paginate(16); // Paginate the result
 
             // Return the search view with products
@@ -95,6 +101,7 @@ class IndexController extends Controller
             'pageNo',
         ));
     }
+
 
     public function subCategory($id, $search = null)
     {
