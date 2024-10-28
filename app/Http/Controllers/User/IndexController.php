@@ -40,7 +40,8 @@ class IndexController extends Controller
     }
     public function index()
     {
-        $categories = Category::where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
+        $categories = Category::where('status', 1)->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
         $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->orderBy('sortOrderPopular', 'asc')->orderBy('created_at', 'asc')->paginate(16);
         return view('user.index', compact('categories', 'popularproducts'));
     }
@@ -59,9 +60,11 @@ class IndexController extends Controller
         // Fetch subcategories 
         $subcategories = SubCategory::where('categoryId', $id)
             ->where('status', 1)
+            ->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
             ->orderBy('sortOrder', 'asc')
             ->orderBy('created_at', 'asc')
             ->get();
+
 
         // Fetch the products, order by main category products first, then by product id to ensure consistency
         $subcategoryproducts = Product::where('categoryId', $id)
