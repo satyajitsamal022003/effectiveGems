@@ -91,13 +91,13 @@
                                                                 </div>
                                                                 <div class="col-lg-6">
                                                                     <label for="sortOrderCategory">Sort Order Category</label>
-                                                                    <input type="number" class="form-control" id="sortOrderCategory" placeholder="Sort Order Category" name="sortOrderSubCategory" value="{{ $product->sortOrderCategory }}" min="0">
+                                                                    <input type="number" class="form-control" id="sortOrderCategory" placeholder="Sort Order Category" name="sortOrderCategory" value="{{ $product->sortOrderCategory }}" min="0">
                                                                 </div>
                                                             </div>
                                                             <div class="row mt-3">
                                                                 <div class="col-lg-6">
                                                                     <label for="sortOrderSubCategory">Sort Order Sub Category</label>
-                                                                    <input type="number" class="form-control" id="sortOrderSubCategory" placeholder="Sort Order Sub Category" name="sortOrderCategory" value="{{ $product->sortOrderSubCategory  }}" min="0">
+                                                                    <input type="number" class="form-control" id="sortOrderSubCategory" placeholder="Sort Order Sub Category" name="sortOrderSubCategory" value="{{ $product->sortOrderSubCategory  }}" min="0">
                                                                 </div>
                                                                 <div class="col-lg-6">
                                                                     <label for="sortOrderPopular">Sort Order Popular</label>

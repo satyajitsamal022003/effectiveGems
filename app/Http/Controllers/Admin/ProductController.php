@@ -127,6 +127,7 @@ class ProductController extends Controller
         $product = Product::findOrFail($id);
         $productData = $request->except(['_token']);
         $productData['updated_at'] = now();
+        dd($productData);
 
         // Handle the icon
         if ($request->hasFile('icon')) {
