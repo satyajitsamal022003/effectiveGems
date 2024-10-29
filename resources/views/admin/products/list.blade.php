@@ -59,6 +59,7 @@
                                             <th class="no-sort">MRP Price</th>
                                             <th>B2C Price</th>
                                             <th class="no-sort">On Top</th>
+                                            <th class="no-sort">Sort</th>
                                             <th class="no-sort">Status</th>
                                             <th class="no-sort">Action</th>
                                         </tr>
@@ -280,6 +281,10 @@
                         }
                     },
                     {
+                        data: 'sortOrderSubCategory',
+                        name: 'sortOrderSubCategory',
+                    },
+                    {
                         data: 'status',
                         name: 'status',
                         orderable: false,
@@ -342,7 +347,7 @@
                     response.forEach(function(subCategory) {
                         subCategorySelect.append(
                             `<option value="${subCategory.id}">${subCategory.subCategoryName}</option>`
-                            );
+                        );
                     });
                 },
                 error: function(xhr, status, error) {
