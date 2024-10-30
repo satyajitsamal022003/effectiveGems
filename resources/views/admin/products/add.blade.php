@@ -55,7 +55,8 @@
                                                             <div class="form-group">
                                                                 <label>Product Small Name (To show on the variant)</label>
                                                                 <input class="form-control" id=""
-                                                                    placeholder="Product Small Name" name="variantName">
+                                                                    placeholder="Product Small Name" name="variantName"
+                                                                    value="{{ old('variantName') }}">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="">Category </label>
@@ -93,10 +94,8 @@
                                                                             Category</label>
                                                                         <input type="number" class="form-control"
                                                                             id="" placeholder="Sort Order Category"
-                                                                            name="sortOrderCategory
-sortOrderCategory"
-                                                                            value="{{ old('sortOrderCategory
-                                                                                                                                                        sortOrderCategory') }}"
+                                                                            name="sortOrderCategory"
+                                                                            value="{{ old('sortOrderCategory') }}"
                                                                             min="0">
                                                                     </div>
                                                                 </div>
@@ -115,7 +114,8 @@ sortOrderCategory"
                                                                         <label for="sortOrderPopular">Sort Order
                                                                             Popular</label>
                                                                         <input type="number" class="form-control"
-                                                                            id="" placeholder="Sort Order Popular"
+                                                                            id=""
+                                                                            placeholder="Sort Order Popular"
                                                                             name="sortOrderPopular"
                                                                             value="{{ old('sortOrderPopular') }}"
                                                                             min="0">
