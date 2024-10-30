@@ -24,7 +24,7 @@
                     @foreach ($subcategories as $subcat)
                         <div class="sub-item">
                             <a href="/sub-category/{{ $subcat->id }}">
-                                <img src="{{ asset($subcat->image) }}" alt="{{ $subcat->subCategoryName }}">
+                                <img src="{{ asset($subcat->image?? 'blank.png') }}" alt="{{ $subcat->subCategoryName }}">
                             </a>
                             <div class="sub-text">
                                 <h4>{{ $subcat->subCategoryName }}</h4>
@@ -69,7 +69,7 @@
                             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                                 <div class="as_product_box">
                                     <a href="{{ route('user.productdetails', $subcat->id) }}" class="as_product_img">
-                                        <img src="{{ asset($subcat->image1) }}" alt="{{ $subcat->productName }}"
+                                        <img src="{{ asset($subcat->image1 ?? 'blank.png') }}" alt="{{ $subcat->productName }}"
                                             class="img-responsive">
                                     </a>
                                     <div class="as_product_detail">
