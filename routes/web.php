@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\ActivationController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CertificationController;
+use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CourierController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Route;
 
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    Route::resource('coupons', CouponController::class);
     Route::resource('order', AdminOrderController::class);
     Route::get('/orders/data', [AdminOrderController::class, 'getOrdersData'])->name('admin.order.data');
     Route::post('/orders/changeStatus', [AdminOrderController::class, 'changeStatus'])->name('admin.order.changeStatus');
