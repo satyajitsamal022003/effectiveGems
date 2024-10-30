@@ -26,8 +26,8 @@
                             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                                 <div class="as_product_box">
                                     <a href="{{ route('user.productdetails', $subcat->id) }}" class="as_product_img">
-                                        <img src="{{ asset($subcat->image1) }}" alt="{{ $subcat->productName }}"
-                                            class="img-responsive">
+                                        <img src="{{ asset($subcat->image1 ?? 'blank.png') }}"
+                                            alt="{{ $subcat->productName }}" class="img-responsive">
                                     </a>
                                     <div class="as_product_detail">
                                         <h4 class="as_subheading">{{ $subcat->productName }}</h4>

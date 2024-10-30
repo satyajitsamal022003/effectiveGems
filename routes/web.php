@@ -104,6 +104,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 Route::get('/', [IndexController::class, 'index'])->name('user.index');
 Route::get('/category-products/{id}', [IndexController::class, 'categorywiseproduct'])->name('user.categorywiseproduct');
 Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name('user.subCategory');
+Route::get('/sub-category-ajax/{id}', [IndexController::class, 'subCategoryAjax'])->name('user.subCategoryAjax');
 Route::get('/products-details/{prodid}', [IndexController::class, 'productdetails'])->name('user.productdetails');
 Route::get('/layout-category-products/{id}', [IndexController::class, 'getProductsForCategory']);
 Route::post('/searchProduct', [IndexController::class, 'searchProducts'])->name('searchProducts');
