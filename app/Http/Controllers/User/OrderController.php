@@ -114,6 +114,7 @@ class OrderController extends Controller
         $order->shippingAmount = $request->shippingAmount;
         $order->sameBillingAddress = $request->sameAddress;
         $order->promoCode = $request->promoCode;
+        $order->orderStatus = 'Failed';
         if ($order->save()) {
             $orderId = $order->id;
             $cart = Cart::where("ip", $ip)->first();
@@ -127,11 +128,11 @@ class OrderController extends Controller
                     }
                 } else
                     $deliveryPrice = 0;
-                    if ($item->productDetails->categoryId == 1) {
-                        return ($item->productDetails->priceB2C * $item->quantity) + $item->activation + $item->certificate + $courierType->courier_price;
-                    } else {
-                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-               }
+                if ($item->productDetails->categoryId == 1) {
+                    return ($item->productDetails->priceB2C * $item->quantity) + $item->activation + $item->certificate + $courierType->courier_price;
+                } else {
+                    return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                }
             });
             foreach ($cartItems as $key => $value) {
                 $orderItem = new OrderItem();

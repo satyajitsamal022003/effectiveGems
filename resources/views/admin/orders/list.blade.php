@@ -19,6 +19,19 @@
                 <div class="col-sm-12">
                     <div class="card">
                         <div class="card-body">
+                            <div class="form-select mb-2">
+                                <label for="">Order Status</label>
+                                <select id="orderStatusFilter" class="form-control">
+                                    <option value="Placed" selected>Placed</option>
+                                    <option value="Approved">Approved</option>
+                                    <option value="Dispatched">Dispatched</option>
+                                    <option value="Delivered">Delivered</option>
+                                    <option value="Failed">Failed</option>
+                                    <option value="Requested">Requested</option>
+                                    <option value="Cancelled">Cancelled</option>
+                                </select>
+
+                            </div>
                             <div class="table-responsive">
                                 <table id="ordersTable" class="datatable table table-stripped">
                                     <thead>
@@ -353,7 +366,9 @@
                 serverSide: true,
                 ajax: {
                     url: "{{ route('admin.order.data') }}", // Update the route for orders
-                    data: function(d) {}
+                    data: function(d) {
+                        d.orderStatus = $('#orderStatusFilter').val(); // Pass orderstatus parameter
+                    }
                 },
                 columns: [{
                         data: 'DT_RowIndex', // Sl.No
@@ -388,20 +403,10 @@
                         name: 'amount'
                     },
                     {
-                        data: 'orderApproved', // Status
+                        data: 'orderStatus', // Status
                         name: 'status',
                         orderable: false,
-                        searchable: false,
-                        render: function(data, type, full, meta) {
-                            switch (data) {
-                                case 1:
-                                    return 'Approved';
-                                case 2:
-                                    return 'Canceled';
-                                default:
-                                    return 'Approved';
-                            }
-                        }
+                        searchable: false,                        
 
                     },
                     {
@@ -442,6 +447,9 @@
                         }
                     }
                 ]
+            });
+            $('#orderStatusFilter').on('change', function() {
+                table.ajax.reload();
             });
 
         });
@@ -591,7 +599,7 @@
                         // Calculate subtotal for the item
                         let subtotal;
                         console.log(item.product_details);
-                        
+
                         if (item.product_details.categoryId != 1) {
                             // For categories other than 1
                             subtotal = (item.product_details.priceB2C + item.activation + item
