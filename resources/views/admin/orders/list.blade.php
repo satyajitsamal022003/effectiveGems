@@ -22,7 +22,8 @@
                             <div class="form-select mb-2">
                                 <label for="">Order Status</label>
                                 <select id="orderStatusFilter" class="form-control">
-                                    <option value="Placed" selected>Placed</option>
+                                    <option value="" selected>All</option>
+                                    <option value="Placed">Placed</option>
                                     <option value="Approved">Approved</option>
                                     <option value="Dispatched">Dispatched</option>
                                     <option value="Delivered">Delivered</option>
