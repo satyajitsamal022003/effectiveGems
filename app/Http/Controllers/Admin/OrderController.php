@@ -57,6 +57,7 @@ class OrderController extends Controller
 
 
         // Apply filtering by category if applicable
+        $query->where('orderStatus','!=', 'Failed');
         if (!empty($orderStatus)) {
             $query->where('orderStatus', $orderStatus);
         }
