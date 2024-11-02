@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::resource('order', AdminOrderController::class);
+    Route::get('/pending-orders-list', [AdminOrderController::class, 'pendingOrdersList'])->name('admin.order.pendingOrdersList');
+    Route::get('/pending-orders-data', [AdminOrderController::class, 'getPendingOrdersData'])->name('admin.order.getPendingOrdersData');
     Route::get('/orders/data', [AdminOrderController::class, 'getOrdersData'])->name('admin.order.data');
     Route::post('/orders/changeStatus', [AdminOrderController::class, 'changeStatus'])->name('admin.order.changeStatus');
     // Admin dashboard route

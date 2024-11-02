@@ -19,19 +19,6 @@
                 <div class="col-sm-12">
                     <div class="card">
                         <div class="card-body">
-                            <div class="form-select mb-2">
-                                <label for="">Order Status</label>
-                                <select id="orderStatusFilter" class="form-control">
-                                    <option value="" selected>All</option>
-                                    <option value="Placed">Placed</option>
-                                    <option value="Approved">Approved</option>
-                                    <option value="Dispatched">Dispatched</option>
-                                    <option value="Delivered">Delivered</option>
-                                    <option value="Requested">Requested</option>
-                                    <option value="Cancelled">Cancelled</option>
-                                </select>
-
-                            </div>
                             <div class="table-responsive">
                                 <table id="ordersTable" class="datatable table table-stripped">
                                     <thead>
@@ -43,7 +30,6 @@
                                             <th>View</th>
                                             <th>Amount</th>
                                             <th>Status</th>
-                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -365,7 +351,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('admin.order.data') }}", // Update the route for orders
+                    url: "{{ route('admin.order.getPendingOrdersData') }}", // Update the route for orders
                     data: function(d) {
                         d.orderStatus = $('#orderStatusFilter').val(); // Pass orderstatus parameter
                     }
@@ -406,46 +392,9 @@
                         data: 'orderStatus', // Status
                         name: 'status',
                         orderable: false,
-                        searchable: false,                        
-
-                    },
-                    {
-                        data: 'id', // Action buttons
-                        name: 'action',
-                        orderable: false,
                         searchable: false,
-                        render: function(data, type, full, meta) {
-                            if (full.orderApproved == 0) {
-                                return `
-                                    <a href="#" title="Approve" onclick="return toggleOnStatus(${data},1)" class="btn btn-sm bg-success mr-2">
-                                        <i class="fa-regular fa-check"></i>
-                                    </a>
-                                    <a href="#" title="Cancel" onclick="openCancelModal(${data})" class="btn btn-sm bg-danger mr-2">
-                                        <i class="fa-regular fa-xmark"></i>
-                                    </a>
-                                    <a href="#" title="Request To Customer" onclick="openRequestModal(${data})" class="btn btn-sm bg-info mr-2">
-                                        <i class="fa-regular fa-person-circle-question"></i>
-                                    </a>`;
-                            } else if (full.orderApproved == 1) {
-                                return `
-                                    <a href="#" title="Enter Courier Details" onclick="openCourierDetailsModal(${data})" class="btn btn-sm bg-warning mr-2">
-                                        <i class="fa-regular fa-truck"></i>
-                                    </a>
-                                    <a href="#" title="Enter PDF Copy of Invoice" onclick="openInvoiceModal(${data})" class="btn btn-sm bg-secondary mr-2">
-                                        <i class="fa-regular fa-file-pdf"></i>
-                                    </a>`;
-                            } else if (full.orderApproved == 4) {
-                                return `
-                                    <a href="#" title="Enter Your Delivery Details" onclick="openDeliveryDetailsModal(${data})" class="btn btn-sm bg-primary mr-2">
-                                        <i class="fa-regular fa-box"></i>
-                                    </a>`;
-                            } else if (full.orderApproved == 5) {
-                                return '';
-                            } else {
-                                return '';
-                            }
-                        }
-                    }
+
+                    },                    
                 ]
             });
             $('#orderStatusFilter').on('change', function() {
@@ -569,7 +518,7 @@
                 modal.find('.modal-body').empty();
 
                 // Assuming you only display the first item, you could loop through all items if needed
-                if (order.items && order.items.length > 0) {
+                if (order.items.length > 0) {
                     foundCourierTypeId2 = false;
                     // Loop through each item in order.items
                     order.items.forEach(function(item) {
