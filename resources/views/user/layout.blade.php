@@ -110,15 +110,15 @@
                         <!--login and cart section end-->
 
                         <ul class="social-link">
-                            <li><a href="#" title="Facebook" target="_blank"><i
+                            <li><a href="{{$setting->fbLink}}" title="Facebook" target="_blank"><i
                                         class="fa-brands fa-facebook-f"></i></a>
                             </li>
-                            <li><a href="#" title="Twitter" target="_blank"><i
+                            <li><a href="{{$setting->twitterLink}}" title="Twitter" target="_blank"><i
                                         class="fa-brands fa-twitter"></i></a></li>
-                            <li><a href="#" title="Instagram" target="_blank"><i
+                            <li><a href="{{$setting->instaLink}}" title="Instagram" target="_blank"><i
                                         class="fa-brands fa-instagram"></i></a>
                             </li>
-                            <li><a href="#" title="YouTube" target="_blank"><i
+                            <li><a href="{{$setting->youtubeLink}}" title="YouTube" target="_blank"><i
                                         class="fa-brands fa-youtube"></i></a></li>
                         </ul>
                     </div>

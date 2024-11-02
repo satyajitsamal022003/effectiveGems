@@ -189,17 +189,24 @@
                                     </ul>
 
 
-                                    <!--product variant start-->
+                                    <!--product variant start--> 
                                     @if (count($variants) != 0)
                                         <div class="product-variant-section">
                                             <h3>Product Variant :</h3>
                                             @foreach ($variants as $variant)
                                                 <div class="variant-item">
-                                                <h4>{{ $variant->variantName }}<br>₹<strong>{{ $variant->priceB2C }}</strong></h4>
+                                                    @if (!empty($variant->prodid))
+                                                        <a href="{{ route('user.productdetails', ['prodid' => $variant->prodid]) }}">
+                                                            <h4>{{ $variant->variantName ?? '' }}<br>₹<strong>{{ $variant->priceB2C ?? '' }}</strong></h4>
+                                                        </a>
+                                                    @else
+                                                        <h4>{{ $variant->variantName ?? 'N/A' }}<br>₹<strong>{{ $variant->priceB2C ?? '' }}</strong></h4>
+                                                    @endif
                                                 </div>
                                             @endforeach
                                         </div>
                                     @endif
+
 
                                     <div class="clearfix">&nbsp;</div>
                                     <!--product variant end-->
