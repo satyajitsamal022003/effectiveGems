@@ -26,7 +26,7 @@
                             <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                                 <div class="as_product_box">
                                     <a href="{{ route('user.productdetails', $subcat->id) }}" class="as_product_img">
-                                        <img src="{{ asset($subcat->image1 ?? 'blank.png') }}"
+                                        <img src="{{ asset($subcat->image1 ?? 'defaultImage.jpeg') }}"
                                             alt="{{ $subcat->productName }}" class="img-responsive">
                                     </a>
                                     <div class="as_product_detail">

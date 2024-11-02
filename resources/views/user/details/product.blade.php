@@ -49,7 +49,7 @@
 
                                         @foreach ($images as $image)
                                             <a href="{{ asset($image) }}">
-                                                <img src="{{ asset($image ?? 'blank.png') }}" alt="Product Image" />
+                                                <img src="{{ asset($image ?? 'defaultImage.jpeg') }}" alt="Product Image" />
                                             </a>
                                         @endforeach
                                     </div>
@@ -288,7 +288,7 @@
                                     <div class="as_product_box">
                                         <a href="{{ route('user.productdetails', $related->id) }}"
                                             class="as_product_img">
-                                            <img src="{{ asset($related->image1 ?? 'blank.png') }}"
+                                            <img src="{{ asset($related->image1 ?? 'defaultImage.jpeg') }}"
                                                 class="img-responsive" alt="Product Image" />
                                         </a>
                                         <div class="as_product_detail">
@@ -336,7 +336,7 @@
                                     <div class="as_product_box">
                                         <a href="{{ route('user.productdetails', $popular->id) }}"
                                             class="as_product_img">
-                                            <img src="{{ asset($popular->image1 ?? 'blank.png') }}"
+                                            <img src="{{ asset($popular->image1 ?? 'defaultImage.jpeg') }}"
                                                 class="img-responsive" alt="Product Image" />
                                         </a>
                                         <div class="as_product_detail">
