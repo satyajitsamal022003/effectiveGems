@@ -455,11 +455,9 @@
                                             <div class="extra-feature">
                                                 <div class="extra-feature-list">
                                                     @if ($cartItem->productDetails->activation && $cartItem->productDetails->activation->id == 2)
-                                                   
-
                                                     @elseif($cartItem->productDetails->activation)
-                                                        
-                                                        <input type="checkbox" id="activation" name="is_act-{{ $cartItem->id }}"
+                                                        <input type="checkbox" id="activation"
+                                                            name="is_act-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_act_selected ? 'checked' : '' }}
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
@@ -469,9 +467,9 @@
                                                 </div>
                                                 <div class="extra-feature-list">
                                                     @if ($cartItem->productDetails->certification && $cartItem->productDetails->certification->id == 2)
-
                                                     @elseif($cartItem->productDetails->certification)
-                                                        <input type="checkbox" id="certificate" name="is_cert-{{ $cartItem->id }}"
+                                                        <input type="checkbox" id="certificate"
+                                                            name="is_cert-{{ $cartItem->id }}"
                                                             {{ $cartItem->is_cert_selected ? 'checked' : '' }}
                                                             value="1"
                                                             onchange="return onSetChange({{ $cartItem->id }}, `{{ $cartItem->productDetails->activation ? $cartItem->productDetails->activation->amount : 0 }}`, `{{ $cartItem->productDetails->certification ? $cartItem->productDetails->certification->amount : 0 }}`)">
@@ -493,12 +491,13 @@
                             <div class="form-group">
                                 <div class="row align-items-center">
                                     <div class="col-lg-7 col-md-8 col-12">
-                                        <input type="text" name="" class="form-control"
+                                        <input type="text" name="couponCode" id="couponCode" class="form-control"
                                             placeholder="Discount Code" value="" />
                                     </div>
                                     <div class="col-lg-5 col-md-6 col-12">
                                         <div class="main-btn mt-0">
-                                            <button type="button" class="as_btn"><span>Apply</span></button>
+                                            <button onclick="applyCoupon()" type="button"
+                                                class="as_btn couponApplyBtn"><span>Apply</span></button>
                                         </div>
                                     </div>
                                 </div>
@@ -507,6 +506,11 @@
                             <div class="total_order">
                                 <h4>Subtotal</h4>
                                 <h6>₹<span id="total"> {{ $total }}</span></h6>
+
+                            </div>
+                            <div class="total_order dvalue d-none">
+                                <h4>Discounted value</h4>
+                                <h6>₹<span id="discountedtotal"></span></h6>
 
                             </div>
                             <div class="total_order">
@@ -625,5 +629,42 @@
             },
         });
 
+    }
+
+    function applyCoupon() {
+        const couponCode = $('input[name="couponCode"]').val(); // Get the coupon code from the input
+        const cartId = "{{ $cartId }}"; // Get the cart ID
+
+        $.ajax({
+            type: "POST",
+            url: "{{ route('coupon.applyCoupon') }}", // Replace with your route for applying the coupon
+            data: {
+                _token: "{{ csrf_token() }}", // CSRF token for security
+                couponName: couponCode, // Send the coupon code
+                cartId: cartId, // Send the cart ID
+            },
+            success: function(response) {
+                // Assuming response contains subtotal, discount, and finalAmount
+                alert(`Discount of rs ${response.discount} applied!`); // Show a success message
+                $('.amount').val(response.finalAmount);
+                $('.subTotal').text(response.finalAmount);
+                $('#discountedtotal').text(response.finalSubtotal);
+                $('.dvalue').removeClass('d-none');
+                $('<input>').attr({
+                    type: 'hidden',
+                    name: 'appliedCoupon',
+                    value: couponCode
+                }).appendTo('form');
+                $('#couponCode').prop('disabled', true);
+                $('.couponApplyBtn').prop('disabled', true);
+                // $('.subTotal').text(`${response.subtotal}`); // Update the subtotal on the page
+                // $('#total').text(`${response.finalAmount}`); // Update the total amount on the page
+            },
+            error: function(xhr, status, error) {
+
+                // Handle error here
+                alert("An error occurred: " + error); // You can customize this message
+            },
+        });
     }
 </script>

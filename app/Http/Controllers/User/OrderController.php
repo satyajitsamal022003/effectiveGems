@@ -27,6 +27,7 @@ class OrderController extends Controller
 
         if ($ip) {
             $cart = Cart::where("ip", $ip)->first();
+            $cartId = $cart->id;
         }
 
         // Fetch cart items with product details
@@ -62,7 +63,7 @@ class OrderController extends Controller
         });
         $total = $subtotal - $totalDelPrice;
         $states = State::all();
-        return view('user.checkout.index', compact('states', 'cartItems', 'subtotal', 'total', 'totalDelPrice'));
+        return view('user.checkout.index', compact('states', 'cartItems', 'subtotal', 'total', 'totalDelPrice','cartId'));
     }
 
     /**
@@ -115,6 +116,7 @@ class OrderController extends Controller
         $order->sameBillingAddress = $request->sameAddress;
         $order->promoCode = $request->promoCode;
         $order->orderStatus = 'Failed';
+        $order->couponApplied = $request->appliedCoupon;
         if ($order->save()) {
             $orderId = $order->id;
             $cart = Cart::where("ip", $ip)->first();
@@ -146,10 +148,11 @@ class OrderController extends Controller
                 $orderItem->amount = $value->quantity * $value->productDetails->priceB2B;
                 $orderItem->save();
             }
+            $amount = $request->amount *100;
             $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
             $razorpayOrderData = [
                 'receipt'         => 'orderId-' . $orderId, // Your internal order ID as receipt ID
-                'amount'          => $subtotal * 100,
+                'amount'          => $amount,
                 'currency'        => 'INR',
                 'payment_capture' => 1
             ];

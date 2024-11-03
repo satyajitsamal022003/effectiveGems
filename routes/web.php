@@ -22,6 +22,7 @@ use Illuminate\Support\Facades\Route;
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::resource('coupons', CouponController::class);
+
     Route::resource('order', AdminOrderController::class);
     Route::get('/pending-orders-list', [AdminOrderController::class, 'pendingOrdersList'])->name('admin.order.pendingOrdersList');
     Route::get('/pending-orders-data', [AdminOrderController::class, 'getPendingOrdersData'])->name('admin.order.getPendingOrdersData');
@@ -105,6 +106,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/add-setting', [AdminOrderController::class, 'addsetting'])->name('admin.settings');
     Route::post('/store-setting', [AdminOrderController::class, 'storesetting'])->name('admin.storesettings');
 });
+Route::post('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('coupon.applyCoupon');
 Route::get('/', [IndexController::class, 'index'])->name('user.index');
 Route::get('/category-products/{id}', [IndexController::class, 'categorywiseproduct'])->name('user.categorywiseproduct');
 Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name('user.subCategory');
@@ -130,7 +132,7 @@ Route::post('razorpay-callback', [RazorpayController::class, 'paymentCallback'])
 Route::get('razorpay-test', [RazorpayController::class, 'testRazorpayCredentials'])->name('razorpay.testRazorpayCredentials');
 
 Route::get('optimize', [IndexController::class, 'optimize'])->name('user.optmize');
-Route::get('/pages/{url}',[IndexController::class,'pages'])->name('pages');
+Route::get('/pages/{url}', [IndexController::class, 'pages'])->name('pages');
 
 //success and failed
 Route::get('/payment-success', [IndexController::class, 'paymentsuccess'])->name('payment.success');
