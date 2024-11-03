@@ -122,6 +122,7 @@
                         </div>
                         <div class="col-lg-6 col-md-6 col-12">
                             <div class="sub-total-info">
+                                <h4>Coupon -<span id="modalCouponApplied"></span></h4>
                                 <h4>Sub Total : RS <span id="modalSubTotal"></span> /-</h4>
                                 <h4>Total : RS <span id="modalSubTotal2"></span>/-</h4>
                             </div>
@@ -655,6 +656,7 @@
                 //     'Tracking Number: Z06066552'); // Placeholder
 
                 // Subtotal and total
+                modal.find('#modalCouponApplied').text(order.couponApplied || 'N/A');
                 modal.find('#modalSubTotal').text(order.amount || 'N/A');
                 modal.find('#modalSubTotal2').text(order.amount || 'N/A');
             });

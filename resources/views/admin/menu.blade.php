@@ -49,12 +49,14 @@
                      <a href="product.html"><i class="fa-solid fa-passport"></i> <span>Orders</span>
                          <span class="menu-arrow"></span></a>
                      <ul>
-                         <li>
-                             <a href="{{ route('admin.order.pendingOrdersList') }}"><i class="fa-solid fa-cart-shopping"></i>Payment
-                                 failed</a>
-                         </li>
+
                          <li class="">
                              <a href="/admin/order"><i class="fa-solid fa-cart-shopping"></i><span>Order</span></a>
+                         </li>
+                         <li>
+                             <a href="{{ route('admin.order.pendingOrdersList') }}"><i
+                                     class="fa-solid fa-cart-shopping"></i>Payment
+                                 failed</a>
                          </li>
                      </ul>
                  </li>
