@@ -49,7 +49,7 @@
 
                                         @foreach ($images as $image)
                                             <a href="{{ asset($image) }}">
-                                                <img src="{{ asset($image ?? 'blank.png') }}" alt="Product Image" />
+                                                <img src="{{ asset($image ?? 'defaultImage.jpeg') }}" alt="Product Image" />
                                             </a>
                                         @endforeach
                                     </div>
@@ -185,21 +185,28 @@
                                     <!--button end-->
 
                                     <ul class="short-note">
-                                        {{ strip_tags($productdetails->productDesc1) }}
+                                        {!! $productdetails->productDesc1 !!}
                                     </ul>
 
 
-                                    <!--product variant start-->
+                                    <!--product variant start--> 
                                     @if (count($variants) != 0)
                                         <div class="product-variant-section">
                                             <h3>Product Variant :</h3>
                                             @foreach ($variants as $variant)
                                                 <div class="variant-item">
-                                                <h4>{{ $variant->variantName }}<br>₹<strong>{{ $variant->priceB2C }}</strong></h4>
+                                                    @if (!empty($variant->prodid))
+                                                        <a href="{{ route('user.productdetails', ['prodid' => $variant->prodid]) }}">
+                                                            <h4>{{ $variant->variantName ?? '' }}<br>₹<strong>{{ $variant->priceB2C ?? '' }}</strong></h4>
+                                                        </a>
+                                                    @else
+                                                        <h4>{{ $variant->variantName ?? 'N/A' }}<br>₹<strong>{{ $variant->priceB2C ?? '' }}</strong></h4>
+                                                    @endif
                                                 </div>
                                             @endforeach
                                         </div>
                                     @endif
+
 
                                     <div class="clearfix">&nbsp;</div>
                                     <!--product variant end-->
@@ -225,13 +232,13 @@
                 </ul>
                 <div class="resp-tabs-container">
                 <div>
-                    <p>{{ html_entity_decode(strip_tags($productdetails->productDesc2)) ?? 'No Description Available' }}</p>
+                    <p>{!! $productdetails->productDesc2 ?? 'No Description Available' !!}</p>
                 </div>
 
                     <!--tab 1 end-->
                     <div>
                         @if ($productdetails->productDesc3)
-                            {{ strip_tags($productdetails->productDesc3) }}
+                            {!!  $productdetails->productDesc3 !!}
                         @else
                             <p>Worldwide Shipping is available.<br>
                                 1. Free shipping on orders over INR 5,000 in India.<br>
@@ -242,7 +249,7 @@
                     <!--tab 2 end-->
                     <div>
                         @if ($productdetails->productDesc4)
-                            {{ strip_tags($productdetails->productDesc4) }}
+                            {!! $productdetails->productDesc4 !!}
                         @else
                             <p> 1. Get 100% moneyback on returning loose gemstones within 10 days for a full refund of the
                                 gemstone price.<br>
@@ -254,7 +261,7 @@
                     <!--tab 3 end-->
                     <div>
                         @if ($productdetails->productDesc5)
-                            {{ strip_tags($productdetails->productDesc5) }}
+                            {!! $productdetails->productDesc5 !!}
                         @else
                             <p> 1. Credit Cards: All Visa, MasterCard and American Express Credit Cards are accepted<br>
                                 2. Debit Cards (India): All Visa and Maestro Debit Cards are accepted.<br>
@@ -288,7 +295,7 @@
                                     <div class="as_product_box">
                                         <a href="{{ route('user.productdetails', $related->id) }}"
                                             class="as_product_img">
-                                            <img src="{{ asset($related->image1 ?? 'blank.png') }}"
+                                            <img src="{{ asset($related->image1 ?? 'defaultImage.jpeg') }}"
                                                 class="img-responsive" alt="Product Image" />
                                         </a>
                                         <div class="as_product_detail">
@@ -336,7 +343,7 @@
                                     <div class="as_product_box">
                                         <a href="{{ route('user.productdetails', $popular->id) }}"
                                             class="as_product_img">
-                                            <img src="{{ asset($popular->image1 ?? 'blank.png') }}"
+                                            <img src="{{ asset($popular->image1 ?? 'defaultImage.jpeg') }}"
                                                 class="img-responsive" alt="Product Image" />
                                         </a>
                                         <div class="as_product_detail">

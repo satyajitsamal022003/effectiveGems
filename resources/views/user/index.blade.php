@@ -26,7 +26,7 @@
             @foreach($categories as $category)
                 <a href="{{ route('user.categorywiseproduct', $category->id) }}" class="category-box animate__fadeInLeft" data-aos="zoom-in" data-aos-duration="1500">
                     <div class="category-img">
-                        <img src="{{ asset($category->image ?? 'blank.png') }}" alt="Category Image" />
+                        <img src="{{ asset($category->image ?? 'defaultImage.jpeg') }}" alt="Category Image" />
                     </div>
                     <div class="category-text">
                         <h4>{{ $category->categoryName }}</h4>
@@ -56,7 +56,7 @@
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
                         <div class="as_product_box">
                             <a href="{{ route('user.productdetails', $popular->id) }}" class="as_product_img">
-                                 <img src="{{ asset($popular->image1 ?? 'blank.png') }}" class="img-responsive" alt="product Image" />
+                                 <img src="{{ asset($popular->image1 ?? 'defaultImage.jpeg') }}" class="img-responsive" alt="product Image" />
                             </a>
                             <div class="as_product_detail">
                                 <h4 class="as_subheading">{{ $popular->productName }}</h4>

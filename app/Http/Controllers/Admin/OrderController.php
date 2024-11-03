@@ -14,6 +14,7 @@ use App\Mail\OrderdeliveryDetails;
 use App\Mail\OrderinvoiceDetails;
 use App\Models\Couriername;
 use App\Models\Setting;
+use App\Models\State;
 
 class OrderController extends Controller
 {
@@ -25,6 +26,10 @@ class OrderController extends Controller
     {
         return view('admin.orders.list');
     }
+    public function pendingOrdersList()
+    {
+        return view('admin.orders.pendingOrders');
+    }
     public function getOrdersData(Request $request)
     {
 
@@ -33,6 +38,7 @@ class OrderController extends Controller
         $pageNo = intval($request->input('start'));
         $skip = $pageNo;
         $searchValue = $request->input('search.value');
+        $orderStatus = $request->input('orderStatus');
         // $category = $request->input('category');
         // Base query to fetch orders and eager load order items and their related products
         $query = Order::with(['items.productDetails']); // Eager load order items and product details
@@ -51,9 +57,10 @@ class OrderController extends Controller
 
 
         // Apply filtering by category if applicable
-        // if (!empty($category)) {
-        //     $query->where('orderApproved', $category);
-        // }
+        $query->where('orderStatus','!=', 'Failed');
+        if (!empty($orderStatus)) {
+            $query->where('orderStatus', $orderStatus);
+        }
 
         // Get the total filtered records count
         $totalFilteredRecords = $query->count();
@@ -74,6 +81,73 @@ class OrderController extends Controller
             $order->DT_RowIndex = $pageNo + $key + 1;
             $specificDate = new DateTime($order->created_at);
             $order->orderDate = $specificDate->format('d-m-Y h:iA');
+            $order->state = State::find($order->state)->stateName;
+            $order->country = "India";
+            $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
+            // You can add extra details here if needed
+            foreach ($order->items as $key => $item) {
+                $item->productDetails->image = asset($item->productDetails->image1);
+            }
+            return $order;
+        });
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFilteredRecords,
+            'data' => $data
+        ]);
+    }
+    public function getPendingOrdersData(Request $request)
+    {
+
+        $draw = intval($request->input('draw'));
+        $length = intval($request->input('length'));
+        $pageNo = intval($request->input('start'));
+        $skip = $pageNo;
+        $searchValue = $request->input('search.value');
+        $orderStatus = $request->input('orderStatus');
+        // $category = $request->input('category');
+        // Base query to fetch orders and eager load order items and their related products
+        $query = Order::with(['items.productDetails']); // Eager load order items and product details
+
+        // Apply search filtering if needed
+        if (!empty($searchValue)) {
+            $query->where(function ($query) use ($searchValue) {
+                $query->where('firstName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('middleName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('lastName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('userId', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('amount', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('ip', 'LIKE', '%' . $searchValue . '%');
+            });
+        }
+
+
+        // Apply filtering by category if applicable
+        $query->where('orderStatus', 'Failed');
+
+        // Get the total filtered records count
+        $totalFilteredRecords = $query->count();
+
+        // Apply pagination
+        $orders = $query // Filter by payment completed
+            ->orderBy('created_at', 'desc')
+            ->skip($skip)
+            ->take($length)
+            ->get();
+
+        // Get the total record count without filtering
+        $totalRecords = Order::count();
+
+        // Map the orders to include a custom index and return the data
+
+        $data = $orders->map(function ($order, $key) use ($pageNo) {
+            $order->DT_RowIndex = $pageNo + $key + 1;
+            $specificDate = new DateTime($order->created_at);
+            $order->orderDate = $specificDate->format('d-m-Y h:iA');
+            $order->state = State::find($order->state)->stateName;
+            $order->country = "India";
             $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
             // You can add extra details here if needed
             foreach ($order->items as $key => $item) {
@@ -142,6 +216,8 @@ class OrderController extends Controller
     {
         $orderId = $req->orderId;
         $orderApproved = $req->orderApproved; // 1 for approved, 0 for canceled
+
+
         $cancellationReason = $req->cancellationReason;
         $order = Order::find($orderId);
 
@@ -155,6 +231,11 @@ class OrderController extends Controller
             // Save the cancellation reason if the order is canceled
             $order->cancellation_reason = $cancellationReason; // Ensure you have this field in your orders table
         }
+        if ($orderApproved == 1) {
+            $order->orderStatus = 'Approved ';
+        }
+
+
         $order->save();
 
         // Prepare response
@@ -196,6 +277,7 @@ class OrderController extends Controller
 
         $order->request_to_customer = $message;
         $order->orderApproved = 3;
+        $order->orderStatus = 'Requested ';
         $order->save();
 
         // Send the email using the Mailable
@@ -226,6 +308,7 @@ class OrderController extends Controller
         $order->courierdetails = json_encode($courierDetails);
 
         $order->orderApproved = 4;
+        $order->orderStatus = 'Dispatched ';
 
         $order->save();
 
@@ -256,6 +339,7 @@ class OrderController extends Controller
         $order->deliverydetails = json_encode($deliveryDetails);
 
         $order->orderApproved = 5;
+        $order->orderStatus = 'Delivered ';
 
         $order->save();
 
@@ -314,6 +398,7 @@ class OrderController extends Controller
 
         // Approve the order
         $order->orderApproved = 1; // Assuming 1 means approved
+        $order->orderStatus = 'Accepted ';
         $order->save();
 
         // Optionally, send an email to confirm acceptance
@@ -332,6 +417,7 @@ class OrderController extends Controller
 
         // Cancel the order
         $order->orderApproved = 2; // Assuming 0 means canceled
+        $order->orderStatus = 'Cancelled ';
         $order->save();
 
         // Optionally, send an email to confirm cancellation
@@ -341,35 +427,34 @@ class OrderController extends Controller
     }
 
     public function getCourierName(Request $request)
-{
-    $courier = Couriername::find($request->courier_id);
+    {
+        $courier = Couriername::find($request->courier_id);
 
-    if ($courier) {
-        return response()->json(['courierName' => $courier->name]);
+        if ($courier) {
+            return response()->json(['courierName' => $courier->name]);
+        }
+
+        return response()->json(['courierName' => 'Unknown'], 404);
     }
 
-    return response()->json(['courierName' => 'Unknown'], 404);
-}
+    public function addsetting()
+    {
+        $setting = Setting::first();
+        return view('admin.settings', compact('setting'));
+    }
 
-public function addsetting(){
-    $setting = Setting::first();
-    return view('admin.settings',compact('setting'));
-}
+    public function storesetting(Request $request)
+    {
+        // Use updateOrCreate to insert or update the record
+        Setting::updateOrCreate(
+            ['id' => 1], // Replace with the condition for finding an existing record
+            [
+                'header_script' => $request->get('header_script'),
+                'footer_script' => $request->get('footer_script'),
+            ]
+        );
 
-public function storesetting(Request $request)
-{
-    // Use updateOrCreate to insert or update the record
-    Setting::updateOrCreate(
-        ['id' => 1], // Replace with the condition for finding an existing record
-        [
-            'header_script' => $request->get('header_script'),
-            'footer_script' => $request->get('footer_script'),
-        ]
-    );
-
-    // Redirect to a specified route with a success message
-    return back()->with('message', 'Setting saved successfully');
-}
-
-
+        // Redirect to a specified route with a success message
+        return back()->with('message', 'Setting saved successfully');
+    }
 }

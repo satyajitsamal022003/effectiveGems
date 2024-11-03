@@ -94,7 +94,7 @@ class SubCategoryController extends Controller
             'image' => $imagePath,
             'sortOrder' => $request->input('sortOrder'),
             'description' => $request->input('description'),
-            'status' => $request->has('onoffswitch928') ? 0 : 1,
+            'status' => $request->has('onoffswitch928') ? 1 : 0,
         ]);
 
         // Redirect with success message

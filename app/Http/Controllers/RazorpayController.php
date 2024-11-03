@@ -79,6 +79,7 @@ class RazorpayController extends Controller
         } catch (\Throwable $th) {
         }
         $order->paymentCompleted = 1;
+        $order->orderStatus = 'Placed';
         $order->transactionId = $request->razorpay_payment_id;
         $order->save();
 

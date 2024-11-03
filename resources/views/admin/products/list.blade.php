@@ -253,7 +253,7 @@
                         render: function(data, type, full, meta) {
                             // If image exists, prepend the path; otherwise, provide a fallback image.
                             const imageUrl = data ? `{{ asset('/${data}') }}` :
-                                `{{ asset('blank.png') }}`;
+                                `{{ asset('defaultImage.jpeg') }}`;
                             return `<img src="${imageUrl}" alt="Product Image" style="height: 35px;" class="img-responsive"/>`;
                         }
                     },
