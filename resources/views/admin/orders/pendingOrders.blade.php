@@ -381,8 +381,9 @@
                         orderable: false,
                         searchable: false,
                         render: function(data, type, full, meta) {
-                            return `<a href="javascript:" data-toggle="modal" data-order='${JSON.stringify(full)}' data-target="#exampleModal"
-                                    class="btn btn-sm bg-info mr-2">View</a>`;
+                            const orderData = encodeURIComponent(JSON.stringify(full));
+                            return `<a href="javascript:" data-toggle="modal" data-order="${orderData}" data-target="#exampleModal"
+            class="btn btn-sm bg-info mr-2">View</a>`;
                         }
                     },
                     {
@@ -395,7 +396,7 @@
                         orderable: false,
                         searchable: false,
 
-                    },                    
+                    },
                 ]
             });
             $('#orderStatusFilter').on('change', function() {
@@ -450,6 +451,11 @@
             $('#exampleModal').on('show.bs.modal', function(event) {
                 var button = $(event.relatedTarget); // Button that triggered the modal
                 var order = button.data('order'); // Extract the order object
+                try {
+                    order = JSON.parse(decodeURIComponent(order));
+                } catch (e) {
+                    console.error("Error parsing JSON:", e);
+                }
 
                 console.log(order); // You can check the order data in the console for debugging
 
