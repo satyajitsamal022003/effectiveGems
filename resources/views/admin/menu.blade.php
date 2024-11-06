@@ -45,6 +45,12 @@
                  <li class="">
                      <a href="#"><i class="fa-solid fa-users-line"></i><span>Testimonial</span></a>
                  </li>
+                 <li class="">
+                     <a href="/admin/redirects"><i class="fa-solid fa-users-line"></i><span>Redirects</span></a>
+                 </li>
+                 <li class="">
+                    <a href="/admin/coupons"><i class="fa-solid fa-cart-shopping"></i><span>Coupons</span></a>
+                </li>
                  <li class="submenu">
                      <a href="product.html"><i class="fa-solid fa-passport"></i> <span>Orders</span>
                          <span class="menu-arrow"></span></a>
@@ -60,16 +66,7 @@
                          </li>
                      </ul>
                  </li>
-                 <li class="submenu">
-                     <a href="product.html"><i class="fa-solid fa-passport"></i> <span>Coupons</span>
-                         <span class="menu-arrow"></span></a>
-                     <ul>
-
-                         <li class="">
-                             <a href="/admin/coupons"><i class="fa-solid fa-cart-shopping"></i><span>Coupons</span></a>
-                         </li>                         
-                     </ul>
-                 </li>
+              
 
                  <li class="submenu">
                      <a href="#"><i class="fa-solid fa-gear"></i> <span>System</span> <span

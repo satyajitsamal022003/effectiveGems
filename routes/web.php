@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\IndexController;
 use App\Http\Controllers\User\OrderController;
@@ -22,6 +23,11 @@ use Illuminate\Support\Facades\Route;
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::resource('coupons', CouponController::class);
+    Route::post('coupons-status-change', [CouponController::class, 'updateStatus'])->name('coupons.couponstatus');
+    Route::resource('redirects', RedirectController::class);
+    Route::post('redirects/status/update', [RedirectController::class, 'updateStatus'])->name('redirects.updateStatus');
+    
+
 
     Route::resource('order', AdminOrderController::class);
     Route::get('/pending-orders-list', [AdminOrderController::class, 'pendingOrdersList'])->name('admin.order.pendingOrdersList');

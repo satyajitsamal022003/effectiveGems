@@ -71,7 +71,8 @@ class CouponController extends Controller
             'type' => $request->type,
         ]);
 
-        return response()->json(['message' => 'Coupon created successfully'], 201);
+        return redirect()->route('coupons.index');
+
     }
 
 
@@ -130,40 +131,48 @@ class CouponController extends Controller
      */
     public function update(Request $request, int $id)
     {
+        // dd($request->all()); // For debugging, you can remove this after confirming the data
+
+        // Find the coupon by ID
         $coupon = Coupon::find($id);
 
         if (!$coupon) {
             return response()->json(['message' => 'Coupon not found'], 404);
         }
 
-        $request->validate([
-            'wholeSite' => 'nullable|string',
-            'products' => 'nullable|string',
-            'categories' => 'nullable|string',
-            'startDate' => 'required|date',
-            'endDate' => 'required|date|after_or_equal:startDate',
-            'status' => 'required|integer',
-            'productList' => 'nullable|array', // Validate productList as an array
-            'categoriesList' => 'nullable|array', // Validate categoriesList as an array
-            'subCategoriesList' => 'nullable|array', // Validate subCategoriesList as an array
-        ]);
+        // Validate the incoming request
+        // $request->validate([
+        //     'wholeSite' => 'nullable|string',
+        //     'products' => 'nullable|string',
+        //     'categories' => 'nullable|string',
+        //     'startDate' => 'required|date',
+        //     'endDate' => 'required|date|after_or_equal:startDate',
+        //     'status' => 'required|integer',
+        //     'productList' => 'nullable|array',
+        //     'categoriesList' => 'nullable|array',
+        //     'subCategoriesList' => 'nullable|array',
+        // ]);
 
+        // Update the coupon only with provided fields
         $coupon->update([
-            'wholeSite' => $request->wholeSite ? 1 : 0, // Convert to integer for storage
-            'products' => $request->has('productList') ? implode(',', $request->productList) : null, // Convert array to comma-separated string
-            'categories' => $request->has('categoriesList') ? implode(',', $request->categoriesList) : null, // Convert array to comma-separated string
-            'subCategories' => $request->has('subCategoriesList') ? implode(',', $request->subCategoriesList) : null, // Convert array to comma-separated string
-            'startDate' => Carbon::parse($request->startDate),
-            'endDate' => Carbon::parse($request->endDate),
-            'status' => $request->status,
-            'name' => $request->name,
-            'description' => $request->description,
-            'value' => $request->value,
-            'type' => $request->type,
+            'wholeSite' => $request->has('wholeSite') ? 1 : $coupon->wholeSite, // Only update if provided, otherwise retain old value
+            'products' => $request->has('productList') ? implode(',', $request->productList) : $coupon->products,
+            'categories' => $request->has('categoriesList') ? implode(',', $request->categoriesList) : $coupon->categories,
+            'subCategories' => $request->has('subCategoriesList') ? implode(',', $request->subCategoriesList) : $coupon->subCategories,
+            'startDate' => $request->has('startDate') ? Carbon::parse($request->startDate) : $coupon->startDate,
+            'endDate' => $request->has('endDate') ? Carbon::parse($request->endDate) : $coupon->endDate,
+            'status' => $request->has('status') ? $request->status : $coupon->status,
+            'name' => $request->has('name') ? $request->name : $coupon->name,
+            'description' => $request->has('description') ? $request->description : $coupon->description,
+            'value' => $request->has('value') ? $request->value : $coupon->value,
+            'type' => $request->has('type') ? $request->type : $coupon->type,
         ]);
 
-        return response()->json(['message' => 'Coupon updated successfully'], 200);
+        // Return a success message
+        return redirect()->route('coupons.index');
+
     }
+
 
     /**
      * Remove the specified resource from storage.
@@ -177,7 +186,17 @@ class CouponController extends Controller
         }
 
         $coupon->delete();
-        return response()->json(['message' => 'Coupon deleted successfully'], 200);
+        return redirect()->route('coupons.index');
+    }
+    public function updateStatus(Request $request)
+    {
+        $redirect = Coupon::find($request->couponId);
+        if ($redirect) {
+            $redirect->status = $request->status;
+            $redirect->save();
+            return response()->json(['message' => 'Coupon status updated successfully']);
+        }
+        return response()->json(['message' => 'Coupon not found'], 422);
     }
     public function applyCoupon(Request $req)
     {

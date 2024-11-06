@@ -1,6 +1,5 @@
 @extends('admin.layout')
 @section('content')
-
     <div class="page-wrapper">
         <div class="content container-fluid">
 
@@ -53,14 +52,6 @@
                                                             <div class="row">
                                                                 <div class="col-6">
                                                                     <div class="form-group">
-                                                                        <label>Value</label>
-                                                                        <input class="form-control" placeholder="Value"
-                                                                            name="value" {{ $isDisabled }}
-                                                                            value="{{ old('value', $coupon->value) }}">
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6">
-                                                                    <div class="form-group">
                                                                         <label>Type</label>
                                                                         <div class="form-check">
                                                                             <input type="radio" class="form-check-input"
@@ -79,6 +70,15 @@
                                                                         </div>
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-6">
+                                                                    <div class="form-group">
+                                                                        <label>Value</label>
+                                                                        <input class="form-control" placeholder="Value"
+                                                                            name="value" {{ $isDisabled }}
+                                                                            value="{{ old('value', $coupon->value) }}">
+                                                                    </div>
+                                                                </div>
+
                                                             </div>
 
                                                             <!-- Checkboxes for products, categories, wholeSite, and subCategories -->

@@ -51,14 +51,6 @@
                                                             </div>
                                                             <div class="row">
                                                                 <div class="col-6">
-
-                                                                    <div class="form-group">
-                                                                        <label>Value</label>
-                                                                        <input class="form-control" placeholder="value"
-                                                                            name="value">{{ old('value') }}</input>
-                                                                    </div>
-                                                                </div>
-                                                                <div class="col-6">
                                                                     <div class="form-group">
                                                                         <label>Type</label>
 
@@ -80,6 +72,15 @@
                                                                     </div>
 
                                                                 </div>
+                                                                <div class="col-6">
+
+                                                                    <div class="form-group">
+                                                                        <label>Value</label>
+                                                                        <input class="form-control" placeholder="value"
+                                                                            name="value">{{ old('value') }}</input>
+                                                                    </div>
+                                                                </div>
+
                                                             </div>
 
                                                             <!-- Checkboxes for products, categories, wholeSite, and subCategories -->
