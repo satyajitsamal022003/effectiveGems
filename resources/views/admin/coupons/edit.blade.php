@@ -1,5 +1,6 @@
 @extends('admin.layout')
 @section('content')
+    @php $isDisabled = $coupon->startDate > $currentDate ? 'disabled' : ''; @endphp
     <div class="page-wrapper">
         <div class="content container-fluid">
 
@@ -41,20 +42,20 @@
                                                         <div class="col-xl-8">
                                                             <div class="form-group">
                                                                 <label>Coupon Name</label>
-                                                                <input class="form-control required"
+                                                                <input class="form-control required" {{ $isDisabled }}
                                                                     placeholder="Coupon Name" name="name" required
                                                                     value="{{ old('name', $coupon->name) }}">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Description</label>
-                                                                <textarea class="form-control" placeholder="Description" name="description">{{ old('description', $coupon->description) }}</textarea>
+                                                                <textarea class="form-control" {{ $isDisabled }} placeholder="Description" name="description">{{ old('description', $coupon->description) }}</textarea>
                                                             </div>
                                                             <div class="row">
                                                                 <div class="col-6">
                                                                     <div class="form-group">
                                                                         <label>Value</label>
                                                                         <input class="form-control" placeholder="Value"
-                                                                            name="value"
+                                                                            name="value" {{ $isDisabled }}
                                                                             value="{{ old('value', $coupon->value) }}">
                                                                     </div>
                                                                 </div>
@@ -63,13 +64,15 @@
                                                                         <label>Type</label>
                                                                         <div class="form-check">
                                                                             <input type="radio" class="form-check-input"
-                                                                                name="type" value="1"
+                                                                                {{ $isDisabled }} name="type"
+                                                                                value="1"
                                                                                 {{ old('type', $coupon->type) == '1' ? 'checked' : '' }}>
                                                                             <label class="form-check-label">Flat</label>
                                                                         </div>
                                                                         <div class="form-check">
                                                                             <input type="radio" class="form-check-input"
-                                                                                name="type" value="2"
+                                                                                {{ $isDisabled }} name="type"
+                                                                                value="2"
                                                                                 {{ old('type', $coupon->type) == '2' ? 'checked' : '' }}>
                                                                             <label
                                                                                 class="form-check-label">Percentage</label>
@@ -82,15 +85,15 @@
                                                             <div class="form-group">
                                                                 <label>Applicable To:</label>
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        name="wholeSite" id="wholeSite"
+                                                                    <input {{ $isDisabled }} class="form-check-input"
+                                                                        type="checkbox" name="wholeSite" id="wholeSite"
                                                                         {{ $coupon->wholeSite ? 'checked' : '' }}>
                                                                     <label class="form-check-label" for="wholeSite">Whole
                                                                         Site</label>
                                                                 </div>
                                                                 <div class="form-check">
-                                                                    <input class="form-check-input" type="checkbox"
-                                                                        name="products" id="products"
+                                                                    <input {{ $isDisabled }} class="form-check-input"
+                                                                        type="checkbox" name="products" id="products"
                                                                         {{ $coupon->products ? 'checked' : '' }}>
                                                                     <label class="form-check-label"
                                                                         for="products">Products</label>
@@ -101,8 +104,8 @@
                                                                     style="{{ $coupon->products ? 'display: block;' : 'display: none;' }}">
                                                                     <div class="form-group">
                                                                         <label for="">Search Product</label>
-                                                                        <select class="form-control" id="productList"
-                                                                            name="productList[]" multiple>
+                                                                        <select class="form-control" {{ $isDisabled }}
+                                                                            id="productList" name="productList[]" multiple>
                                                                             <option value="">--Select Product--
                                                                             </option>
                                                                             @foreach ($products as $product)
@@ -116,7 +119,8 @@
 
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
-                                                                        name="categories" id="categories"
+                                                                        {{ $isDisabled }} name="categories"
+                                                                        id="categories"
                                                                         {{ $coupon->categories ? 'checked' : '' }}>
                                                                     <label class="form-check-label"
                                                                         for="categories">Categories</label>
@@ -125,8 +129,9 @@
                                                                     style="{{ $coupon->categories ? 'display: block;' : 'display: none;' }}">
                                                                     <div class="form-group">
                                                                         <label for="">Search Categories</label>
-                                                                        <select class="form-control" id="categoriesList"
-                                                                            name="categoriesList[]" multiple>
+                                                                        <select {{ $isDisabled }} class="form-control"
+                                                                            id="categoriesList" name="categoriesList[]"
+                                                                            multiple>
                                                                             <option value="">--Select Category--
                                                                             </option>
                                                                             @foreach ($categories as $category)
@@ -139,7 +144,8 @@
                                                                 </div>
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
-                                                                        name="subCategories" id="subCategories"
+                                                                        {{ $isDisabled }} name="subCategories"
+                                                                        id="subCategories"
                                                                         {{ $coupon->subCategories ? 'checked' : '' }}>
                                                                     <label class="form-check-label"
                                                                         for="subCategories">Sub Categories</label>
@@ -149,7 +155,7 @@
                                                                     style="{{ $coupon->subCategories ? 'display: block;' : 'display: none;' }}">
                                                                     <div class="form-group">
                                                                         <label for="">Search Sub Categories</label>
-                                                                        <select class="form-control"
+                                                                        <select {{ $isDisabled }} class="form-control"
                                                                             id="subCategoriesList"
                                                                             name="subCategoriesList[]" multiple>
                                                                             <option value="">--Select Sub Category--
@@ -168,17 +174,19 @@
                                                             <!-- Date fields -->
                                                             <div class="form-group">
                                                                 <label for="startDate">Start Date</label>
-                                                                <input type="date" class="form-control"
-                                                                    name="startDate" id="startDate" required
+                                                                <input type="date" {{ $isDisabled }}
+                                                                    class="form-control" name="startDate" id="startDate"
+                                                                    required
                                                                     value="{{ old('startDate', \Carbon\Carbon::parse($coupon->startDate)->format('Y-m-d')) }}">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label for="endDate">End Date</label>
-                                                                <input type="date" class="form-control" name="endDate"
-                                                                    id="endDate" required
+                                                                <input type="date" {{ $isDisabled }}
+                                                                    class="form-control" name="endDate" id="endDate"
+                                                                    required
                                                                     value="{{ old('endDate', \Carbon\Carbon::parse($coupon->endDate)->format('Y-m-d')) }}">
                                                             </div>
-                                                            
+
                                                         </div>
                                                         <div class="col-md-4">
                                                             <div class="form-group">

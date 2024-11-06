@@ -94,6 +94,7 @@ class CouponController extends Controller
      */
     public function edit(int $id)
     {
+        $currentDate = now();
         $coupon = Coupon::find($id);
 
         if (!$coupon) {
@@ -106,7 +107,7 @@ class CouponController extends Controller
         $categories = Category::where('status', 1)->get();
         $subCategories = SubCategory::where('status', 1)->get();
         $products = Product::where('status', 1)->orderBy('id', 'desc')->get();
-        return view('admin.coupons.edit', compact('categories', 'coupon', 'products', 'subCategories'));
+        return view('admin.coupons.edit', compact('categories', 'coupon', 'products', 'subCategories','currentDate'));
     }
 
     /**
@@ -175,6 +176,10 @@ class CouponController extends Controller
         // If the coupon does not exist, return an error response
         if (!$coupon) {
             return response()->json(['message' => 'Coupon not found'], 422);
+        }
+        $currentDate = now();
+        if ($coupon->startDate > $currentDate || $coupon->endDate < $currentDate) {
+            return response()->json(['message' => 'Coupon expired or not yet valid'], 422);
         }
 
         // Calculate subtotal from the cart items
@@ -261,7 +266,7 @@ class CouponController extends Controller
 
         // Calculate final amount after discount
         $finalSubtotal = max(0, $total - $discount); // Ensure final amount does not go below zero
-        $finalAmount = max(0, $total - $discount) +$totalDelPrice; // Ensure final amount does not go below zero
+        $finalAmount = max(0, $total - $discount) + $totalDelPrice; // Ensure final amount does not go below zero
 
         return response()->json([
             'total' => $total,
