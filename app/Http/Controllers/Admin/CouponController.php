@@ -94,12 +94,27 @@ class CouponController extends Controller
      */
     public function edit(int $id)
     {
-        $currentDate = now();
         $coupon = Coupon::find($id);
 
+        // Debug output
+        // dd($startDate, $currentDate); 
+
         if (!$coupon) {
-            return response()->json(['message' => 'Coupon not found'], 404);
+            return response()->json(['message' => 'Coupon not found'], 422);
         }
+
+        $currentDate = Carbon::now('Asia/Kolkata'); // Get current time in 'Asia/Kolkata' timezone
+        $startDate = Carbon::parse($coupon->startDate)->timezone('Asia/Kolkata'); // Parse start date to 'Asia/Kolkata' timezone
+
+        // Debug output
+        // dd($startDate->toDateTimeString(), $currentDate->toDateTimeString()); // Check both dates
+
+        // Compare Carbon instances directly (including both date and time)
+        $isDisabled = $currentDate->greaterThan($startDate) ? 'disabled' : ''; // Use full Carbon comparison
+
+        // Debug output for the result
+
+
         $coupon->productList = $coupon->products ? explode(',', $coupon->products) : [];
         $coupon->categoriesList = $coupon->categories ? explode(',', $coupon->categories) : [];
         $coupon->subCategoriesList = $coupon->subCategories ? explode(',', $coupon->subCategories) : [];
@@ -107,7 +122,7 @@ class CouponController extends Controller
         $categories = Category::where('status', 1)->get();
         $subCategories = SubCategory::where('status', 1)->get();
         $products = Product::where('status', 1)->orderBy('id', 'desc')->get();
-        return view('admin.coupons.edit', compact('categories', 'coupon', 'products', 'subCategories','currentDate'));
+        return view('admin.coupons.edit', compact('categories', 'coupon', 'products', 'subCategories', 'currentDate', 'isDisabled'));
     }
 
     /**
@@ -177,10 +192,15 @@ class CouponController extends Controller
         if (!$coupon) {
             return response()->json(['message' => 'Coupon not found'], 422);
         }
-        $currentDate = now();
-        if ($coupon->startDate > $currentDate || $coupon->endDate < $currentDate) {
+        $currentDate = Carbon::now('Asia/Kolkata');  // Get current date and time in 'Asia/Kolkata' timezone
+
+        $startDate = Carbon::parse($coupon->startDate)->timezone('Asia/Kolkata');  // Parse start date in 'Asia/Kolkata' timezone
+        $endDate = Carbon::parse($coupon->endDate)->timezone('Asia/Kolkata');  // Parse end date in 'Asia/Kolkata' timezone
+
+        if ($startDate->lessThan($currentDate) || $endDate->greaterThan($currentDate)) {
             return response()->json(['message' => 'Coupon expired or not yet valid'], 422);
         }
+
 
         // Calculate subtotal from the cart items
         $cartItems = $cart ? $cart->items()->with(['productDetails'])->get() : collect();

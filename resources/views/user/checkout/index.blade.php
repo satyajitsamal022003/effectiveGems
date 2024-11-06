@@ -661,9 +661,8 @@
                 // $('#total').text(`${response.finalAmount}`); // Update the total amount on the page
             },
             error: function(xhr, status, error) {
-
-                // Handle error here
-                alert("An error occurred: " + error); // You can customize this message
+                alert(JSON.parse(xhr.responseText)
+                .message); // You can customize this message
             },
         });
     }

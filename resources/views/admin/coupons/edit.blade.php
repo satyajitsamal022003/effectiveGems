@@ -1,6 +1,6 @@
 @extends('admin.layout')
 @section('content')
-    @php $isDisabled = $coupon->startDate > $currentDate ? 'disabled' : ''; @endphp
+
     <div class="page-wrapper">
         <div class="content container-fluid">
 
@@ -8,7 +8,7 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">Coupons</h3>
+                        <h3 class="page-title">Coupons</h3>{{ $isDisabled }}
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('coupons.index') }}">Coupons</a></li>
