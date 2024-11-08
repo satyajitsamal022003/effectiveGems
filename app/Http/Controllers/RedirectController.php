@@ -33,7 +33,7 @@ class RedirectController extends Controller
         }
         $redirects = Redirect::select('id', 'old_url', 'new_url', 'status')->get();
 
-        return view('admin.redirects.index',compact('redirects'));
+        return view('admin.redirects.index', compact('redirects'));
     }
 
     // Show the form to create a new redirect
@@ -51,9 +51,20 @@ class RedirectController extends Controller
             'status' => 'required',
         ]);
 
-        Redirect::create($request->only('old_url', 'new_url', 'status'));
+        // Extract path from old_url and new_url
+        $oldUrlPath = ltrim(parse_url($request->old_url, PHP_URL_PATH), '/');
+        $newUrlPath = ltrim(parse_url($request->new_url, PHP_URL_PATH), '/');
+
+        // Create the redirect entry with only the path
+        Redirect::create([
+            'old_url' => $oldUrlPath,
+            'new_url' => $newUrlPath,
+            'status' => $request->status,
+        ]);
+
         return redirect()->route('redirects.index');
     }
+
 
     // Show the form to edit an existing redirect
     public function edit($id)
@@ -71,14 +82,27 @@ class RedirectController extends Controller
             'status' => 'required',
         ]);
 
+        // Extract path from the old_url and new_url, then remove the leading slash
+        $oldUrlPath = ltrim(parse_url($request->old_url, PHP_URL_PATH), '/');
+        $newUrlPath = ltrim(parse_url($request->new_url, PHP_URL_PATH), '/');
+
+        // Find the redirect entry by ID
         $redirect = Redirect::findOrFail($id);
-        $redirect->update($request->only('old_url', 'new_url', 'status'));
+
+        // Update the redirect with the path excluding the leading slash
+        $redirect->update([
+            'old_url' => $oldUrlPath,
+            'new_url' => $newUrlPath,
+            'status' => $request->status,
+        ]);
 
         return redirect()->route('redirects.index');
     }
 
+
+
     // Delete a redirect
-    public function destroy(Request $request,$id)
+    public function destroy(Request $request, $id)
     {
         $redirect = Redirect::find($id);
         if ($redirect) {
