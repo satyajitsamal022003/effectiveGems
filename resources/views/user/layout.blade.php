@@ -185,8 +185,7 @@
                                 <div class="search-bg"></div>
                                 <div class="search-form">
                                     <div class="container">
-                                        <form action="{{ route('searchProducts') }}" method="POST">
-                                            @csrf
+                                        <form action="{{ route('searchProducts') }}" method="GET">
                                             <div class="form row">
                                                 <input type="hidden" name="catId" value="@yield('catId')">
                                                 <input type="hidden" name="subCatId" value="@yield('subCatId')">

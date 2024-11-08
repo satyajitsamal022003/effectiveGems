@@ -119,7 +119,7 @@ Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name(
 Route::get('/sub-category-ajax/{id}', [IndexController::class, 'subCategoryAjax'])->name('user.subCategoryAjax');
 Route::get('/products-details/{prodid}', [IndexController::class, 'productdetails'])->name('user.productdetails');
 Route::get('/layout-category-products/{id}', [IndexController::class, 'getProductsForCategory']);
-Route::post('/searchProduct', [IndexController::class, 'searchProducts'])->name('searchProducts');
+Route::get('/searchProduct', [IndexController::class, 'searchProducts'])->name('searchProducts');
 
 
 // Cart 

@@ -56,9 +56,12 @@
                             {{-- No "Previous" button --}}
                         @else
                             <li class="page-item">
-                                <form action="{{ route('searchProducts') }}" method="POST">
-                                    @csrf
+                                <form action="{{ route('searchProducts') }}" method="GET">
                                     <input type="hidden" name="search" value="{{ $search }}">
+                                    <input type="hidden" name="catId"
+                                        value="{{ request()->query('catId') ?? (isset($catId) ? $catId : '') }}">
+                                    <input type="hidden" name="subCatId"
+                                        value="{{ request()->query('subCatId') ?? (isset($subCatId) ? $subCatId : '') }}">
                                     <button type="submit" name="page"
                                         value="{{ $subcategoryproducts->currentPage() - 1 }}"
                                         class="page-link">&laquo;</button>
@@ -69,8 +72,11 @@
                         {{-- Show pages around current page --}}
                         @for ($i = max(1, $subcategoryproducts->currentPage() - 2); $i <= min($subcategoryproducts->lastPage(), $subcategoryproducts->currentPage() + 2); $i++)
                             <li class="page-item {{ $i === $subcategoryproducts->currentPage() ? 'active' : '' }}">
-                                <form action="{{ route('searchProducts') }}" method="POST">
-                                    @csrf
+                                <form action="{{ route('searchProducts') }}" method="GET">
+                                    <input type="hidden" name="catId"
+                                        value="{{ request()->query('catId') ?? (isset($catId) ? $catId : '') }}">
+                                    <input type="hidden" name="subCatId"
+                                        value="{{ request()->query('subCatId') ?? (isset($subCatId) ? $subCatId : '') }}">
                                     <input type="hidden" name="search" value="{{ $search }}">
                                     <button type="submit" name="page" value="{{ $i }}"
                                         class="page-link">{{ $i }}</button>
@@ -80,8 +86,11 @@
 
                         @if ($subcategoryproducts->hasMorePages())
                             <li class="page-item">
-                                <form action="{{ route('searchProducts') }}" method="POST">
-                                    @csrf
+                                <form action="{{ route('searchProducts') }}" method="GET">
+                                    <input type="hidden" name="catId"
+                                        value="{{ request()->query('catId') ?? (isset($catId) ? $catId : '') }}">
+                                    <input type="hidden" name="subCatId"
+                                        value="{{ request()->query('subCatId') ?? (isset($subCatId) ? $subCatId : '') }}">
                                     <input type="hidden" name="search" value="{{ $search }}">
                                     <button type="submit" name="page"
                                         value="{{ $subcategoryproducts->currentPage() + 1 }}"

@@ -29,16 +29,21 @@ class IndexController extends Controller
     }
     public function searchProducts(Request $request)
     {
-        $catId = $request->catId;
-        $subCatId = $request->subCatId;
-        $search = $request->search;
-        if ($catId)
+        // Retrieve the query parameters directly from the request
+        $catId = $request->query('catId');
+        $subCatId = $request->query('subCatId');
+        $search = $request->query('search');
+
+        // Check if catId or subCatId is provided, otherwise fall back to subCategory2
+        if ($catId) {
             return $this->categorywiseproduct($catId, $search);
-        elseif ($subCatId)
+        } elseif ($subCatId) {
             return $this->subCategory($subCatId, $search);
-        else
+        } else {
             return $this->subCategory2($search);
+        }
     }
+
     public function index()
     {
         // dd(Hash::make('$ub/0wI?@#2VmVn1?p/#ckYm+8?%]i05'));
