@@ -47,7 +47,7 @@ class RedirectController extends Controller
     {
         $request->validate([
             'old_url' => 'required|unique:redirects,old_url',
-            'new_url' => 'required|url',
+            'new_url' => 'required',
             'status' => 'required',
         ]);
 
@@ -67,7 +67,7 @@ class RedirectController extends Controller
     {
         $request->validate([
             'old_url' => 'required|unique:redirects,old_url,' . $id,
-            'new_url' => 'required|url',
+            'new_url' => 'required',
             'status' => 'required',
         ]);
 

@@ -66,6 +66,7 @@ class CouponController extends Controller
             'endDate' => Carbon::parse($request->endDate),
             'status' => $request->status,
             'name' => $request->name,
+            'code' => $request->code,
             'description' => $request->description,
             'value' => $request->value,
             'type' => $request->type,
@@ -163,6 +164,7 @@ class CouponController extends Controller
             'endDate' => $request->has('endDate') ? Carbon::parse($request->endDate) : $coupon->endDate,
             'status' => $request->has('status') ? $request->status : $coupon->status,
             'name' => $request->has('name') ? $request->name : $coupon->name,
+            'code' => $request->has('code') ? $request->code : $coupon->code,
             'description' => $request->has('description') ? $request->description : $coupon->description,
             'value' => $request->has('value') ? $request->value : $coupon->value,
             'type' => $request->has('type') ? $request->type : $coupon->type,
@@ -205,7 +207,7 @@ class CouponController extends Controller
         $couponName = $req->couponName;
 
         // Retrieve the coupon by name
-        $coupon = Coupon::where("name", $couponName)->first();
+        $coupon = Coupon::where("code", $couponName)->first();
 
         // If the coupon does not exist, return an error response
         if (!$coupon) {

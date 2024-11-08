@@ -46,6 +46,12 @@
                                                                     value="{{ old('name', $coupon->name) }}">
                                                             </div>
                                                             <div class="form-group">
+                                                                <label>Coupon Code</label>
+                                                                <input class="form-control required" {{ $isDisabled }}
+                                                                    placeholder="Coupon Code" name="code" required
+                                                                    value="{{ old('code', $coupon->code) }}">
+                                                            </div>
+                                                            <div class="form-group">
                                                                 <label>Description</label>
                                                                 <textarea class="form-control" {{ $isDisabled }} placeholder="Description" name="description">{{ old('description', $coupon->description) }}</textarea>
                                                             </div>

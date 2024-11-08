@@ -46,6 +46,12 @@
                                                                     value="{{ old('name') }}">
                                                             </div>
                                                             <div class="form-group">
+                                                                <label>Coupon Code</label>
+                                                                <input class="form-control required"
+                                                                    placeholder="Coupon Code" name="code" required
+                                                                    value="{{ old('code') }}">
+                                                            </div>
+                                                            <div class="form-group">
                                                                 <label>Description</label>
                                                                 <textarea class="form-control" placeholder="Description" name="description">{{ old('description') }}</textarea>
                                                             </div>

@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use App\Models\Redirect;
@@ -16,17 +15,17 @@ class RedirectOldUrls
      */
     public function handle($request, Closure $next)
     {
-        // dd($request->path());
-        $fullUrl = $request->getSchemeAndHttpHost() . $request->getRequestUri();
-        $redirect = Redirect::where('old_url', $fullUrl)->where('status',1)->first();
+        // Get only the path portion of the URL
+        $path = $request->path();
+        // dd($path);
+        $redirect = Redirect::where('old_url', $path)->where('status', 1)->first();
 
-        // dd($fullUrl);
-
-
+        // If a matching redirect is found, redirect to the new URL
         if ($redirect) {
             return redirect($redirect->new_url, 301);
         }
 
+        // If no redirect is found, proceed with the next middleware
         return $next($request);
     }
 }
