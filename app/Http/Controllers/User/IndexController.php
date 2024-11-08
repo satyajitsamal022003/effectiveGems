@@ -86,12 +86,7 @@ class IndexController extends Controller
         if ($search) {
             $subcategoryproducts = Product::where('categoryId', $id)
                 ->where('status', 1) // Filter by status
-                ->where(function ($query) use ($search) {
-                    // Soundex Matching
-                    $query->whereRaw("SOUNDEX(productName) = SOUNDEX(?)", [$search])
-                        // Flexible Matching with LIKE (for partial matches)
-                        ->orWhere('productName', 'like', '%' . $search . '%');
-                })
+                ->whereRaw("MATCH(productName) AGAINST(? IN NATURAL LANGUAGE MODE)", [$search])
                 ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
                 ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
                 ->orderBy('sortOrder', 'asc') // Then order by sortOrder
@@ -130,12 +125,7 @@ class IndexController extends Controller
         if ($search) {
             $subcategoryproducts = Product::where('subCategoryId', $id)
                 ->where('status', 1)
-                ->where(function ($query) use ($search) {
-                    // Soundex Matching
-                    $query->whereRaw("SOUNDEX(productName) = SOUNDEX(?)", [$search])
-                        // Flexible Matching with LIKE (for partial matches)
-                        ->orWhere('productName', 'like', '%' . $search . '%');
-                })
+                ->whereRaw("MATCH(productName) AGAINST(? IN NATURAL LANGUAGE MODE)", [$search])
                 ->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
                 ->orderBy('created_at', 'asc')
                 ->paginate(16);
