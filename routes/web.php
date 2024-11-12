@@ -164,6 +164,7 @@ Route::get('sitemap/footer-pages.xml', [SiteMapController::class, 'footerPages']
 Route::get('sitemap/products.xml', [SiteMapController::class, 'products'])->name('sitemap.products');
 Route::get('sitemap/product-images.xml', [SiteMapController::class, 'productImages'])->name('sitemap.productImages');
 Route::get('sitemap/category-images.xml', [SiteMapController::class, 'categoryImages'])->name('sitemap.categoryImages');
+Route::get('sitemap/products/page/{page}.xml', [SiteMapController::class, 'productsPage'])->name('sitemap.products.page');
 Route::get('sitemap/subcategory-images.xml', [SiteMapController::class, 'subCategoryImages'])->name('sitemap.subCategoryImages');
 Route::get('sitemap/products-images/page/{page}.xml', [SiteMapController::class, 'productImagesPage'])->name('sitemap.product-images.page');
 Route::get('sitemap/category-images/page/{page}.xml', [SiteMapController::class, 'categoryImagesPage'])->name('sitemap.category-images.page');
