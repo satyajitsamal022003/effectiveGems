@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This XML Sitemap Index file contains 4 sitemaps. -->
+
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <sitemap>
+        <loc>https://www.effectivegems.com/sitemaps/categories-sitemap.xml</loc>
+            <lastmod>2024-11-12T07:26:00+00:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>https://www.effectivegems.com/sitemaps/subcategories-sitemap.xml</loc>
+            <lastmod>2024-11-12T07:26:00+00:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>https://www.effectivegems.com/sitemaps/products-sitemap.xml</loc>
+            <lastmod>2024-11-12T07:26:00+00:00</lastmod>
+    </sitemap>
+    <sitemap>
+        <loc>https://www.effectivegems.com/sitemaps/footer-urls-sitemap.xml</loc>
+            <lastmod>2024-11-12T07:26:00+00:00</lastmod>
+    </sitemap>
+</sitemapindex>
