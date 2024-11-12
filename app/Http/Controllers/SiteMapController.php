@@ -30,7 +30,7 @@ class SiteMapController extends Controller
     }
     public function subcategories()
     {
-        $subcategories = \App\Models\Subcategory::all(); // Adjust based on your subcategory model
+        $subcategories = \App\Models\SubCategory::all(); // Adjust based on your subcategory model
 
         return response()->view('sitemap.subcategories', compact('subcategories'))->header('Content-Type', 'application/xml');
     }
