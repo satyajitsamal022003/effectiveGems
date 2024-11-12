@@ -14,7 +14,10 @@ class SiteMapController extends Controller
             route('sitemap.subcategories'),
             route('sitemap.footer-pages'),
             route('sitemap.products'),
-            route('sitemap.images')
+            // route('sitemap.images'),
+            route('sitemap.productImages'),
+            route('sitemap.categoryImages'),
+            route('sitemap.subCategoryImages'),
         ];
 
         return response()->view('sitemap.index', compact('sitemaps'))->header('Content-Type', 'application/xml');
@@ -58,11 +61,67 @@ class SiteMapController extends Controller
 
         return response()->view('sitemap.products_page', compact('products'))->header('Content-Type', 'application/xml');
     }
-    public function images()
+    public function productImages()
     {
-        dd(1);
-        // $images = \App\Models\Image::all(); // Adjust based on your image model
+        $productsPerPage = 100;
+        $totalProducts = \App\Models\Product::count();
+        $totalPages = ceil($totalProducts / $productsPerPage);
 
-        // return response()->view('sitemap.images', compact('images'))->header('Content-Type', 'application/xml');
+        $sitemaps = [];
+        for ($page = 1; $page <= $totalPages; $page++) {
+            $sitemaps[] = route('sitemap.product-images.page', ['page' => $page]);
+        }
+
+        return response()->view('sitemap.product-images', compact('sitemaps'))->header('Content-Type', 'application/xml');
     }
+
+    public function productImagesPage($page)
+    {
+        $productsPerPage = 100;
+        $products = \App\Models\Product::skip(($page - 1) * $productsPerPage)->take($productsPerPage)->get();
+
+        return response()->view('sitemap.product-images-page', compact('products'))->header('Content-Type', 'application/xml');
+    }
+
+    public function categoryImages()
+    {
+        $productsPerPage = 100;
+        $totalProducts = \App\Models\Category::count();
+        $totalPages = ceil($totalProducts / $productsPerPage);
+
+        $sitemaps = [];
+        for ($page = 1; $page <= $totalPages; $page++) {
+            $sitemaps[] = route('sitemap.category-images.page', ['page' => $page]);
+        }
+
+        return response()->view('sitemap.category-images', compact('sitemaps'))->header('Content-Type', 'application/xml');
+    }
+    public function categoryImagesPage($page)
+    {
+        $productsPerPage = 100;
+        $products = \App\Models\Category::skip(($page - 1) * $productsPerPage)->take($productsPerPage)->get();
+
+        return response()->view('sitemap.category-images-page', compact('products'))->header('Content-Type', 'application/xml');
+    }
+    public function subCategoryImages()
+    {
+        $productsPerPage = 100;
+        $totalProducts = \App\Models\SubCategory::count();
+        $totalPages = ceil($totalProducts / $productsPerPage);
+
+        $sitemaps = [];
+        for ($page = 1; $page <= $totalPages; $page++) {
+            $sitemaps[] = route('sitemap.subcategory-images.page', ['page' => $page]);
+        }
+
+        return response()->view('sitemap.sub-category-images', compact('sitemaps'))->header('Content-Type', 'application/xml');
+    }
+    public function subCategoryImagesPage($page)
+    {
+        $productsPerPage = 100;
+        $products = \App\Models\SubCategory::skip(($page - 1) * $productsPerPage)->take($productsPerPage)->get();
+
+        return response()->view('sitemap.sub-categories-image-page', compact('products'))->header('Content-Type', 'application/xml');
+    }
+    
 }
