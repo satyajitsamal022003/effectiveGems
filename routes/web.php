@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\SiteMapController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\IndexController;
 use App\Http\Controllers\User\OrderController;
@@ -26,7 +27,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('coupons-status-change', [CouponController::class, 'updateStatus'])->name('coupons.couponstatus');
     Route::resource('redirects', RedirectController::class);
     Route::post('redirects/status/update', [RedirectController::class, 'updateStatus'])->name('redirects.updateStatus');
-    
+
 
 
     Route::resource('order', AdminOrderController::class);
@@ -154,6 +155,15 @@ Route::post('/invoice-upload', [AdminOrderController::class, 'invoiceupload'])->
 Route::get('/order/accept/{id}', [AdminOrderController::class, 'acceptOrder'])->name('order.accept');
 Route::get('/order/cancel/{id}', [AdminOrderController::class, 'cancelOrder'])->name('order.cancel');
 Route::get('/get-courier-name', [AdminOrderController::class, 'getCourierName'])->name('order.getCourierName');
+
+// SITEMAPS 
+Route::get('sitemap.xml', [SiteMapController::class, 'index'])->name('sitemap.index');
+Route::get('sitemap/categories.xml', [SiteMapController::class, 'categories'])->name('sitemap.categories');
+Route::get('sitemap/subcategories.xml', [SiteMapController::class, 'subcategories'])->name('sitemap.subcategories');
+Route::get('sitemap/footer-pages.xml', [SiteMapController::class, 'footerPages'])->name('sitemap.footer-pages');
+Route::get('sitemap/products.xml', [SiteMapController::class, 'products'])->name('sitemap.products');
+Route::get('sitemap/images.xml', [SiteMapController::class, 'images'])->name('sitemap.images');
+Route::get('sitemap/products/page/{page}.xml', [SiteMapController::class, 'productsPage'])->name('sitemap.products.page');
 
 
 

@@ -89,8 +89,8 @@
                         <!--login and cart section start-->
                         <div class="menu-right">
                             <div class="header-login position-relative">
-                                <a href="javascript:;"><i class="fa-light fa-circle-user"></i> Login/Signup</a>
-                                <div class="header-login-dropdown">
+                                <a href="/login"><i class="fa-light fa-circle-user"></i> Login</a>/<a href="/register"><i class="fa-light fa-circle-user"></i> Signup</a>
+                                {{-- <div class="header-login-dropdown">
                                     <ul>
                                         <li><a href="my-profile.html"><i class="fa-light fa-circle-user"></i> My
                                                 Profile</a></li>
@@ -98,7 +98,7 @@
                                         </li>
                                         <li><a href="wishlist.html"><i class="fa-light fa-heart"></i> Wishlist</a></li>
                                     </ul>
-                                </div>
+                                </div> --}}
                             </div>
                             <!--cart for desktop start-->
                             <div class="header-cart for-desktop"><a href="#" id="cartLink"
