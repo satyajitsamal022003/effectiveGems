@@ -74,6 +74,117 @@
                                 </div>
                             </div>
 
+                            <div class="col-md-4">
+                                <div class="main-box seo-box">
+                                    <div class="inline-text">
+                                        <p>Search Engine Listing Preview</p>
+                                        <a href="javascript:" onclick="showseoedit()">Edit
+                                            Website SEO</a>
+                                    </div>
+                                    <div class="box-content">
+                                        <p id="seo_title"></p>
+                                        <a id="seo_url" href=""></a>
+                                        <span id="seo_description"></span>
+                                    </div>
+                                    <div class="seo-edit-box">
+                                        <div class="form-group">
+                                            <label>Meta Title </label>
+                                            <input class="form-control" id="metaTitle"
+                                                placeholder="Meta Title" name="metaTitle"
+                                                value="">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-form-label">Meta Description
+                                            </label>
+
+                                            <textarea id="metaDescription" class="form-control " placeholder="First Description" name="metaDescription"
+                                                cols="50" rows="4"></textarea>
+
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Seo Url </label>
+                                            <input class="form-control" id="seoUrl"
+                                                placeholder="Seo Url" name="seoUrl"
+                                                value="">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Meta Keyword </label>
+                                            <input class="form-control" id="metaKeyword"
+                                                placeholder="Meta Keyword" name="metaKeyword"
+                                                value="">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Meta image </label>
+                                            <input class="form-control" id="metaImage"
+                                                placeholder="Meta image" name="metaImage"
+                                                value="">
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <script>
+                                    function showseoedit() {
+                                        $(".seo-edit-box").toggle('slow');
+                                    }
+                                </script>
+                                <button type="button" class="btn btn-success mt-3">Generate
+                                    SEO
+                                </button>
+
+
+                                <!--image seo start-->
+                                <div class="main-box seo-box mt-3">
+                                    <div class="inline-text">
+                                        <p>Search Engine Image Preview</p>
+                                        <a href="javascript:" onclick="showseoimgedit()">Edit
+                                            Image SEO</a>
+                                    </div>
+                                    <div class="seo-img-edit-box">
+                                        <div class="form-group">
+                                            <label>Alternative Text</label>
+                                            <input class="form-control" id="imageAlt"
+                                                placeholder="Alternative Text" name="imageAlt"
+                                                value="">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Image Title</label>
+                                            <input class="form-control" id="imageTitle"
+                                                placeholder="Image Title" name="imageTitle"
+                                                value="">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Image Caption</label>
+                                            <input class="form-control" id="imageCaption"
+                                                placeholder="Image Caption" name="imageCaption"
+                                                value="">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-form-label">Image Description
+                                            </label>
+                                            <textarea id="imageDesc" class="form-control" placeholder="Description" name="imageDesc" cols="50"
+                                                rows="4"></textarea>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <script>
+                                    function showseoimgedit() {
+                                        $(".seo-img-edit-box").toggle('slow');
+                                    }
+                                </script>
+                                <button type="button" class="btn btn-success mt-3">Generate
+                                    SEO </button>
+                                <!--image seo en-->
+                            </div>
+
                             <button type="submit" class="btn btn-primary">Update Category</button>
                         </form>
                     </div>
@@ -82,16 +193,15 @@
         </div>
     </div>
 </div>
- <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
-    <script>
-        CKEDITOR.replace('description');
-    </script>
+<script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+<script>
+    CKEDITOR.replace('description');
+</script>
 
 <script>
-    
     function previewImage(event, previewId) {
         const reader = new FileReader();
-        reader.onload = function(){
+        reader.onload = function() {
             const output = document.getElementById(previewId);
             output.src = reader.result;
         }

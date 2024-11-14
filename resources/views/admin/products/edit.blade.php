@@ -290,31 +290,31 @@
                                                                 <div class="form-group">
                                                                     <label>Meta Title </label>
                                                                     <input class="form-control" id="metaTitle"
-                                                                        placeholder="Meta Title" name="metaTitle">
+                                                                        placeholder="Meta Title" name="metaTitle" value="{{ $product->metaTitle }}">
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label class="col-form-label">Meta Description
                                                                     </label>
                                                                     <textarea id="metaDescription" class="form-control" placeholder="First Description" name="metaDescription"
-                                                                        cols="50" rows="4"></textarea>
+                                                                        cols="50" rows="4">{{ $product->metaDescription }}</textarea>
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label>Seo Url </label>
                                                                     <input class="form-control" id="seoUrl"
                                                                         placeholder="Seo Url" name="seoUrl"
-                                                                        value="">
+                                                                        value="{{ $product->seoUrl }}">
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label>Meta Keyword </label>
                                                                     <input class="form-control" id="metaKeyword"
                                                                         placeholder="Meta Keyword" name="metaKeyword"
-                                                                        value="">
+                                                                        value="{{ $product->metaKeyword }}">
                                                                 </div>
                                                                 <div class="form-group">
                                                                     <label>Meta image </label>
                                                                     <input class="form-control" id="metaImage"
                                                                         placeholder="Meta image" name="metaImage"
-                                                                        value="">
+                                                                        value="{{ $product->metaImage }}">
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -400,38 +400,38 @@
                                                 <div class="main-box seo-box mt-3">
                                                     <div class="inline-text">
                                                         <p>Search Engine Image Preview</p>
-                                                        <a href="javascript:" onclick="showseoimgedit()">Edit Image
+                                                        <a href="javascript:" onclick="showseoimgedit1()">Edit Image
                                                             SEO</a>
                                                     </div>
-                                                    <div class="seo-img-edit-box">
+                                                    <div class="seo-img-edit-box1">
                                                         <div class="form-group">
                                                             <label>Alternative Text</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Alternative Text" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageAlt1"
+                                                                placeholder="Alternative Text" name="imageAlt1"
+                                                                value="{{$product->imageAlt1}}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>Image Title</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Image Title" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageTitle1"
+                                                                placeholder="Image Title" name="imageTitle1"
+                                                                value="{{$product->imageTitle1}}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>Image Caption</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Image Caption" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageCaption1"
+                                                                placeholder="Image Caption" name="imageCaption1"
+                                                                value="{{$product->imageCaption1}}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label class="col-form-label">Image Description </label>
-                                                            <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
-                                                                rows="4"></textarea>
+                                                            <textarea id="imageDesc1" class="form-control" placeholder="Description" name="imageDesc1" cols="50"
+                                                                rows="4">{{$product->imageDesc1}}</textarea>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <script>
-                                                    function showseoimgedit() {
-                                                        $(".seo-img-edit-box").toggle('slow');
+                                                    function showseoimgedit1() {
+                                                        $(".seo-img-edit-box1").toggle('slow');
                                                     }
                                                 </script>
                                                 <button type="button" class="btn btn-success mt-3">Save</button>
@@ -440,41 +440,41 @@
                                                 <div class="main-box seo-box mt-3">
                                                     <div class="inline-text">
                                                         <p>Search Engine Image Preview</p>
-                                                        <a href="javascript:" onclick="showseoimgedit()">Edit Image
+                                                        <a href="javascript:" onclick="showseoimgedit2()">Edit Image
                                                             SEO</a>
                                                     </div>
-                                                    <div class="seo-img-edit-box">
+                                                    <div class="seo-img-edit-box2">
                                                         <div class="form-group">
                                                             <label>Alternative Text</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Alternative Text" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageAlt2"
+                                                                placeholder="Alternative Text" name="imageAlt2"
+                                                                value="{{$product->imageAlt2}}">
                                                         </div>
 
                                                         <div class="form-group">
                                                             <label>Image Title</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Image Title" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageTitle2"
+                                                                placeholder="Image Title" name="imageTitle2"
+                                                                value="{{$product->imageTitle2}}">
                                                         </div>
 
                                                         <div class="form-group">
                                                             <label>Image Caption</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Image Caption" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageCaption2"
+                                                                placeholder="Image Caption" name="imageCaption2"
+                                                                value="{{$product->imageCaption2}}">
                                                         </div>
 
                                                         <div class="form-group">
                                                             <label class="col-form-label">Image Description </label>
-                                                            <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
-                                                                rows="4"></textarea>
+                                                            <textarea id="imageDesc2" class="form-control" placeholder="Description" name="imageDesc2" cols="50"
+                                                                rows="4">{{$product->imageDesc2}}</textarea>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <script>
-                                                    function showseoimgedit() {
-                                                        $(".seo-img-edit-box").toggle('slow');
+                                                    function showseoimgedit2() {
+                                                        $(".seo-img-edit-box2").toggle('slow');
                                                     }
                                                 </script>
                                                 <button type="button" class="btn btn-success mt-3">Save</button>
@@ -485,38 +485,38 @@
                                                 <div class="main-box seo-box mt-3">
                                                     <div class="inline-text">
                                                         <p>Search Engine Image Preview</p>
-                                                        <a href="javascript:" onclick="showseoimgedit()">Edit Image
+                                                        <a href="javascript:" onclick="showseoimgedit3()">Edit Image
                                                             SEO</a>
                                                     </div>
-                                                    <div class="seo-img-edit-box">
+                                                    <div class="seo-img-edit-box3">
                                                         <div class="form-group">
                                                             <label>Alternative Text</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Alternative Text" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageAlt3"
+                                                                placeholder="Alternative Text" name="imageAlt3"
+                                                                value="{{$product->imageAlt3}}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>Image Title</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Image Title" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageTitle3"
+                                                                placeholder="Image Title" name="imageTitle3"
+                                                                value="{{$product->imageTitle3}}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label>Image Caption</label>
-                                                            <input class="form-control" id=""
-                                                                placeholder="Image Caption" name=""
-                                                                value="">
+                                                            <input class="form-control" id="imageCaption3"
+                                                                placeholder="Image Caption" name="imageCaption3"
+                                                                value="{{$product->imageCaption3}}">
                                                         </div>
                                                         <div class="form-group">
                                                             <label class="col-form-label">Image Description </label>
-                                                            <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
-                                                                rows="4"></textarea>
+                                                            <textarea id="imageDesc3" class="form-control" placeholder="Description" name="imageDesc3" cols="50"
+                                                                rows="4">{{$product->imageDesc3}}</textarea>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <script>
-                                                    function showseoimgedit() {
-                                                        $(".seo-img-edit-box").toggle('slow');
+                                                    function showseoimgedit3() {
+                                                        $(".seo-img-edit-box3").toggle('slow');
                                                     }
                                                 </script>
                                                 <button type="button" class="btn btn-success mt-3">Save</button>

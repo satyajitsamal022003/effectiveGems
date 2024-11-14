@@ -169,29 +169,29 @@
                                                                 <div class="seo-img-edit-box">
                                                                     <div class="form-group">
                                                                         <label>Alternative Text</label>
-                                                                        <input class="form-control" id=""
-                                                                            placeholder="Alternative Text" name=""
+                                                                        <input class="form-control" id="imageAlt"
+                                                                            placeholder="Alternative Text" name="imageAlt"
                                                                             value="">
                                                                     </div>
 
                                                                     <div class="form-group">
                                                                         <label>Image Title</label>
-                                                                        <input class="form-control" id=""
-                                                                            placeholder="Image Title" name=""
+                                                                        <input class="form-control" id="imageTitle"
+                                                                            placeholder="Image Title" name="imageTitle"
                                                                             value="">
                                                                     </div>
 
                                                                     <div class="form-group">
                                                                         <label>Image Caption</label>
-                                                                        <input class="form-control" id=""
-                                                                            placeholder="Image Caption" name=""
+                                                                        <input class="form-control" id="imageCaption"
+                                                                            placeholder="Image Caption" name="imageCaption"
                                                                             value="">
                                                                     </div>
 
                                                                     <div class="form-group">
                                                                         <label class="col-form-label">Image Description
                                                                         </label>
-                                                                        <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
+                                                                        <textarea id="imageDesc" class="form-control" placeholder="Description" name="imageDesc" cols="50"
                                                                             rows="4"></textarea>
 
                                                                     </div>

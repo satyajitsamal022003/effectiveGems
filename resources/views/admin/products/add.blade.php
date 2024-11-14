@@ -392,38 +392,38 @@
                                                     <div class="main-box seo-box mt-3">
                                                         <div class="inline-text">
                                                             <p>Search Engine Image Preview</p>
-                                                            <a href="javascript:" onclick="showseoimgedit()">Edit Image
+                                                            <a href="javascript:" onclick="showseoimgedit1()">Edit Image
                                                                 SEO</a>
                                                         </div>
-                                                        <div class="seo-img-edit-box">
+                                                        <div class="seo-img-edit-box1">
                                                             <div class="form-group">
                                                                 <label>Alternative Text</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Alternative Text" name=""
+                                                                <input class="form-control" id="imageAlt1"
+                                                                    placeholder="Alternative Text" name="imageAlt1"
                                                                     value="">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Image Title</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Image Title" name=""
+                                                                <input class="form-control" id="imageTitle1"
+                                                                    placeholder="Image Title" name="imageTitle1"
                                                                     value="">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Image Caption</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Image Caption" name=""
+                                                                <input class="form-control" id="imageCaption1"
+                                                                    placeholder="Image Caption" name="imageCaption1"
                                                                     value="">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label class="col-form-label">Image Description </label>
-                                                                <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
+                                                                <textarea id="imageDesc1" class="form-control" placeholder="Description" name="imageDesc1" cols="50"
                                                                     rows="4"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <script>
-                                                        function showseoimgedit() {
-                                                            $(".seo-img-edit-box").toggle('slow');
+                                                        function showseoimgedit1() {
+                                                            $(".seo-img-edit-box1").toggle('slow');
                                                         }
                                                     </script>
                                                     <button type="button" class="btn btn-success mt-3">Save</button>
@@ -432,41 +432,41 @@
                                                     <div class="main-box seo-box mt-3">
                                                         <div class="inline-text">
                                                             <p>Search Engine Image Preview</p>
-                                                            <a href="javascript:" onclick="showseoimgedit()">Edit Image
+                                                            <a href="javascript:" onclick="showseoimgedit2()">Edit Image
                                                                 SEO</a>
                                                         </div>
-                                                        <div class="seo-img-edit-box">
+                                                        <div class="seo-img-edit-box2">
                                                             <div class="form-group">
                                                                 <label>Alternative Text</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Alternative Text" name=""
+                                                                <input class="form-control" id="imageAlt2"
+                                                                    placeholder="Alternative Text" name="imageAlt2"
                                                                     value="">
                                                             </div>
 
                                                             <div class="form-group">
                                                                 <label>Image Title</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Image Title" name=""
+                                                                <input class="form-control" id="imageTitle2"
+                                                                    placeholder="Image Title" name="imageTitle2"
                                                                     value="">
                                                             </div>
 
                                                             <div class="form-group">
                                                                 <label>Image Caption</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Image Caption" name=""
+                                                                <input class="form-control" id="imageCaption2"
+                                                                    placeholder="Image Caption" name="imageCaption2"
                                                                     value="">
                                                             </div>
 
                                                             <div class="form-group">
                                                                 <label class="col-form-label">Image Description </label>
-                                                                <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
+                                                                <textarea id="imageDesc2" class="form-control" placeholder="Description" name="imageDesc2" cols="50"
                                                                     rows="4"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <script>
-                                                        function showseoimgedit() {
-                                                            $(".seo-img-edit-box").toggle('slow');
+                                                        function showseoimgedit2() {
+                                                            $(".seo-img-edit-box2").toggle('slow');
                                                         }
                                                     </script>
                                                     <button type="button" class="btn btn-success mt-3">Save</button>
@@ -477,38 +477,38 @@
                                                     <div class="main-box seo-box mt-3">
                                                         <div class="inline-text">
                                                             <p>Search Engine Image Preview</p>
-                                                            <a href="javascript:" onclick="showseoimgedit()">Edit Image
+                                                            <a href="javascript:" onclick="showseoimgedit3()">Edit Image
                                                                 SEO</a>
                                                         </div>
-                                                        <div class="seo-img-edit-box">
+                                                        <div class="seo-img-edit-box3">
                                                             <div class="form-group">
                                                                 <label>Alternative Text</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Alternative Text" name=""
+                                                                <input class="form-control" id="imageAlt3"
+                                                                    placeholder="Alternative Text" name="imageAlt3"
                                                                     value="">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Image Title</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Image Title" name=""
+                                                                <input class="form-control" id="imageTitle3"
+                                                                    placeholder="Image Title" name="imageTitle3"
                                                                     value="">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label>Image Caption</label>
-                                                                <input class="form-control" id=""
-                                                                    placeholder="Image Caption" name=""
+                                                                <input class="form-control" id="imageCaption3"
+                                                                    placeholder="Image Caption" name="imageCaption3"
                                                                     value="">
                                                             </div>
                                                             <div class="form-group">
                                                                 <label class="col-form-label">Image Description </label>
-                                                                <textarea id="" class="form-control" placeholder="Description" name="" cols="50"
+                                                                <textarea id="imageDesc3" class="form-control" placeholder="Description" name="imageDesc3" cols="50"
                                                                     rows="4"></textarea>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <script>
-                                                        function showseoimgedit() {
-                                                            $(".seo-img-edit-box").toggle('slow');
+                                                        function showseoimgedit3() {
+                                                            $(".seo-img-edit-box3").toggle('slow');
                                                         }
                                                     </script>
                                                     <button type="button" class="btn btn-success mt-3">Save</button>
