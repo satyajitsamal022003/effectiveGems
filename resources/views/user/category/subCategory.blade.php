@@ -12,7 +12,7 @@
     : $category->description .
     ' |
     Effective Gems')
-@section('image', asset($subcat->image1))
+@section('image', asset($category->image1))
 
 @section('subCatId', $category->id)
 
