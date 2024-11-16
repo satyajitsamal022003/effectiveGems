@@ -35,6 +35,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/pending-orders-data', [AdminOrderController::class, 'getPendingOrdersData'])->name('admin.order.getPendingOrdersData');
     Route::get('/orders/data', [AdminOrderController::class, 'getOrdersData'])->name('admin.order.data');
     Route::post('/orders/changeStatus', [AdminOrderController::class, 'changeStatus'])->name('admin.order.changeStatus');
+    Route::post('/orders/add-payment-details', [AdminOrderController::class, 'addPaymentDetails'])->name('admin.order.addPaymentDetails');
     // Admin dashboard route
     Route::post('/orders/request-customer', [AdminOrderController::class, 'requestToCustomer'])->name('admin.order.requestToCustomer');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
@@ -116,9 +117,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('coupon.applyCoupon');
 Route::get('/', [IndexController::class, 'index'])->name('user.index');
 Route::get('/category-products/{id}', [IndexController::class, 'categorywiseproduct'])->name('user.categorywiseproduct');
+Route::get('/category-product/{slug}', [IndexController::class, 'categorywiseproductSlug'])->name('user.categorywiseproductSlug');
 Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name('user.subCategory');
+Route::get('/sub-categories/{slug}', [IndexController::class, 'subCategorySlug'])->name('user.subCategorySlug');
 Route::get('/sub-category-ajax/{id}', [IndexController::class, 'subCategoryAjax'])->name('user.subCategoryAjax');
 Route::get('/products-details/{prodid}', [IndexController::class, 'productdetails'])->name('user.productdetails');
+Route::get('/products-detail/{slug}', [IndexController::class, 'productdetailsSlug'])->name('user.productdetailsslug');
 Route::get('/layout-category-products/{id}', [IndexController::class, 'getProductsForCategory']);
 Route::get('/searchProduct', [IndexController::class, 'searchProducts'])->name('searchProducts');
 

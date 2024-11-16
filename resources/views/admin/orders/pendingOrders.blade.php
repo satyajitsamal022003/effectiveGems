@@ -30,6 +30,7 @@
                                             <th>View</th>
                                             <th>Amount</th>
                                             <th>Status</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody></tbody>
@@ -114,6 +115,40 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="addPaymentDetails" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog order-details-modal" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add payment details</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-group container">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">Payment mode:</label>
+                                <input type="text" class="form-control" name="paymentMode">
+
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">Transaction ID:</label>
+                                <input type="text" class="form-control" name="transactionId">
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="order-list-bottom">
+                    <button class="btn btn-primary" id="savePaymentDetails">Save</button>
                 </div>
             </div>
         </div>
@@ -397,10 +432,56 @@
                         searchable: false,
 
                     },
+                    {
+                        data: 'id', // View button
+                        name: 'action',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, full, meta) {
+                            const orderData = encodeURIComponent(JSON.stringify(full));
+                            return `<a href="javascript:" data-toggle="modal" data-id="${full.id}" data-target="#addPaymentDetails"
+            class="btn btn-sm bg-success mr-2">Add payment details</a>`;
+                        }
+                    },
                 ]
             });
             $('#orderStatusFilter').on('change', function() {
                 table.ajax.reload();
+            });
+            $('#addPaymentDetails').on('show.bs.modal', function(event) {
+                const button = $(event.relatedTarget); // Button that triggered the modal
+                const orderId = button.data('id'); // Extract info from data-id attribute
+                $(this).find('.modal-content').attr('data-order-id',
+                    orderId); // Store orderId in modal for later use
+            });
+
+            // Handle Save button click
+            $('#savePaymentDetails').click(function() {
+                const modal = $('#addPaymentDetails');
+                const orderId = modal.find('.modal-content').data('order-id'); // Get orderId from modal
+                const paymentMode = modal.find('input[name="paymentMode"]').val(); // Get Payment Mode
+                const transactionId = modal.find('input[name="transactionId"]').val(); // Get Transaction ID
+                console.log(orderId, paymentMode, transactionId);
+
+                // Perform AJAX request
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('admin.order.addPaymentDetails') }}",
+                    data: {
+                        '_token': '{{ csrf_token() }}',
+                        'orderId': orderId,
+                        'paymentMode': paymentMode,
+                        'transactionId': transactionId
+                    },
+                    success: function(response) {
+                        toastr.success(response.message);
+                        table.ajax.reload(); // Reload the DataTable
+                        modal.modal('hide'); // Hide the modal
+                    },
+                    error: function(xhr, status, error) {
+                        toastr.error('An error occurred: ' + error);
+                    }
+                });
             });
 
         });

@@ -6,9 +6,9 @@
     <link rel="canonical" href="index.html" />
     <meta name="description" content="">
     <meta name="metakeyword" content="">
-    <meta property="og:title" content="Home | Effective Gems" />
-    <meta property="og:description" content="" />
-    <meta property="og:image" content="thumb/image.html" />
+    <meta property="og:title" content="@yield('title', 'Home | Effective Gems')" />
+    <meta property="og:description" content="@yield('description', '')" />
+    <meta property="og:image" content="@yield('image', 'thumb/image.html')" />
     <?php
     $setting = App\Models\Setting::first();
     echo $setting->header_script;
@@ -89,7 +89,8 @@
                         <!--login and cart section start-->
                         <div class="menu-right">
                             <div class="header-login position-relative">
-                                <a href="/login"><i class="fa-light fa-circle-user"></i> Login</a>/<a href="/register"><i class="fa-light fa-circle-user"></i> Signup</a>
+                                <a href="/login"><i class="fa-light fa-circle-user"></i> Login</a>/<a
+                                    href="/register"><i class="fa-light fa-circle-user"></i> Signup</a>
                                 {{-- <div class="header-login-dropdown">
                                     <ul>
                                         <li><a href="my-profile.html"><i class="fa-light fa-circle-user"></i> My
@@ -110,15 +111,15 @@
                         <!--login and cart section end-->
 
                         <ul class="social-link">
-                            <li><a href="{{$setting->fbLink}}" title="Facebook" target="_blank"><i
+                            <li><a href="{{ $setting->fbLink }}" title="Facebook" target="_blank"><i
                                         class="fa-brands fa-facebook-f"></i></a>
                             </li>
-                            <li><a href="{{$setting->twitterLink}}" title="Twitter" target="_blank"><i
+                            <li><a href="{{ $setting->twitterLink }}" title="Twitter" target="_blank"><i
                                         class="fa-brands fa-twitter"></i></a></li>
-                            <li><a href="{{$setting->instaLink}}" title="Instagram" target="_blank"><i
+                            <li><a href="{{ $setting->instaLink }}" title="Instagram" target="_blank"><i
                                         class="fa-brands fa-instagram"></i></a>
                             </li>
-                            <li><a href="{{$setting->youtubeLink}}" title="YouTube" target="_blank"><i
+                            <li><a href="{{ $setting->youtubeLink }}" title="YouTube" target="_blank"><i
                                         class="fa-brands fa-youtube"></i></a></li>
                         </ul>
                     </div>

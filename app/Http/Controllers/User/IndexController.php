@@ -102,6 +102,66 @@ class IndexController extends Controller
 
         // Fetch the category details
         $category = Category::find($id);
+        if ($category->seoUrl) {
+            return redirect()->route('user.categorywiseproductSlug', ['slug' => $category->seoUrl], 301);
+        }
+        // Return the category product view with subcategories and products
+        return view('user.category.product', compact(
+            'subcategories',
+            'category',
+            'subcategoryproducts',
+            'pageNo',
+        ));
+    }
+    public function categorywiseproductSlug($slug, $search = null)
+    {
+        // Pagination setup
+        $category = Category::where('seoUrl',$slug)->first();
+        $pageNo = request()->get('page', 1);
+        $itemsPerPage = 16; // Number of items per page
+        $toSkip = ($pageNo - 1) * $itemsPerPage;
+
+        // Fetch subcategory IDs
+        $subcat = SubCategory::where('categoryId', $category->id)->where('status', 1)->get();
+        $subcategoryIds = $subcat->pluck('id');
+
+        // Fetch subcategories 
+        $subcategories = SubCategory::where('categoryId', $category->id)
+            ->where('status', 1)
+            ->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('sortOrder', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+
+        // Fetch the products, order by main category products first, then by product id to ensure consistency
+        $subcategoryproducts = Product::where('categoryId', $category->id)
+            ->where('status', 1) // Filter by status
+            ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
+            ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
+            ->orderBy('sortOrder', 'asc') // Then order by sortOrder
+            ->orderBy('created_at', 'asc') // Finally order by created_at
+            ->paginate(16); // Paginate the result
+
+        // If there's a search query, modify the product search and apply the same ordering
+        if ($search) {
+            $subcategoryproducts = Product::where('categoryId', $category->id)
+                ->where('status', 1) // Filter by status
+                ->whereRaw("MATCH(productName) AGAINST(? IN NATURAL LANGUAGE MODE)", [$search])
+                ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
+                ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
+                ->orderBy('sortOrder', 'asc') // Then order by sortOrder
+                ->orderBy('created_at', 'asc') // Finally order by created_at
+                ->paginate(16); // Paginate the result
+
+            // Return the search view with products
+            return view('user.category.searchProducts', compact(
+                'subcategoryproducts',
+                'search'
+            ));
+        }
+
+        // Fetch the category details
 
         // Return the category product view with subcategories and products
         return view('user.category.product', compact(
@@ -137,6 +197,40 @@ class IndexController extends Controller
         }
 
         $category = SubCategory::find($id);
+        $seoUrl = $category->seoUrl;
+        if ($seoUrl) {
+            return redirect()->route('user.subCategorySlug', ['slug' => $seoUrl], 301);
+        }
+
+        return view('user.category.subCategory', compact(
+            'category',
+            'subcategoryproducts',
+        ));
+    }
+    public function subCategorySlug($slug, $search = null)
+    {
+        // Pagination setup
+        $pageNo = request()->get('page', 1);
+        $category = SubCategory::where('seoUrl', $slug)->first();
+        $itemsPerPage = 16; // Number of items per page
+        $toSkip = ($pageNo - 1) * $itemsPerPage;
+        // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
+        $subcategoryproducts = Product::where('subCategoryId', $category->id)->where('status', 1)->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
+            ->orderBy('created_at', 'asc')->paginate(16);
+        if ($search) {
+            $subcategoryproducts = Product::where('subCategoryId', $category->id)
+                ->where('status', 1)
+                ->whereRaw("MATCH(productName) AGAINST(? IN NATURAL LANGUAGE MODE)", [$search])
+                ->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
+                ->orderBy('created_at', 'asc')
+                ->paginate(16);
+            return view('user.category.searchProducts', compact(
+
+                'subcategoryproducts',
+                'search'
+            ));
+        }
+
 
         return view('user.category.subCategory', compact(
             'category',
@@ -176,6 +270,9 @@ class IndexController extends Controller
     {
 
         $productdetails = Product::with('category')->where('id', $prodid)->first();
+        // dd($productdetails );
+        $productSlug = $productdetails->seoUrl;
+
 
         $relatedProducts = Product::where('id', '!=', $prodid)->where('categoryId', $productdetails->categoryId)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->paginate(16);
         $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->paginate(16);
@@ -184,6 +281,25 @@ class IndexController extends Controller
         if ($productdetails->variant)
             $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();
         // dd(count($variants));
+        if ($productSlug) {
+            return redirect()->route('user.productdetailsslug', ['slug' => $productSlug], 301);
+        }
+        return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype"));
+    }
+    public function productdetailsSlug($slug)
+    {
+
+        $productdetails = Product::with('category')->where('seoUrl', $slug)->first();
+        $productSlug = $productdetails->seoUrl;
+
+
+        $relatedProducts = Product::where('id', '!=', $productdetails->id)->where('categoryId', $productdetails->categoryId)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->paginate(16);
+        $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->paginate(16);
+        $variants = [];
+        $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
+        if ($productdetails->variant)
+            $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();        // dd(count($variants));
+
         return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype"));
     }
 

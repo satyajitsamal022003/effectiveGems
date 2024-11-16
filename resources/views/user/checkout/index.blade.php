@@ -555,6 +555,8 @@
                     $('.subTotal').text(`${response.subtotal}`);
                     $('.amount').val(response.subtotal);
                     $('#deliveryCharges').text(response.totalDelPrice);
+                    $('#total').text(response.total);
+
                     // toastr.success(response.message);
                 },
                 error: function(xhr, status, error) {
@@ -662,7 +664,7 @@
             },
             error: function(xhr, status, error) {
                 alert(JSON.parse(xhr.responseText)
-                .message); // You can customize this message
+                    .message); // You can customize this message
             },
         });
     }
