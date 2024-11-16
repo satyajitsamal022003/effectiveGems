@@ -149,19 +149,12 @@
             <h1 class="text-white mt-3 new-font">Our Major Products</h1>
             <div class="as_paragraph_wrapper mb-3">
                 <ul>
-                    <li>Gemstones</li>
-                    <li>Rudraksha</li>
-                    <li>Vastu Materials</li>
-                    <li>Astrological Herbs</li>
-                    <li>Tantra Materials</li>
-                    <li>Shanks</li>
-                    <li>Yantra</li>
-                    <li>Mala & Murti</li>
-                    <li>Bracelet</li>
-                    <li>Tumbles</li>
+                @foreach(App\Models\Category::where('status',1)->get() as $majorprods)
+                    <li><a href="{{route('user.categorywiseproduct', $majorprods->id)}}">Gemstones</a></li>
+                @endforeach    
                 </ul>
             </div>
-            <a href="about.html" class="as_btn btn_two mt-3">Read More</a>
+            <!-- <a href="about.html" class="as_btn btn_two mt-3">Read More</a> -->
         </div>
     </div>
 </section>

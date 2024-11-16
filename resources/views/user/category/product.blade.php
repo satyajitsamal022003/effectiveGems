@@ -27,7 +27,7 @@
                                 <img src="{{ asset($subcat->image?? 'defaultImage.jpeg') }}" alt="{{ $subcat->subCategoryName }}">
                             </a>
                             <div class="sub-text">
-                                <h4>{{ $subcat->subCategoryName }}</h4>
+                                <a href="/sub-category/{{ $subcat->id }}"><h4>{{ $subcat->subCategoryName }}</h4></a>
                             </div>
                         </div>
                     @endforeach

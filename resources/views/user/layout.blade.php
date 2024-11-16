@@ -262,7 +262,7 @@
                                     </ul>
                                 </div>
                             </div>
-                            <div class="col-lg-2 col-md-2 col-sm-12 col-12">
+                            <!-- <div class="col-lg-2 col-md-2 col-sm-12 col-12">
                                 <div class="as_footer_widget">
                                     <h3 class="as_footer_heading">Quick Links</h3>
                                     <ul>
@@ -273,7 +273,7 @@
                                         <li><a href="contact.html"> Contact Us</a></li>
                                     </ul>
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-2 col-md-2 col-sm-12 col-12">
                                 <div class="as_footer_widget">
                                     <h3 class="as_footer_heading">Our Product</h3>
