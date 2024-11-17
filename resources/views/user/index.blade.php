@@ -218,59 +218,39 @@
 
 
 <!--testimonial start-->
+@if($testimonials->count() > 0)
 <section class="as_customer_wrapper as_padderBottom40 as_padderTop40">
     <div class="container">
         <div class="row">
             <div class="col-lg-12">
                 <div class="inline-header" data-aos="zoom-in" data-aos-duration="1500">
-                    <h1 class="as_heading">What My Client Say</h1>
+                    <h1 class="as_heading">What My Clients Say</h1>
                     <div class="text-center">
-                        <a href="testimonial.html" class="as_btn">view more</a>
+                        <a href="" class="as_btn">View More</a>
                     </div>
                 </div>
 
                 <div class="as_customer_slider mt-5">
                     <div class="as_customer_for">
-                        <div class="as_customer_content" data-aos="flip-left" data-aos-duration="1500">
-                            <div class="flex_text">
-                                <img src="{{url('/')}}/user/assets/images/profile_user.jpg" alt="image">
-                                <h3>Somnath - <span>User</span></h3>
-                            </div>
-                            <p>Effective gems is one of the largest gemstone wholesale store in India. All faces
-                                Rudraksha , all types vastu articles, all types of Yantra, dakshinavart shankh available
-                                there at wholesale prices.</p>
-                        </div>
-                        <div class="as_customer_content" data-aos="flip-left" data-aos-duration="1500">
-                            <div class="flex_text">
-                                <img src="{{url('/')}}/user/assets/images/profile_user.jpg" alt="image">
-                                <h3>Pratap Rath - <span>User</span></h3>
-                            </div>
-                            <p>Gem Stones and Rudraksha are of good quality with affordable prices . Quality and the
-                                product which is you can trust . And good behaviour also .</p>
-                        </div>
-                        <div class="as_customer_content" data-aos="flip-left" data-aos-duration="1500">
-                            <div class="flex_text">
-                                <img src="{{url('/')}}/user/assets/images/profile_user.jpg" alt="image">
-                                <h3>Hrydayan Pradhaan - <span>User</span></h3>
-                            </div>
-                            <p>Effective gems is one of the largest gemstone wholesale store in India. All faces
-                                Rudraksha , all types vastu articles, all types of Yantra, dakshinavart shankh available
-                                there at wholesale prices.</p>
-                        </div>
-                        <div class="as_customer_content" data-aos="flip-left" data-aos-duration="1500">
-                            <div class="flex_text">
-                                <img src="{{url('/')}}/user/assets/images/profile_user.jpg" alt="image">
-                                <h3>Rabindra - <span>Professor</span></h3>
-                            </div>
-                            <p>Gem Stones and Rudraksha are of good quality with affordable prices . Quality and the
-                                product which is you can trust . And good behaviour also .</p>
-                        </div>
+                        @foreach($testimonials as $testimonial)
+                            @if($testimonial->status == 1)
+                                <div class="as_customer_content" data-aos="flip-left" data-aos-duration="1500">
+                                    <div class="flex_text">
+                                        <img src="{{ $testimonial->userImage ? asset($testimonial->userImage) : url('/user/assets/images/profile_user.jpg') }}" alt="image">
+                                        <h3>{{ $testimonial->userName }} - <span>{{ $testimonial->designation }}</span></h3>
+                                    </div>
+                                    <p>{!! $testimonial->description !!}</p>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+@endif
+
 <!--testimonial end-->
 
 

@@ -43,7 +43,7 @@
                  </li>
 
                  <li class="">
-                     <a href="#"><i class="fa-solid fa-users-line"></i><span>Testimonial</span></a>
+                     <a href="{{route('admin.listtestimonial')}}"><i class="fa-solid fa-users-line"></i><span>Testimonial</span></a>
                  </li>
                  <li class="">
                      <a href="/admin/redirects"><i class="fa-solid fa-users-line"></i><span>Redirects</span></a>

@@ -8,6 +8,7 @@ use App\Models\Couriertype;
 use App\Models\Product;
 use App\Models\SubCategory;
 use App\Models\Page;
+use App\Models\Testimonial;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Artisan;
@@ -46,11 +47,12 @@ class IndexController extends Controller
 
     public function index()
     {
+        $testimonials = Testimonial::where('status', 1)->get();
         // dd(Hash::make('$ub/0wI?@#2VmVn1?p/#ckYm+8?%]i05'));
         $categories = Category::where('status', 1)->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
             ->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
         $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->orderBy('sortOrderPopular', 'asc')->orderBy('created_at', 'asc')->paginate(16);
-        return view('user.index', compact('categories', 'popularproducts'));
+        return view('user.index', compact('categories', 'popularproducts','testimonials'));
     }
 
     public function categorywiseproduct($id, $search = null)

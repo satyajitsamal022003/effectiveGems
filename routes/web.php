@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\RedirectController;
@@ -56,6 +57,15 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('admin/toggleOnTop', [CategoryController::class, 'toggleOnTop'])->name('admin.toggleOnTop');
     Route::post('admin/toggleOnFooter', [CategoryController::class, 'toggleOnFooter'])->name('admin.toggleOnFooter');
     Route::post('admin/toggleOnStatus', [CategoryController::class, 'toggleOnStatus'])->name('admin.toggleOnStatus');
+
+    //Testimonial
+    Route::get('/add-testimonial', [TestimonialController::class, 'addtestimonial'])->name('admin.addtestimonial');
+    Route::post('/store-testimonial', [TestimonialController::class, 'storetestimonial'])->name('admin.storetestimonial');
+    Route::get('/testimonial-list', [TestimonialController::class, 'listtestimonial'])->name('admin.listtestimonial');
+    Route::get('/testimonial-edit/{id}', [TestimonialController::class, 'edittestimonial'])->name('admin.edittestimonial');
+    Route::post('/update-testimonial/{id}', [TestimonialController::class, 'updatetestimonial'])->name('admin.updatetestimonial');
+    Route::delete('/delete-testimonial/{id}', [TestimonialController::class, 'deletetestimonial'])->name('admin.deletetestimonial');
+    Route::post('testimonial/toggleOnStatus', [TestimonialController::class, 'toggleOnStatus'])->name('testimonial.toggleOnStatus');
 
 
     //subcategory
