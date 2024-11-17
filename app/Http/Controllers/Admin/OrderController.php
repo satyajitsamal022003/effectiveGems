@@ -22,6 +22,19 @@ class OrderController extends Controller
      * Display a listing of the resource.
      */
 
+    public function addPaymentDetails(Request $request)
+    {
+        $orderId = $request->orderId;
+        $paymentMode = $request->paymentMode;
+        $transactionId = $request->transactionId;
+        $order = Order::find($orderId);
+        $order->paymentMode = $paymentMode;
+        $order->paymentCompleted = 1;
+        $order->orderStatus = 'Placed';
+        $order->transactionId = $transactionId;
+        $order->save();
+        return response()->json(['status'=>true,'message'=>"Payment details added"]);
+    }
     public function index()
     {
         return view('admin.orders.list');
@@ -57,7 +70,7 @@ class OrderController extends Controller
 
 
         // Apply filtering by category if applicable
-        $query->where('orderStatus','!=', 'Failed');
+        $query->where('orderStatus', '!=', 'Failed');
         if (!empty($orderStatus)) {
             $query->where('orderStatus', $orderStatus);
         }
