@@ -40,6 +40,11 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+
+        'euser' => [
+            'driver' => 'session',
+            'provider' => 'eusermodel',
+        ],
     ],
 
     /*
@@ -63,6 +68,11 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+
+        'eusermodel' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Euser::class, // Replace with your actual model namespace
         ],
 
         // 'users' => [

@@ -40,6 +40,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
         rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -89,8 +90,10 @@
                         <!--login and cart section start-->
                         <div class="menu-right">
                             <div class="header-login position-relative">
-                                <a href="/login"><i class="fa-light fa-circle-user"></i> Login</a>/<a
-                                    href="/register"><i class="fa-light fa-circle-user"></i> Signup</a>
+                            @guest('euser')
+                                <a href="/login"><i class="fa-light fa-circle-user"></i> Login</a> / 
+                                <a href="/register"><i class="fa-light fa-circle-user"></i> Signup</a>
+                            @endguest
                                 {{-- <div class="header-login-dropdown">
                                     <ul>
                                         <li><a href="my-profile.html"><i class="fa-light fa-circle-user"></i> My
@@ -387,6 +390,7 @@
     <script src="{{ url('/') }}/user/assets/js/mega-menu.js"></script>
     <script src="{{ url('/') }}/user/assets/js/aos.js"></script>
     <script src="{{ url('/') }}/user/assets/js/easy-responsive-tabs.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 
     <!-- Fotorama -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script>
@@ -517,6 +521,28 @@
                 }
             });
         });
+    </script>
+
+<script>
+        // Check if there's an error message
+        @if(Session::has('error'))
+        toastr.error("{{ session('error') }}");
+        @endif
+
+        // Check if there's a success message
+        @if(Session::has('message'))
+        toastr.success("{{ session('message') }}");
+        @endif
+
+        @if(Session::has('info'))
+        toastr.info("{{ session('info') }}");
+        @endif
+
+        @if($errors -> any())
+        @foreach($errors -> all() as $error)
+        toastr.error("{{ $error }}");
+        @endforeach
+        @endif
     </script>
 
 

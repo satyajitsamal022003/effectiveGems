@@ -10,6 +10,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\eusers\EuserController;
+use App\Http\Controllers\eusers\RegisterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RazorpayController;
 use App\Http\Controllers\RedirectController;
@@ -184,6 +186,32 @@ Route::get('sitemap/products-images/page/{page}.xml', [SiteMapController::class,
 Route::get('sitemap/category-images/page/{page}.xml', [SiteMapController::class, 'categoryImagesPage'])->name('sitemap.category-images.page');
 Route::get('sitemap/subcategory-images/page/{page}.xml', [SiteMapController::class, 'subCategoryImagesPage'])->name('sitemap.subcategory-images.page');
 
+
+
+
+//User panel
+
+Route::group(['prefix' => 'user'], function () {
+    Route::get('/sign-up', function () {
+        return view('eusers.register');
+    })->name('eusers.signup');
+    
+    Route::post('/post-sign-up', [RegisterController::class, 'postsignup'])->name('eusers.postsignup');
+    
+    Route::get('/sign-in', function () {
+        return view('eusers.login');
+    })->name('eusers.login');
+    
+    Route::post('/post-sign-in', [EuserController::class, 'postsignin'])->name('eusers.postsignin');
+    Route::post('/logout', [EuserController::class, 'logout'])->name('euser.logout');
+
+    Route::middleware('euser.auth')->group(function () {
+        Route::get('/dashboard', [EuserController::class, 'dashboard'])->name('euser.dashboard');
+        Route::get('/my-orders', [EuserController::class, 'myorderlist'])->name('euser.myorderlist');
+        Route::get('/orders-view', [EuserController::class, 'ordersview'])->name('euser.ordersview');
+        Route::get('/my-wishlist', [EuserController::class, 'wishlist'])->name('euser.wishlist');
+    });
+});
 
 
 
