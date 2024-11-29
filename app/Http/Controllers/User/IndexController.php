@@ -28,6 +28,34 @@ class IndexController extends Controller
         }, $substrings));
     }
 
+    protected function applySearch($query, $searchTerm)
+    {
+        if ($searchTerm) {
+            $substrings = [];
+            for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
+                $substrings[] = substr($searchTerm, $i, 3);
+            }
+
+            $pattern = implode('|', array_map(function ($substr) {
+                return preg_quote($substr, '/');
+            }, $substrings));
+
+            $query->where(function ($q) use ($searchTerm, $pattern) {
+                $q->where('productName', 'LIKE', "%{$searchTerm}%")
+                    ->orWhere('productName', 'REGEXP', $pattern);
+            });
+
+            $query->orderByRaw("
+            CASE
+                WHEN productName = ? THEN 1
+                WHEN productName LIKE ? THEN 2
+                ELSE 3
+            END", [$searchTerm, "%{$searchTerm}%"]);
+        }
+        return $query;
+    }
+
+
 
 
     public function optimize()
@@ -99,25 +127,22 @@ class IndexController extends Controller
             ->paginate(16); // Paginate the result
 
         // If there's a search query, modify the product search and apply the same ordering
+        $query = Product::where('categoryId', $id)
+            ->where('status', 1);
         if ($search) {
-            $pattern = $this->generateSearchPattern($search);
-
-            $subcategoryproducts = Product::where('categoryId', $id)
-                ->where('status', 1)
-                ->where(function ($query) use ($pattern) {
-                    $query->where('productName', 'REGEXP', $pattern);
-                })
-                ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END")
-                ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END")
-                ->orderBy('sortOrder', 'asc')
-                ->orderBy('created_at', 'asc')
-                ->paginate(16);
-
-            return view('user.category.searchProducts', compact(
-                'subcategoryproducts',
-                'search'
-            ));
+            $query = $this->applySearch($query, $search);
         }
+
+        $subcategoryproducts = $query->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END")
+            ->orderBy('sortOrder', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(16);
+
+        return view('user.category.searchProducts', compact(
+            'subcategoryproducts',
+            'search'
+        ));
 
 
         // Fetch the category details
@@ -202,24 +227,23 @@ class IndexController extends Controller
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
         $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
             ->orderBy('created_at', 'asc')->paginate(16);
+
+        $query = Product::where('subCategoryId', $id)
+            ->where('status', 1);
         if ($search) {
-            $pattern = $this->generateSearchPattern($search);
-
-            $subcategoryproducts = Product::where('subCategoryId', $id)
-                ->where('status', 1)
-                ->where(function ($query) use ($pattern) {
-                    $query->where('productName', 'REGEXP', $pattern);
-                })
-                ->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")
-                ->orderBy('sortOrderSubCategory')
-                ->orderBy('created_at', 'asc')
-                ->paginate(16);
-
-            return view('user.category.searchProducts', compact(
-                'subcategoryproducts',
-                'search'
-            ));
+            $query = $this->applySearch($query, $search);
         }
+
+        $subcategoryproducts = $query->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('sortOrderSubCategory', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(16);
+
+
+        return view('user.category.searchProducts', compact(
+            'subcategoryproducts',
+            'search'
+        ));
 
 
         $category = SubCategory::find($id);
@@ -277,13 +301,13 @@ class IndexController extends Controller
         $itemsPerPage = 8; // Number of items per page
         $toSkip = ($pageNo - 1) * $itemsPerPage;
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
-        $pattern = $this->generateSearchPattern($search);
+        $query = Product::where('status', 1);
 
-        $subcategoryproducts = Product::where('status', 1)
-            ->where(function ($query) use ($pattern) {
-                $query->where('productName', 'REGEXP', $pattern);
-            })
-            ->paginate(16);
+        if ($search) {
+            $query = $this->applySearch($query, $search);
+        }
+
+        $subcategoryproducts = $query->paginate(16);
 
         $category = SubCategory::find(1);
 
