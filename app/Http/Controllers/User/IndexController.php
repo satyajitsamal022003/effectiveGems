@@ -17,6 +17,15 @@ use Illuminate\Support\Facades\Hash;
 class IndexController extends Controller
 {
 
+    public function getSuggestions(Request $request)
+{
+    $query = $request->input('query');
+    $suggestions = Product::where('name', 'LIKE', "%{$query}%")
+        ->limit(10)
+        ->get(['name']); // Adjust the fields based on your database
+    return response()->json($suggestions);
+}
+
     private function generateSearchPattern($searchTerm)
     {
         $substrings = [];

@@ -41,6 +41,28 @@
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
         rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
+        <style>
+    /* Styling for suggestions */
+    .suggestions-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        width: calc(100% - 30px);
+        z-index: 1000;
+    }
+
+    .suggestions-list li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    .suggestions-list li:hover {
+        background-color: #f0f0f0;
+    }
+</style>
 </head>
 
 <body>
@@ -194,7 +216,10 @@
                                                 <input type="hidden" name="catId" value="@yield('catId')">
                                                 <input type="hidden" name="subCatId" value="@yield('subCatId')">
                                                 <div class="col-10"> <input type="text" id="search"
-                                                        name="search" placeholder="Type here to search..."></div>
+                                                        name="search" placeholder="Type here to search...">
+                                                    
+                                                        <ul id="suggestions" class="suggestions-list"></ul>
+                                                    </div>
                                                 <div class="col-2">
                                                     <button type="submit" class="as_btn">Search</button>
                                                 </div>
@@ -544,6 +569,47 @@
         @endforeach
         @endif
     </script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const searchInput = document.getElementById("search");
+        const suggestionsBox = document.getElementById("suggestions");
+
+        searchInput.addEventListener("input", function () {
+            const query = this.value.trim();
+
+            if (query.length > 2) { // Trigger suggestions when input is more than 2 characters
+                fetch(`/api/get-suggestions?query=${query}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        suggestionsBox.innerHTML = ""; // Clear previous suggestions
+
+                        if (data.length > 0) {
+                            data.forEach(suggestion => {
+                                const li = document.createElement("li");
+                                li.textContent = suggestion.name; // Assuming 'name' is the key for suggestions
+                                li.addEventListener("click", function () {
+                                    searchInput.value = suggestion.name;
+                                    suggestionsBox.innerHTML = ""; // Clear suggestions on selection
+                                });
+                                suggestionsBox.appendChild(li);
+                            });
+                        }
+                    })
+                    .catch(error => console.error("Error fetching suggestions:", error));
+            } else {
+                suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
+            }
+        });
+
+        // Hide suggestions when clicking outside the input
+        document.addEventListener("click", function (e) {
+            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                suggestionsBox.innerHTML = "";
+            }
+        });
+    });
+</script>
 
 
 </body>
