@@ -32,28 +32,48 @@ class IndexController extends Controller
     {
         if ($searchTerm) {
             $substrings = [];
+    
+            // Generate substrings of 3 consecutive characters
             for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
                 $substrings[] = substr($searchTerm, $i, 3);
             }
-
+    
+            // Split the search term into individual words
+            $words = explode(' ', $searchTerm);
+    
+            // Create the REGEXP pattern
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
-
-            $query->where(function ($q) use ($searchTerm, $pattern) {
-                $q->where('productName', 'LIKE', "%{$searchTerm}%")
-                    ->orWhere('productName', 'REGEXP', $pattern);
+    
+            $query->where(function ($q) use ($searchTerm, $words, $pattern) {
+                // Full name match
+                $q->where('productName', 'LIKE', "%{$searchTerm}%");
+    
+                // Match individual words
+                $q->orWhere(function ($q) use ($words) {
+                    foreach ($words as $word) {
+                        $q->orWhere('productName', 'LIKE', "%{$word}%");
+                    }
+                });
+    
+                // Substring match
+                $q->orWhere('productName', 'REGEXP', $pattern);
             });
-
+    
+            // Prioritize results based on match type
             $query->orderByRaw("
-            CASE
-                WHEN productName = ? THEN 1
-                WHEN productName LIKE ? THEN 2
-                ELSE 3
-            END", [$searchTerm, "%{$searchTerm}%"]);
+                CASE
+                    WHEN productName = ? THEN 1                   -- Exact full name match
+                    WHEN productName LIKE ? THEN 2                -- Full name contains search term
+                    WHEN " . implode(' OR ', array_map(fn($word) => "productName LIKE '%$word%'", $words)) . " THEN 3
+                    ELSE 4                                        -- Substring matches
+                END", [$searchTerm, "%{$searchTerm}%"]);
         }
+    
         return $query;
     }
+    
 
 
 
