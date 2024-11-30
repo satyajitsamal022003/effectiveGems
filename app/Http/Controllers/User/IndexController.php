@@ -31,48 +31,51 @@ class IndexController extends Controller
     protected function applySearch($query, $searchTerm)
     {
         if ($searchTerm) {
-            $substrings = [];
+            // Split the search term into individual words
+            $words = explode(' ', $searchTerm);
     
             // Generate substrings of 3 consecutive characters
+            $substrings = [];
             for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
                 $substrings[] = substr($searchTerm, $i, 3);
             }
     
-            // Split the search term into individual words
-            $words = explode(' ', $searchTerm);
-    
-            // Create the REGEXP pattern
+            // Create the REGEXP pattern for substrings
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
     
+            // Apply search conditions
             $query->where(function ($q) use ($searchTerm, $words, $pattern) {
                 // Full name match
-                $q->where('productName', 'LIKE', "%{$searchTerm}%");
+                $q->where('productName', '=', $searchTerm);
     
-                // Match individual words
-                $q->orWhere(function ($q) use ($words) {
-                    foreach ($words as $word) {
-                        $q->orWhere('productName', 'LIKE', "%{$word}%");
-                    }
-                });
+                // Individual word match
+                foreach ($words as $word) {
+                    $q->orWhere('productName', 'LIKE', "%{$word}%");
+                }
     
                 // Substring match
                 $q->orWhere('productName', 'REGEXP', $pattern);
             });
     
-            // Prioritize results based on match type
+            // Order by priority: exact full match, individual word match, substring match
             $query->orderByRaw("
                 CASE
-                    WHEN productName = ? THEN 1                   -- Exact full name match
-                    WHEN productName LIKE ? THEN 2                -- Full name contains search term
-                    WHEN " . implode(' OR ', array_map(fn($word) => "productName LIKE '%$word%'", $words)) . " THEN 3
-                    ELSE 4                                        -- Substring matches
+                    WHEN productName = ? THEN 1                       -- Exact full name match
+                    WHEN productName LIKE ? THEN 2                    -- Contains full name
+                    " . implode("\n", array_map(
+                        fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 3),
+                        $words,
+                        array_keys($words)
+                    )) . "
+                    ELSE 99                                           -- Substring matches
                 END", [$searchTerm, "%{$searchTerm}%"]);
         }
     
         return $query;
     }
+    
     
 
 
