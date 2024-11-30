@@ -45,41 +45,36 @@ class IndexController extends Controller
                 return preg_quote($substr, '/');
             }, $substrings));
     
-            // Apply search conditions
             $query->where(function ($q) use ($searchTerm, $words, $pattern) {
-                // Full name match
+                // Check for exact match first
                 $q->where('productName', '=', $searchTerm);
     
-                // Individual word match
-                foreach ($words as $word) {
-                    $q->orWhere('productName', 'LIKE', "%{$word}%");
-                }
+                // Apply secondary conditions only if no exact match is found
+                $q->orWhere(function ($q) use ($words, $pattern) {
+                    // Individual word match
+                    foreach ($words as $word) {
+                        $q->orWhere('productName', 'LIKE', "%{$word}%");
+                    }
     
-                // Substring match
-                $q->orWhere('productName', 'REGEXP', $pattern);
+                    // Substring match
+                    $q->orWhere('productName', 'REGEXP', $pattern);
+                });
             });
     
             // Order by priority: exact full match, individual word match, substring match
             $query->orderByRaw("
                 CASE
                     WHEN productName = ? THEN 1                       -- Exact full name match
-                    WHEN productName LIKE ? THEN 2                    -- Contains full name
-                    " . implode("\n", array_map(
-                        fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 3),
-                        $words,
-                        array_keys($words)
-                    )) . "
-                    ELSE 99                                           -- Substring matches
-                END", [$searchTerm, "%{$searchTerm}%"]);
+                    WHEN " . implode(' OR ', array_map(
+                        fn($word) => "productName LIKE '%{$word}%'",
+                        $words
+                    )) . " THEN 2                                     -- Individual word matches
+                    ELSE 3                                            -- Substring matches
+                END", [$searchTerm]);
         }
     
         return $query;
     }
-    
-    
-
-
-
 
     public function optimize()
     {
