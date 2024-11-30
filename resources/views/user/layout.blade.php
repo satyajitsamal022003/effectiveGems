@@ -6,6 +6,7 @@
     <link rel="canonical" href="index.html" />
     <meta name="description" content="">
     <meta name="metakeyword" content="">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta property="og:title" content="@yield('title', 'Home | Effective Gems')" />
     <meta property="og:description" content="@yield('description', '')" />
     <meta property="og:image" content="@yield('image', 'thumb/image.html')" />
@@ -571,44 +572,54 @@
     </script>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const searchInput = document.getElementById("search");
-        const suggestionsBox = document.getElementById("suggestions");
+   document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("search");
+    const suggestionsBox = document.getElementById("suggestions");
 
-        searchInput.addEventListener("input", function () {
-            const query = this.value.trim();
+    // Get CSRF token from meta tag
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-            if (query.length > 2) { // Trigger suggestions when input is more than 2 characters
-                fetch(`/api/get-suggestions?query=${query}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        suggestionsBox.innerHTML = ""; // Clear previous suggestions
+    searchInput.addEventListener("input", function () {
+        const query = this.value.trim();
 
-                        if (data.length > 0) {
-                            data.forEach(suggestion => {
-                                const li = document.createElement("li");
-                                li.textContent = suggestion.name; // Assuming 'name' is the key for suggestions
-                                li.addEventListener("click", function () {
-                                    searchInput.value = suggestion.name;
-                                    suggestionsBox.innerHTML = ""; // Clear suggestions on selection
-                                });
-                                suggestionsBox.appendChild(li);
+        if (query.length > 2) { // Trigger suggestions when input is more than 2 characters
+            fetch(`/api/get-suggestions?query=${query}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken // Include the CSRF token here
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    suggestionsBox.innerHTML = ""; // Clear previous suggestions
+
+                    if (data.length > 0) {
+                        data.forEach(suggestion => {
+                            const li = document.createElement("li");
+                            li.textContent = suggestion.name; // Assuming 'name' is the key for suggestions
+                            li.addEventListener("click", function () {
+                                searchInput.value = suggestion.name;
+                                suggestionsBox.innerHTML = ""; // Clear suggestions on selection
                             });
-                        }
-                    })
-                    .catch(error => console.error("Error fetching suggestions:", error));
-            } else {
-                suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
-            }
-        });
-
-        // Hide suggestions when clicking outside the input
-        document.addEventListener("click", function (e) {
-            if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-                suggestionsBox.innerHTML = "";
-            }
-        });
+                            suggestionsBox.appendChild(li);
+                        });
+                    }
+                })
+                .catch(error => console.error("Error fetching suggestions:", error));
+        } else {
+            suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
+        }
     });
+
+    // Hide suggestions when clicking outside the input
+    document.addEventListener("click", function (e) {
+        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.innerHTML = "";
+        }
+    });
+});
+
 </script>
 
 
