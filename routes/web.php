@@ -137,7 +137,7 @@ Route::get('/products-details/{prodid}', [IndexController::class, 'productdetail
 Route::get('/products-detail/{slug}', [IndexController::class, 'productdetailsSlug'])->name('user.productdetailsslug');
 Route::get('/layout-category-products/{id}', [IndexController::class, 'getProductsForCategory']);
 Route::get('/searchProduct', [IndexController::class, 'searchProducts'])->name('searchProducts');
-Route::get('/api/get-suggestions', [IndexController::class, 'getSuggestions']);
+Route::get('/api/get-suggestions', [IndexController::class, 'getSuggestions'])->name('api.suggestions');
 
 
 // Cart 

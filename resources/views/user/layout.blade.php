@@ -579,11 +579,13 @@
     // Get CSRF token from meta tag
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
+    const suggestionsUrl = @json(route('api.suggestions'));
+
     searchInput.addEventListener("input", function () {
         const query = this.value.trim();
 
         if (query.length > 2) { // Trigger suggestions when input is more than 2 characters
-            fetch(`/api/get-suggestions?query=${query}`, {
+            fetch(`${suggestionsUrl}?query=${query}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -597,14 +599,27 @@
                     if (data.length > 0) {
                         data.forEach(suggestion => {
                             const li = document.createElement("li");
-                            li.textContent = suggestion.name; // Assuming 'name' is the key for suggestions
+
+                            // Create the anchor tag with the product details route
+                            const a = document.createElement("a");
+                            a.href = `{{ route('user.productdetails', ['prodid' => '__prodid__']) }}`.replace('__prodid__', suggestion.id);
+                            // Use the product's ID in the URL
+                            a.textContent = suggestion.productName; // Assuming 'productName' is the key for suggestions
+
+                            // Append the anchor to the list item
+                            li.appendChild(a);
+
+                            // Optionally, you can add a click event for setting the search input value
                             li.addEventListener("click", function () {
-                                searchInput.value = suggestion.name;
+                                searchInput.value = suggestion.productName;
                                 suggestionsBox.innerHTML = ""; // Clear suggestions on selection
                             });
+
+                            // Append the list item to the suggestions box
                             suggestionsBox.appendChild(li);
                         });
                     }
+
                 })
                 .catch(error => console.error("Error fetching suggestions:", error));
         } else {

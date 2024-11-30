@@ -18,35 +18,17 @@ class IndexController extends Controller
 {
 
     public function getSuggestions(Request $request)
-{
-    $query = $request->input('query');
-    $suggestions = Product::where('name', 'LIKE', "%{$query}%")
-        ->limit(10)
-        ->get(['name']); // Adjust the fields based on your database
-    return response()->json($suggestions);
-}
-
-    private function generateSearchPattern($searchTerm)
     {
-        $substrings = [];
-        for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
-            $substrings[] = substr($searchTerm, $i, 3);
-        }
-        return implode('|', array_map(function ($substr) {
-            return preg_quote($substr, '/');
-        }, $substrings));
-    }
-
-    protected function applySearch($query, $searchTerm)
-    {
-        if ($searchTerm) {
+        $query = $request->input('query');
+        
+        if ($query) {
             // Split the search term into individual words
-            $words = explode(' ', $searchTerm);
+            $words = explode(' ', $query);
     
             // Generate substrings of 3 consecutive characters
             $substrings = [];
-            for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
-                $substrings[] = substr($searchTerm, $i, 3);
+            for ($i = 0; $i <= strlen($query) - 3; $i++) {
+                $substrings[] = substr($query, $i, 3);
             }
     
             // Create the REGEXP pattern for substrings
@@ -54,36 +36,88 @@ class IndexController extends Controller
                 return preg_quote($substr, '/');
             }, $substrings));
     
-            $query->where(function ($q) use ($searchTerm, $words, $pattern) {
-                // Priority 1: Full term exact match
-                $q->where('productName', '=', $searchTerm)
+            // Query to search products
+            $suggestions = Product::where(function ($q) use ($query, $words, $pattern) {
+                // Priority 1: Exact full-term match
+                $q->orWhere('productName', '=', $query);
     
-                    // Priority 2: Partial word matches
-                    ->orWhere(function ($q) use ($words) {
-                        foreach ($words as $word) {
-                            $q->orWhere('productName', 'LIKE', "%{$word}%");
-                        }
-                    })
+                // Priority 2: Individual word match
+                foreach ($words as $word) {
+                    $q->orWhere('productName', 'LIKE', "%{$word}%");
+                }
     
-                    // Priority 3: Substring matches
-                    ->orWhere('productName', 'REGEXP', $pattern);
-            });
-    
-            // Order results based on priority
-            $query->orderByRaw("
+                // Priority 3: Substring match
+                $q->orWhere('productName', 'REGEXP', $pattern);
+            })
+            ->orderByRaw("
                 CASE
                     WHEN productName = ? THEN 1                       -- Exact full name match
+                    WHEN productName LIKE ? THEN 2                    -- Contains full name
                     " . implode("\n", array_map(
-                        fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 2),
+                        fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 3),
                         $words,
                         array_keys($words)
                     )) . "
                     ELSE 99                                           -- Substring matches
-                END", [$searchTerm]);
+                END", [$query, "%{$query}%"])
+            ->limit(10)
+            ->get(['productName', 'id']);  // Adjust the fields as needed
+    
+            return response()->json($suggestions);
         }
     
-        return $query;
+        return response()->json([]);
     }
+    
+
+protected function applySearch($query, $searchTerm)
+{
+    if ($searchTerm) {
+        // Split the search term into individual words
+        $words = explode(' ', $searchTerm);
+
+        // Generate substrings of 3 consecutive characters
+        $substrings = [];
+        for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
+            $substrings[] = substr($searchTerm, $i, 3);
+        }
+
+        // Create the REGEXP pattern for substrings
+        $pattern = implode('|', array_map(function ($substr) {
+            return preg_quote($substr, '/');
+        }, $substrings));
+
+        // Apply search conditions
+        $query->where(function ($q) use ($searchTerm, $words, $pattern) {
+            // Full name match
+            $q->where('productName', '=', $searchTerm);
+
+            // Individual word match
+            foreach ($words as $word) {
+                $q->orWhere('productName', 'LIKE', "%{$word}%");
+            }
+
+            // Substring match
+            $q->orWhere('productName', 'REGEXP', $pattern);
+        });
+
+        // Order by priority: exact full match, individual word match, substring match
+        $query->orderByRaw("
+            CASE
+                WHEN productName = ? THEN 1                       -- Exact full name match
+                WHEN productName LIKE ? THEN 2                    -- Contains full name
+                " . implode("\n", array_map(
+                    fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 3),
+                    $words,
+                    array_keys($words)
+                )) . "
+                ELSE 99                                           -- Substring matches
+            END", [$searchTerm, "%{$searchTerm}%"]);
+    }
+
+    return $query;
+}
+
     
 
     public function optimize()
