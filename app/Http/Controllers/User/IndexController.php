@@ -46,35 +46,36 @@ class IndexController extends Controller
             }, $substrings));
     
             $query->where(function ($q) use ($searchTerm, $words, $pattern) {
-                // Check for exact match first
-                $q->where('productName', '=', $searchTerm);
+                // Priority 1: Full term exact match
+                $q->where('productName', '=', $searchTerm)
     
-                // Apply secondary conditions only if no exact match is found
-                $q->orWhere(function ($q) use ($words, $pattern) {
-                    // Individual word match
-                    foreach ($words as $word) {
-                        $q->orWhere('productName', 'LIKE', "%{$word}%");
-                    }
+                    // Priority 2: Partial word matches
+                    ->orWhere(function ($q) use ($words) {
+                        foreach ($words as $word) {
+                            $q->orWhere('productName', 'LIKE', "%{$word}%");
+                        }
+                    })
     
-                    // Substring match
-                    $q->orWhere('productName', 'REGEXP', $pattern);
-                });
+                    // Priority 3: Substring matches
+                    ->orWhere('productName', 'REGEXP', $pattern);
             });
     
-            // Order by priority: exact full match, individual word match, substring match
+            // Order results based on priority
             $query->orderByRaw("
                 CASE
                     WHEN productName = ? THEN 1                       -- Exact full name match
-                    WHEN " . implode(' OR ', array_map(
-                        fn($word) => "productName LIKE '%{$word}%'",
-                        $words
-                    )) . " THEN 2                                     -- Individual word matches
-                    ELSE 3                                            -- Substring matches
+                    " . implode("\n", array_map(
+                        fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 2),
+                        $words,
+                        array_keys($words)
+                    )) . "
+                    ELSE 99                                           -- Substring matches
                 END", [$searchTerm]);
         }
     
         return $query;
     }
+    
 
     public function optimize()
     {
