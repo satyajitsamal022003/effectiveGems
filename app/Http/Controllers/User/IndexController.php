@@ -28,6 +28,99 @@ class IndexController extends Controller
         // Optionally return a response or redirect
         return response()->json(['message' => 'Application optimized successfully!']);
     }
+
+    protected function applySearch($query, $searchTerm)
+    {
+        if ($searchTerm) {
+            $words = explode(' ', $searchTerm);
+
+            $substrings = [];
+            for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
+                $substrings[] = substr($searchTerm, $i, 3);
+            }
+
+            $pattern = implode('|', array_map(function ($substr) {
+                return preg_quote($substr, '/');
+            }, $substrings));
+
+            $query->where(function ($q) use ($searchTerm, $words, $pattern) {
+                $q->where('productName', '=', $searchTerm);
+
+                foreach ($words as $word) {
+                    $q->orWhere('productName', 'LIKE', "%{$word}%");
+                }
+
+                $q->orWhere('productName', 'REGEXP', $pattern);
+            });
+
+            $query->orderByRaw("
+            CASE
+                WHEN productName = ? THEN 1                       -- Exact full name match
+                WHEN productName LIKE ? THEN 2                    -- Contains full name
+                " . implode("\n", array_map(
+                fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 3),
+                $words,
+                array_keys($words)
+            )) . "
+                ELSE 99                                           -- Substring matches
+            END", [$searchTerm, "%{$searchTerm}%"]);
+        }
+
+        return $query;
+    }
+
+    public function getSuggestions(Request $request)
+    {
+        $query = $request->input('query');
+
+        if ($query) {
+            // Split the search term into individual words
+            $words = explode(' ', $query);
+
+            // Generate substrings of 3 consecutive characters
+            $substrings = [];
+            for ($i = 0; $i <= strlen($query) - 3; $i++) {
+                $substrings[] = substr($query, $i, 3);
+            }
+
+            // Create the REGEXP pattern for substrings
+            $pattern = implode('|', array_map(function ($substr) {
+                return preg_quote($substr, '/');
+            }, $substrings));
+
+            // Query to search products
+            $suggestions = Product::where(function ($q) use ($query, $words, $pattern) {
+                // Priority 1: Exact full-term match
+                $q->orWhere('productName', '=', $query);
+
+                // Priority 2: Individual word match
+                foreach ($words as $word) {
+                    $q->orWhere('productName', 'LIKE', "%{$word}%");
+                }
+
+                // Priority 3: Substring match
+                $q->orWhere('productName', 'REGEXP', $pattern);
+            })
+                ->orderByRaw("
+                CASE
+                    WHEN productName = ? THEN 1                       -- Exact full name match
+                    WHEN productName LIKE ? THEN 2                    -- Contains full name
+                    " . implode("\n", array_map(
+                    fn($word, $index) => "WHEN productName LIKE '%{$word}%' THEN " . ($index + 3),
+                    $words,
+                    array_keys($words)
+                )) . "
+                    ELSE 99                                           -- Substring matches
+                END", [$query, "%{$query}%"])
+                ->limit(10)
+                ->get(['productName', 'id']);  // Adjust the fields as needed
+
+            return response()->json($suggestions);
+        }
+
+        return response()->json([]);
+    }
+
     public function searchProducts(Request $request)
     {
         // Retrieve the query parameters directly from the request
@@ -52,7 +145,7 @@ class IndexController extends Controller
         $categories = Category::where('status', 1)->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
             ->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
         $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->orderBy('sortOrderPopular', 'asc')->orderBy('created_at', 'asc')->paginate(16);
-        return view('user.index', compact('categories', 'popularproducts','testimonials'));
+        return view('user.index', compact('categories', 'popularproducts', 'testimonials'));
     }
 
     public function categorywiseproduct($id, $search = null)
@@ -85,22 +178,26 @@ class IndexController extends Controller
             ->paginate(16); // Paginate the result
 
         // If there's a search query, modify the product search and apply the same ordering
+        $query = Product::where('categoryId', $id)
+            ->where('status', 1);
         if ($search) {
-            $subcategoryproducts = Product::where('categoryId', $id)
-                ->where('status', 1) // Filter by status
-                ->whereRaw("MATCH(productName) AGAINST(? IN NATURAL LANGUAGE MODE)", [$search])
-                ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
-                ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
-                ->orderBy('sortOrder', 'asc') // Then order by sortOrder
-                ->orderBy('created_at', 'asc') // Finally order by created_at
-                ->paginate(16); // Paginate the result
-
-            // Return the search view with products
-            return view('user.category.searchProducts', compact(
-                'subcategoryproducts',
-                'search'
-            ));
+            $query = $this->applySearch($query, $search);
         }
+
+        $subcategoryproducts = $query->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END")
+            ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END")
+            ->orderBy('sortOrder', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(16);
+
+        $category = Category::find($id);
+
+        return view('user.category.searchProducts', compact(
+            'subcategoryproducts',
+            'search',
+            'category',
+        ));
+
 
         // Fetch the category details
         $category = Category::find($id);
@@ -118,7 +215,7 @@ class IndexController extends Controller
     public function categorywiseproductSlug($slug, $search = null)
     {
         // Pagination setup
-        $category = Category::where('seoUrl',$slug)->first();
+        $category = Category::where('seoUrl', $slug)->first();
         $pageNo = request()->get('page', 1);
         $itemsPerPage = 16; // Number of items per page
         $toSkip = ($pageNo - 1) * $itemsPerPage;
@@ -184,19 +281,25 @@ class IndexController extends Controller
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
         $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
             ->orderBy('created_at', 'asc')->paginate(16);
-        if ($search) {
-            $subcategoryproducts = Product::where('subCategoryId', $id)
-                ->where('status', 1)
-                ->whereRaw("MATCH(productName) AGAINST(? IN NATURAL LANGUAGE MODE)", [$search])
-                ->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
-                ->orderBy('created_at', 'asc')
-                ->paginate(16);
-            return view('user.category.searchProducts', compact(
 
-                'subcategoryproducts',
-                'search'
-            ));
+        $query = Product::where('subCategoryId', $id)
+            ->where('status', 1);
+        if ($search) {
+            $query = $this->applySearch($query, $search);
         }
+
+        $subcategoryproducts = $query->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")
+            ->orderBy('sortOrderSubCategory', 'asc')
+            ->orderBy('created_at', 'asc')
+            ->paginate(16);
+
+        $category = SubCategory::find($id);
+        return view('user.category.searchProducts', compact(
+            'category',
+            'subcategoryproducts',
+            'search'
+        ));
+
 
         $category = SubCategory::find($id);
         $seoUrl = $category->seoUrl;
@@ -253,9 +356,13 @@ class IndexController extends Controller
         $itemsPerPage = 8; // Number of items per page
         $toSkip = ($pageNo - 1) * $itemsPerPage;
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
-        $subcategoryproducts = Product::where('status', 1)
-            ->where('productName', 'like', '%' . $search . '%')
-            ->paginate(16);
+        $query = Product::where('status', 1);
+
+        if ($search) {
+            $query = $this->applySearch($query, $search);
+        }
+
+        $subcategoryproducts = $query->paginate(16);
 
         $category = SubCategory::find(1);
 
