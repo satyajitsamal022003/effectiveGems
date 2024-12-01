@@ -209,7 +209,7 @@ Route::group(['prefix' => 'user'], function () {
     Route::middleware('euser.auth')->group(function () {
         Route::get('/dashboard', [EuserController::class, 'dashboard'])->name('euser.dashboard');
         Route::get('/my-orders', [EuserController::class, 'myorderlist'])->name('euser.myorderlist');
-        Route::get('/orders-view', [EuserController::class, 'ordersview'])->name('euser.ordersview');
+        Route::get('/orders-view/{id}', [EuserController::class, 'ordersview'])->name('euser.ordersview');
         Route::get('/my-wishlist', [EuserController::class, 'wishlist'])->name('euser.wishlist');
     });
 });

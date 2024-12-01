@@ -12,7 +12,7 @@
                         <div class="customer-email">
                             <div class="panel-info mt-0">
                                 <div class="panel-heading">Contact</div>
-                                <a href="login.html" class="edit-after-submit">Login</a>
+                                {{-- <a href="login.html" class="edit-after-submit">Login</a> --}}
                             </div>
                             <div class="row justify-content-center inline-shipping">
                                 <div class="col-lg-12 col-12">
