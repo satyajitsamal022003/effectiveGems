@@ -377,7 +377,8 @@
 
 
                     <div class="as_copyright_wrapper text-center">
-                        <p>Copyright &copy; 2024. All Rights Reserved.</p>
+                        <p>Copyright &copy; 2024. Punyatoya Enterprises. All Rights Reserved.
+                        </p>
 
                         <div class="develop-by">
                             <p>Developed by <a href="https://meinstyn.com/" target="_blank">Meinstyn Solutions</a></p>
