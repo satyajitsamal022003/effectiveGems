@@ -19,6 +19,7 @@ use App\Http\Controllers\SiteMapController;
 use App\Http\Controllers\User\CartController;
 use App\Http\Controllers\User\IndexController;
 use App\Http\Controllers\User\OrderController;
+use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 
@@ -210,7 +211,9 @@ Route::group(['prefix' => 'user'], function () {
         Route::get('/dashboard', [EuserController::class, 'dashboard'])->name('euser.dashboard');
         Route::get('/my-orders', [EuserController::class, 'myorderlist'])->name('euser.myorderlist');
         Route::get('/orders-view/{id}', [EuserController::class, 'ordersview'])->name('euser.ordersview');
-        Route::get('/my-wishlist', [EuserController::class, 'wishlist'])->name('euser.wishlist');
+        Route::get('/my-wishlist', [WishlistController::class, 'index'])->name('euser.wishlist');
+        Route::post('/add-to-wishlist', [WishlistController::class, 'store'])->name('euser.wishlist-add');
+        Route::post('/remove-from-wishlist', [WishlistController::class, 'destroy'])->name('euser.wishlist-destroy');
     });
 });
 

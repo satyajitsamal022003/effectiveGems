@@ -9,4 +9,8 @@ class Wishlist extends Model
 {
     use HasFactory;
     protected $fillable = ['user_id', 'product_id'];
+    public function productDetails()
+    {
+        return $this->hasOne(Product::class, 'id', 'product_id');
+    }
 }

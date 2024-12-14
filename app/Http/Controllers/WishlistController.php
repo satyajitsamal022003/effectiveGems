@@ -14,10 +14,12 @@ class WishlistController extends Controller
     public function index()
     {
         // Fetch all wishlist items for the authenticated user
-        $wishlists = Wishlist::where('user_id', Auth::guard('euser')->user()->id)->get();
+        $wishlists = Wishlist::where('user_id', Auth::guard('euser')->user()->id)
+            ->with('productDetails') // Eager load the related product details
+            ->get();
 
         // Return the wishlist view with the data
-        return view('wishlists.index', compact('wishlists'));
+        return view('eusers.mywishlist.list', compact('wishlists'));
     }
 
     /**
@@ -34,19 +36,39 @@ class WishlistController extends Controller
      */
     public function store(Request $request)
     {
+        // Validate the incoming request
         $validated = $request->validate([
-            'product_id' => 'required|exists:products,id',
+            'product_id' => 'required|exists:product,id',
         ]);
 
+        $userId = Auth::guard('euser')->user()->id;
+
+        // Check if the product already exists in the wishlist
+        $existingWishlistItem = Wishlist::where('user_id', $userId)
+            ->where('product_id', $validated['product_id'])
+            ->first();
+
+        if ($existingWishlistItem) {
+            // Return JSON response with error
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Product is already in your wishlist.',
+            ], 409); // HTTP 409 Conflict
+        }
+
+        // Add the product to the wishlist
         Wishlist::create([
-            'user_id' => Auth::guard('euser')->user()->id,
+            'user_id' => $userId,
             'product_id' => $validated['product_id'],
         ]);
 
-        // Redirect back to the wishlist index page with a success message
-        return redirect()->route('wishlists.index')
-            ->with('success', 'Product added to wishlist successfully.');
+        // Return a success JSON response
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product added to wishlist successfully.',
+        ]);
     }
+
 
     /**
      * Display the specified resource.
@@ -102,8 +124,9 @@ class WishlistController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Wishlist $wishlist)
+    public function destroy(Request $request)
     {
+        $wishlist = Wishlist::find($request->id);
         // Check if the authenticated user owns the wishlist item
         if ($wishlist->user_id !== Auth::guard('euser')->user()->id) {
             abort(403, 'Unauthorized action.');
@@ -112,7 +135,9 @@ class WishlistController extends Controller
         $wishlist->delete();
 
         // Redirect back to the wishlist index page with a success message
-        return redirect()->route('wishlists.index')
-            ->with('success', 'Wishlist item removed successfully.');
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Product removed from wishlist successfully.',
+        ]);
     }
 }
