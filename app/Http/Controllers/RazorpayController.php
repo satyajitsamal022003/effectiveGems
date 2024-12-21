@@ -11,6 +11,7 @@ use Session;
 use Exception;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Auth;
 
 class RazorpayController extends Controller
 {
@@ -85,8 +86,20 @@ class RazorpayController extends Controller
 
         // Send confirmation email
         Mail::to($order->email)->send(new OrderConfirmation($order));
-        $cart = Cart::where("ip", $ip)->first();
-        $cartItems = CartItem::where("cart_id", $cart->id)->delete();
+        if (Auth::guard('euser')->check()) {
+            $euser = Auth::guard('euser')->user();
+            $userId = $euser->id;
+        }
+
+        if ($userId) {
+            $cart = Cart::where("userId", $userId)->first();
+            $cartId = $cart->id;
+        } else {
+            $cart = Cart::where("ip", $ip)->first();
+            $cartId = $cart->id;
+        }
+        // $cart = Cart::where("ip", $ip)->first();
+        // $cartItems = CartItem::where("cart_id", $cart->id)->delete();
         $cart->delete();
         try {
             $attributes = array(
