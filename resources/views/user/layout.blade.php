@@ -119,22 +119,35 @@
                                     <a href="{{ route('eusers.signup') }}"><i class="fa-light fa-circle-user"></i>
                                         Signup</a>
                                 @endguest
-                                {{-- <div class="header-login-dropdown">
-                                    <ul>
-                                        <li><a href="my-profile.html"><i class="fa-light fa-circle-user"></i> My
-                                                Profile</a></li>
-                                        <li><a href="my-order.html"><i class="fa-light fa-box-taped"></i> My Order</a>
-                                        </li>
-                                        <li><a href="wishlist.html"><i class="fa-light fa-heart"></i> Wishlist</a></li>
-                                    </ul>
-                                </div> --}}
+                                @if (Auth::guard('euser')->check())
+                                    <div class="header-login-dropdown-wrapper">
+                                        <button id="userDropdownToggle" class="dropdown-toggle">
+                                            <i class="fa-light fa-circle-user"></i> My Account
+                                        </button>
+                                        <div id="userDropdownMenu" class="header-login-dropdown hidden">
+                                            <ul>
+                                                <li><a href="{{ route('euser.myProfile') }}"><i
+                                                            class="fa-light fa-circle-user"></i> My Profile</a></li>
+                                                <li><a href="{{ route('euser.myorderlist') }}"><i
+                                                            class="fa-light fa-box-taped"></i> My Order</a></li>
+                                                <li><a href="{{ route('euser.wishlist') }}"><i
+                                                            class="fa-light fa-heart"></i> Wishlist</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                @endif
                             </div>
+
                             <!--cart for desktop start-->
-                            <div class="header-cart for-desktop"><a href="#" id="cartLink"
-                                    onclick="if (parseInt(document.querySelector('.cartCount').textContent) > 0) { window.location.href = '/cart'; } else { alert('Your cart is empty!'); }"><i
-                                        class="fa-light fa-cart-shopping"></i><span class="cartCount">0</span></a></div>
+                            <div class="header-cart for-desktop">
+                                <a href="#" id="cartLink"
+                                    onclick="if (parseInt(document.querySelector('.cartCount').textContent) > 0) { window.location.href = '/cart'; } else { alert('Your cart is empty!'); }">
+                                    <i class="fa-light fa-cart-shopping"></i><span class="cartCount">0</span>
+                                </a>
+                            </div>
                             <!--cart for desktop end-->
                         </div>
+
 
                         <!--login and cart section end-->
 
