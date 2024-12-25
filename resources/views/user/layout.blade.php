@@ -41,29 +41,29 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
         rel="stylesheet">
-        <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
-        <style>
-    /* Styling for suggestions */
-    .suggestions-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        position: absolute;
-        background-color: #fff;
-        border: 1px solid #ddd;
-        width: calc(100% - 30px);
-        z-index: 1000;
-    }
+    <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
+    <style>
+        /* Styling for suggestions */
+        .suggestions-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            position: absolute;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            width: calc(100% - 30px);
+            z-index: 1000;
+        }
 
-    .suggestions-list li {
-        padding: 10px;
-        cursor: pointer;
-    }
+        .suggestions-list li {
+            padding: 10px;
+            cursor: pointer;
+        }
 
-    .suggestions-list li:hover {
-        background-color: #f0f0f0;
-    }
-</style>
+        .suggestions-list li:hover {
+            background-color: #f0f0f0;
+        }
+    </style>
 </head>
 
 <body>
@@ -113,10 +113,12 @@
                         <!--login and cart section start-->
                         <div class="menu-right">
                             <div class="header-login position-relative">
-                            @guest('euser')
-                                <a href="/login"><i class="fa-light fa-circle-user"></i> Login</a> / 
-                                <a href="/register"><i class="fa-light fa-circle-user"></i> Signup</a>
-                            @endguest
+                                @guest('euser')
+                                    <a href="{{ route('eusers.login') }}"><i class="fa-light fa-circle-user"></i> Login</a>
+                                    /
+                                    <a href="{{ route('eusers.signup') }}"><i class="fa-light fa-circle-user"></i>
+                                        Signup</a>
+                                @endguest
                                 {{-- <div class="header-login-dropdown">
                                     <ul>
                                         <li><a href="my-profile.html"><i class="fa-light fa-circle-user"></i> My
@@ -218,9 +220,9 @@
                                                 <input type="hidden" name="subCatId" value="@yield('subCatId')">
                                                 <div class="col-10"> <input type="text" id="search"
                                                         name="search" placeholder="Type here to search...">
-                                                    
-                                                        <ul id="suggestions" class="suggestions-list"></ul>
-                                                    </div>
+
+                                                    <ul id="suggestions" class="suggestions-list"></ul>
+                                                </div>
                                                 <div class="col-2">
                                                     <button type="submit" class="as_btn">Search</button>
                                                 </div>
@@ -549,93 +551,96 @@
         });
     </script>
 
-<script>
+    <script>
         // Check if there's an error message
-        @if(Session::has('error'))
-        toastr.error("{{ session('error') }}");
+        @if (Session::has('error'))
+            toastr.error("{{ session('error') }}");
         @endif
 
         // Check if there's a success message
-        @if(Session::has('message'))
-        toastr.success("{{ session('message') }}");
+        @if (Session::has('message'))
+            toastr.success("{{ session('message') }}");
         @endif
 
-        @if(Session::has('info'))
-        toastr.info("{{ session('info') }}");
+        @if (Session::has('info'))
+            toastr.info("{{ session('info') }}");
         @endif
 
-        @if($errors -> any())
-        @foreach($errors -> all() as $error)
-        toastr.error("{{ $error }}");
-        @endforeach
+        @if ($errors->any())
+            @foreach ($errors->all() as $error)
+                toastr.error("{{ $error }}");
+            @endforeach
         @endif
     </script>
 
-<script>
-   document.addEventListener("DOMContentLoaded", function () {
-    const searchInput = document.getElementById("search");
-    const suggestionsBox = document.getElementById("suggestions");
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const searchInput = document.getElementById("search");
+            const suggestionsBox = document.getElementById("suggestions");
 
-    // Get CSRF token from meta tag
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            // Get CSRF token from meta tag
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-    const suggestionsUrl = @json(route('api.suggestions'));
+            const suggestionsUrl = @json(route('api.suggestions'));
 
-    searchInput.addEventListener("input", function () {
-        const query = this.value.trim();
+            searchInput.addEventListener("input", function() {
+                const query = this.value.trim();
 
-        if (query.length > 2) { // Trigger suggestions when input is more than 2 characters
-            fetch(`${suggestionsUrl}?query=${query}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken // Include the CSRF token here
+                if (query.length > 2) { // Trigger suggestions when input is more than 2 characters
+                    fetch(`${suggestionsUrl}?query=${query}`, {
+                            method: 'GET',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken // Include the CSRF token here
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            suggestionsBox.innerHTML = ""; // Clear previous suggestions
+
+                            if (data.length > 0) {
+                                data.forEach(suggestion => {
+                                    const li = document.createElement("li");
+
+                                    // Create the anchor tag with the product details route
+                                    const a = document.createElement("a");
+                                    a.href =
+                                        `{{ route('user.productdetails', ['prodid' => '__prodid__']) }}`
+                                        .replace('__prodid__', suggestion.id);
+                                    // Use the product's ID in the URL
+                                    a.textContent = suggestion
+                                        .productName; // Assuming 'productName' is the key for suggestions
+
+                                    // Append the anchor to the list item
+                                    li.appendChild(a);
+
+                                    // Optionally, you can add a click event for setting the search input value
+                                    li.addEventListener("click", function() {
+                                        searchInput.value = suggestion.productName;
+                                        suggestionsBox.innerHTML =
+                                            ""; // Clear suggestions on selection
+                                    });
+
+                                    // Append the list item to the suggestions box
+                                    suggestionsBox.appendChild(li);
+                                });
+                            }
+
+                        })
+                        .catch(error => console.error("Error fetching suggestions:", error));
+                } else {
+                    suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
                 }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    suggestionsBox.innerHTML = ""; // Clear previous suggestions
+            });
 
-                    if (data.length > 0) {
-                        data.forEach(suggestion => {
-                            const li = document.createElement("li");
-
-                            // Create the anchor tag with the product details route
-                            const a = document.createElement("a");
-                            a.href = `{{ route('user.productdetails', ['prodid' => '__prodid__']) }}`.replace('__prodid__', suggestion.id);
-                            // Use the product's ID in the URL
-                            a.textContent = suggestion.productName; // Assuming 'productName' is the key for suggestions
-
-                            // Append the anchor to the list item
-                            li.appendChild(a);
-
-                            // Optionally, you can add a click event for setting the search input value
-                            li.addEventListener("click", function () {
-                                searchInput.value = suggestion.productName;
-                                suggestionsBox.innerHTML = ""; // Clear suggestions on selection
-                            });
-
-                            // Append the list item to the suggestions box
-                            suggestionsBox.appendChild(li);
-                        });
-                    }
-
-                })
-                .catch(error => console.error("Error fetching suggestions:", error));
-        } else {
-            suggestionsBox.innerHTML = ""; // Clear suggestions if input is too short
-        }
-    });
-
-    // Hide suggestions when clicking outside the input
-    document.addEventListener("click", function (e) {
-        if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
-            suggestionsBox.innerHTML = "";
-        }
-    });
-});
-
-</script>
+            // Hide suggestions when clicking outside the input
+            document.addEventListener("click", function(e) {
+                if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
+                    suggestionsBox.innerHTML = "";
+                }
+            });
+        });
+    </script>
 
 
 </body>

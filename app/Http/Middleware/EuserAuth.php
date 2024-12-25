@@ -21,6 +21,6 @@ class EuserAuth
             return $next($request);
         }
 
-        return redirect('/user/login')->with('error', 'Unauthorized access.');
+        return redirect('/user/sign-in')->with('error', 'Unauthorized access.');
     }
 }

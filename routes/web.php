@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\ActivationController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CertificationController;
@@ -96,7 +97,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('/update-product/{id}', [ProductController::class, 'updateproduct'])->name('admin.editproductdata');
     Route::post('/update-product-partly/{id}', [ProductController::class, 'updateProductPartly'])->name('admin.updateProductPartly');
 
-    //activation 
+    //activation
     Route::get('/add-activation', [ActivationController::class, 'addactivation'])->name('admin.addactivation');
     Route::post('/store-activation', [ActivationController::class, 'storeactivation'])->name('admin.storeactivation');
     Route::get('/activations-list', [ActivationController::class, 'listactivation'])->name('admin.listactivation');
@@ -141,7 +142,7 @@ Route::get('/searchProduct', [IndexController::class, 'searchProducts'])->name('
 Route::get('/api/get-suggestions', [IndexController::class, 'getSuggestions'])->name('api.suggestions');
 
 
-// Cart 
+// Cart
 
 Route::get('/cart', [CartController::class, 'index']);
 Route::post('/add-to-cart', [CartController::class, 'addToCart'])->name('addToCart');
@@ -150,7 +151,7 @@ Route::post('/change-quantity', [CartController::class, 'changeQuantity'])->name
 Route::post('/change-settings', [CartController::class, 'changeAddSettings'])->name('changeAddSettings');
 Route::get('/view-cart', [CartController::class, 'viewCart'])->name('viewCart');
 
-// RazorPay 
+// RazorPay
 Route::get('razorpay', [RazorpayController::class, 'createOrder'])->name('razorpay.order');
 Route::post('razorpay-payment', [RazorpayController::class, 'storePayment'])->name('razorpay.payment.store');
 Route::post('razorpay-callback', [RazorpayController::class, 'paymentCallback'])->name('razorpay.callback');
@@ -174,7 +175,7 @@ Route::get('/order/accept/{id}', [AdminOrderController::class, 'acceptOrder'])->
 Route::get('/order/cancel/{id}', [AdminOrderController::class, 'cancelOrder'])->name('order.cancel');
 Route::get('/get-courier-name', [AdminOrderController::class, 'getCourierName'])->name('order.getCourierName');
 
-// SITEMAPS 
+// SITEMAPS
 Route::get('sitemap.xml', [SiteMapController::class, 'index'])->name('sitemap.index');
 Route::get('sitemap/categories.xml', [SiteMapController::class, 'categories'])->name('sitemap.categories');
 Route::get('sitemap/subcategories.xml', [SiteMapController::class, 'subcategories'])->name('sitemap.subcategories');
@@ -197,13 +198,13 @@ Route::group(['prefix' => 'user'], function () {
     Route::get('/sign-up', function () {
         return view('eusers.register');
     })->name('eusers.signup');
-    
+
     Route::post('/post-sign-up', [RegisterController::class, 'postsignup'])->name('eusers.postsignup');
-    
+
     Route::get('/sign-in', function () {
         return view('eusers.login');
     })->name('eusers.login');
-    
+
     Route::post('/post-sign-in', [EuserController::class, 'postsignin'])->name('eusers.postsignin');
     Route::post('/logout', [EuserController::class, 'logout'])->name('euser.logout');
 
@@ -214,6 +215,16 @@ Route::group(['prefix' => 'user'], function () {
         Route::get('/my-wishlist', [WishlistController::class, 'index'])->name('euser.wishlist');
         Route::post('/add-to-wishlist', [WishlistController::class, 'store'])->name('euser.wishlist-add');
         Route::post('/remove-from-wishlist', [WishlistController::class, 'destroy'])->name('euser.wishlist-destroy');
+        Route::get('/my-profile', [ProfileController::class, 'myProfile'])->name('euser.myProfile');
+        Route::get('/setting', [ProfileController::class, 'Setting'])->name('euser.setting');
+        Route::post('/update-profile', [ProfileController::class, 'updateProfile'])->name('euser.updateProfile');
+        Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('euser.changePassword');
+        Route::get('/manage-address', [AddressController::class, 'manageAddress'])->name('euser.manageaddress');
+        Route::post('/store-address', [AddressController::class, 'storeAddress'])->name('euser.address.store');
+        Route::get('/edit-address/{id}', [AddressController::class, 'editAddress'])->name('euser.address.edit');
+        Route::put('/update-address/{id}', [AddressController::class, 'updateAddress'])->name('euser.address.update');
+        Route::get('/api/address/{id}', [AddressController::class, 'getAddress'])->name('euser.address.getaddress');
+        Route::delete('/delete-address/{id}', [AddressController::class, 'destroy'])->name('euser.address.destroy');
     });
 });
 
