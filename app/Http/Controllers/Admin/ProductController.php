@@ -24,7 +24,7 @@ class ProductController extends Controller
         $categories = Category::select('categoryName', 'id')->whereNotIn('status', [2])->get();
         return view('admin.products.list', compact('categories'));
     }
-    public function getProductsData(Request $request) 
+    public function getProductsData(Request $request)
     {
         $draw = intval($request->input('draw'));
         $length = intval($request->input('length'));
@@ -75,7 +75,7 @@ class ProductController extends Controller
         ]);
     }
 
-    public function storeproduct(Request $request) 
+    public function storeproduct(Request $request)
     {
         $request->validate([
             'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
@@ -86,7 +86,6 @@ class ProductController extends Controller
             'is_variant' => 'nullable',
             'productName' => 'required|string|max:255',
         ]);
-
 
         $productData = $request->except(['_token']);
 
@@ -102,11 +101,24 @@ class ProductController extends Controller
         $productData['is_variant'] = $request->is_variant ? 1 : 0;
         $productData['variant'] = $request->filled('variant') ? json_encode($request->variant) : null;
 
-        $productData['seoUrl'] = Str::slug($request->productName);
+        // Generate unique seoUrl
+        $baseSeoUrl = Str::slug($request->productName);
+        $seoUrl = $baseSeoUrl;
+        $counter = 1;
+
+        // Check for duplicate and append counter if necessary
+        while (Product::where('seoUrl', $seoUrl)->exists()) {
+            $seoUrl = "{$baseSeoUrl}-{$counter}";
+            $counter++;
+        }
+
+        $productData['seoUrl'] = $seoUrl;
+
         Product::create($productData);
 
         return redirect()->route('admin.listproduct')->with('message', 'Product added successfully!');
     }
+
 
     public function editproduct($id)
     {
@@ -206,7 +218,20 @@ class ProductController extends Controller
 
         $productData['is_variant'] = $request->is_variant ? 1 : 0;
         $productData['variant'] = $request->filled('variant') ? json_encode($request->variant) : null;
-        $productData['seoUrl'] = Str::slug($request->productName);
+        // $productData['seoUrl'] = Str::slug($request->productName);
+
+        // Generate unique seoUrl
+        $baseSeoUrl = Str::slug($request->productName);
+        $seoUrl = $baseSeoUrl;
+        $counter = 1;
+
+        // Ensure seoUrl is unique
+        while (Product::where('seoUrl', $seoUrl)->where('id', '!=', $id)->exists()) {
+            $seoUrl = "{$baseSeoUrl}-{$counter}";
+            $counter++;
+        }
+
+        $productData['seoUrl'] = $seoUrl;
 
         $product->update($productData);
 

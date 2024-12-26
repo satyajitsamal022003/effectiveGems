@@ -11,7 +11,9 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\State;
+use App\Models\UserAddress;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Razorpay\Api\Api;
 
 
@@ -23,12 +25,27 @@ class OrderController extends Controller
     public function index(Request $req)
     {
         //
-        $ip = $req->getClientIp();
+        $userId = null;
 
-        if ($ip) {
-            $cart = Cart::where("ip", $ip)->first();
-            $cartId = $cart->id;
+        // Check if the user is authenticated
+        if (Auth::guard('euser')->check()) {
+            $userId = Auth::guard('euser')->user()->id;
         }
+
+        // Fetch the cart based on IP or userId
+        $ip = $req->getClientIp();
+        $cart = Cart::where('ip', $ip)->first();
+
+        if (!$cart && $userId) {
+            $cart = Cart::where('userId', $userId)->first();
+        }
+
+        // If no cart found, redirect to user index
+        if (!$cart) {
+            return redirect()->route('user.index');
+        }
+
+        $cartId = $cart->id;
 
         // Fetch cart items with product details
         $cartItems = $cart ? $cart->items()->with('productDetails')->get() : collect(); // Eager load productDetails
@@ -63,7 +80,9 @@ class OrderController extends Controller
         });
         $total = $subtotal - $totalDelPrice;
         $states = State::all();
-        return view('user.checkout.index', compact('states', 'cartItems', 'subtotal', 'total', 'totalDelPrice','cartId'));
+
+        $addressdata = UserAddress::where('user_id', $userId)->get();
+        return view('user.checkout.index', compact('states', 'cartItems', 'subtotal', 'total', 'totalDelPrice', 'cartId', 'addressdata'));
     }
 
     /**
@@ -80,9 +99,20 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         //
+        $userId = null;
+
+        if (Auth::guard('euser')->check()) {
+            $euser = Auth::guard('euser')->user();
+            $userId = $euser->id;
+        }
+
         $ip = $request->getClientIp();
         $order = new Order();
-        $order->ip = $ip;
+        if ($userId) {
+            $order->userId = $userId;
+        } else {
+            $order->ip = $ip;
+        }
         $order->email = $request->email;
         $order->firstName = $request->firstName;
         $order->middleName = $request->middleName;
@@ -117,9 +147,31 @@ class OrderController extends Controller
         $order->promoCode = $request->promoCode;
         $order->orderStatus = 'Failed';
         $order->couponApplied = $request->appliedCoupon;
+        if ($request->has('save_information') && $userId) {
+            $userAddress = new UserAddress();
+            $userAddress->user_id = $userId;
+            $userAddress->first_name = $request->firstName;
+            $userAddress->middle_name = $request->middleName;
+            $userAddress->last_name = $request->lastName;
+            $userAddress->phone = $request->phoneNumber;
+            $userAddress->country_id = $request->country;
+            $userAddress->state_id = $request->state;
+            $userAddress->city_name = $request->city;
+            $userAddress->zip_code = $request->zipcode;
+            $userAddress->landmark = $request->landmark;
+            $userAddress->apartment = $request->appartment;
+            $userAddress->address = $request->address;
+            // $userAddress->address_type = $request->input('address_type', 'Home');
+            $userAddress->address_type = $request->address_type;
+            $userAddress->save();
+        }
         if ($order->save()) {
             $orderId = $order->id;
-            $cart = Cart::where("ip", $ip)->first();
+            if ($userId) {
+
+                $cart = Cart::where("userId", $userId)->first();
+            } else
+                $cart = Cart::where("ip", $ip)->first();
             $cartItems = $cart ? $cart->items()->with('productDetails')->get() : collect();
             $subtotal =   $cartItems->sum(function ($item) use ($request) {
                 $courierType = Couriertype::find($item->productDetails->courierTypeId);
@@ -148,7 +200,7 @@ class OrderController extends Controller
                 $orderItem->amount = $value->quantity * $value->productDetails->priceB2B;
                 $orderItem->save();
             }
-            $amount = $request->amount *100;
+            $amount = $request->amount * 100;
             $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
             $razorpayOrderData = [
                 'receipt'         => 'orderId-' . $orderId, // Your internal order ID as receipt ID

@@ -186,7 +186,8 @@
                                         onclick="return addToCart({{ $productdetails->id }})"><span>Add
                                             to Cart</span>
                                     </a>
-                                    <a href="javascript:;" class="wishlist-btn-details" title="Add to Wishlist"><i
+                                    <a href="javascript:;" class="wishlist-btn-details" title="Add to Wishlist"
+                                        onclick="return addToWishlist({{ $productdetails->id }})"><i
                                             class="fa-light fa-heart"></i></a>
                                 </div>
                                 <!--button end-->
@@ -384,6 +385,31 @@
 <!--Popular Products end-->
 @endsection
 <script>
+    const addToWishlist = (proId) => {
+
+        // var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());
+        // var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
+        // var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
+        $.ajax({
+            type: "POST",
+            url: "{{ route('euser.wishlist-add') }}",
+            data: {
+                _token: "{{ csrf_token() }}",
+                product_id: proId,
+                // quantity: quantity,
+                // isActive: isActive,
+                // isCert: isCert,
+            },
+            success: function(response) {
+                // $(".cartCount").text(response.totalCartItems);
+                alert(response.message);
+                // toastr.success(response.message);
+            },
+            error: function(xhr, status, error) {
+                // toastr.error("An error occurred: " + error);
+            },
+        });
+    };
     const addToCart = (proId) => {
 
         var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());

@@ -363,8 +363,8 @@ $(document).ready(function () {
 });
 /*quantity end*/
 
-$(document).ready(function () {
-    $(".add-new-address").click(function () {
-        $(".new-address").toggle();
-    });
-});
+// $(document).ready(function () {
+//     $(".add-new-address").click(function () {
+//         $(".new-address").toggle();
+//     });
+// });

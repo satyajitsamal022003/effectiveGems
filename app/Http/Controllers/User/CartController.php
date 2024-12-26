@@ -10,15 +10,24 @@ use App\Models\Certification;
 use App\Models\Couriertype;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
     //
     public function index(Request $req)
     {
+        $userId = null;
+
+        if (Auth::guard('euser')->check()) {
+            $euser = Auth::guard('euser')->user();
+            $userId = $euser->id;
+        }
         $ip = $req->getClientIp();
 
-        if ($ip) {
+        if ($userId) {
+            $cart = Cart::where("userId", $userId)->first();
+        } else {
             $cart = Cart::where("ip", $ip)->first();
         }
 
@@ -84,13 +93,18 @@ class CartController extends Controller
 
     public function viewCart(Request $req)
     {
-        $ip = $req->getClientIp();
-        $userId = $req->userId;
+        $userId = null;
 
-        if ($ip) {
-            $cart = Cart::where("ip", $ip)->first();
-        } else {
+        if (Auth::guard('euser')->check()) {
+            $euser = Auth::guard('euser')->user();
+            $userId = $euser->id;
+        }
+        $ip = $req->getClientIp();
+
+        if ($userId) {
             $cart = Cart::where("userId", $userId)->first();
+        } else {
+            $cart = Cart::where("ip", $ip)->first();
         }
         $cartItems = $cart->items;
         $totalDelPrice = 0;
@@ -127,25 +141,30 @@ class CartController extends Controller
     }
     public function addToCart(Request $req)
     {
+        $userId = null;
+
+        if (Auth::guard('euser')->check()) {
+            $euser = Auth::guard('euser')->user();
+            $userId = $euser->id;
+        }
         $ip = $req->getClientIp();
-        $userId = $req->userId;
         $product_id = $req->product_id;
         $quantity = $req->quantity;
 
 
         // Check if the cart is associated with an IP or user ID
-        if ($ip) {
-            $cart = Cart::where("ip", $ip)->first();
-            if (!$cart) {
-                $cart = new Cart();
-                $cart->ip = $ip;
-                $cart->save();
-            }
-        } else {
+        if ($userId) {
             $cart = Cart::where("userId", $userId)->first();
             if (!$cart) {
                 $cart = new Cart();
                 $cart->userId = $userId;
+                $cart->save();
+            }
+        } else {
+            $cart = Cart::where("ip", $ip)->first();
+            if (!$cart) {
+                $cart = new Cart();
+                $cart->ip = $ip;
                 $cart->save();
             }
         }
@@ -215,86 +234,17 @@ class CartController extends Controller
     }
 
     public function removeFromCart(Request $req)
-{
-    $cartItemId = $req->cartItemId;
-    $cartItem = CartItem::find($cartItemId);
-    $cartId = $cartItem->cart_id;
-    
-    if ($cartItem->delete()) {
-        $totalCartItems = CartItem::where("cart_id", $cartId)->count();
-    }
+    {
+        $cartItemId = $req->cartItemId;
+        $cartItem = CartItem::find($cartItemId);
+        $cartId = $cartItem->cart_id;
 
-    $cart = Cart::find($cartId);
-    $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
-    $totalDelPrice = 0;
-    $subtotal = 0;
-    
-    // Flag to check if an item with courierTypeId of 2 has been found
-    $foundCourierTypeId2 = false;
-
-    // Calculate subtotal
-    $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice, &$foundCourierTypeId2) {
-        $product = Product::find($item->product_id);
-        $courierType = Couriertype::find($item->productDetails->courierTypeId);
-
-        // Determine delivery price
-        if ($courierType) {
-            $deliveryPrice = $courierType->courier_price;
-
-            // Check if the current item has courierTypeId of 2
-            if ($courierType->id == 2) {
-                if (!$foundCourierTypeId2) {
-                    // If this is the first item with courierTypeId 2, keep the delivery price
-                    $foundCourierTypeId2 = true; // Set the flag
-                } else {
-                    // If another item with courierTypeId 2 is found, set delivery price to 0
-                    $deliveryPrice = 0;
-                }
-            } elseif ($courierType->id == 3 || ($courierType->id == 4 && $product->categoryId != 1)) {
-                $deliveryPrice = $deliveryPrice * $item->quantity;
-            }
-        } else {
-            $deliveryPrice = 0; // Default to 0 if no courier type is found
+        if ($cartItem->delete()) {
+            $totalCartItems = CartItem::where("cart_id", $cartId)->count();
         }
 
-        $totalDelPrice += $deliveryPrice;
-        $item->deliveryPrice = $deliveryPrice;
-
-        // Calculate total price based on product category
-        if ($product->categoryId != 1) {
-            $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-        } else {
-            $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
-            return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
-        }
-    });
-
-    $total = $subtotal - $totalDelPrice;
-
-    return response()->json([
-        'subtotal' => $subtotal,
-        'total' => $total,
-        'totalCartItems' => $totalCartItems,
-        'totalDelPrice' => $totalDelPrice,
-        'message' => "Successfully removed from cart"
-    ]);
-}
-
-public function changeQuantity(Request $req) 
-{
-    $cartItemId = $req->cartItemId;
-    $quantity = $req->quantity;
-    $cartItem = CartItem::find($cartItemId);
-    $cartItem->quantity = $quantity;
-    $itemTotal = 0;
-    $itemDeliveryPrice = 0;
-
-    if ($cartItem->save()) {
-        $cart = Cart::find($cartItem->cart_id);
+        $cart = Cart::find($cartId);
         $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
-        
-        // Initialize variables for subtotal and delivery price
         $totalDelPrice = 0;
         $subtotal = 0;
 
@@ -302,7 +252,7 @@ public function changeQuantity(Request $req)
         $foundCourierTypeId2 = false;
 
         // Calculate subtotal
-        $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice, &$cartItemId, &$itemTotal, &$itemDeliveryPrice, &$foundCourierTypeId2) {
+        $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice, &$foundCourierTypeId2) {
             $product = Product::find($item->product_id);
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
 
@@ -332,33 +282,102 @@ public function changeQuantity(Request $req)
             // Calculate total price based on product category
             if ($product->categoryId != 1) {
                 $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-                if ($item->id == $cartItemId) {
-                    $itemTotal = $item->totalPrice;
-                    $itemDeliveryPrice = $deliveryPrice;
-                }
-                return $item->totalPrice;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
             } else {
                 $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
-                if ($item->id == $cartItemId) {
-                    $itemTotal = $item->totalPrice;
-                    $itemDeliveryPrice = $deliveryPrice;
-                }
-                return $item->totalPrice;
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
             }
         });
 
         $total = $subtotal - $totalDelPrice;
 
         return response()->json([
-            'message' => "Successfully updated the cart",
-            'totalDelPrice' => $totalDelPrice,
             'subtotal' => $subtotal,
             'total' => $total,
-            'itemTotal' => $itemTotal,
-            'itemDeliveryPrice' => $itemDeliveryPrice,
+            'totalCartItems' => $totalCartItems,
+            'totalDelPrice' => $totalDelPrice,
+            'message' => "Successfully removed from cart"
         ]);
     }
-}
+
+    public function changeQuantity(Request $req)
+    {
+        $cartItemId = $req->cartItemId;
+        $quantity = $req->quantity;
+        $cartItem = CartItem::find($cartItemId);
+        $cartItem->quantity = $quantity;
+        $itemTotal = 0;
+        $itemDeliveryPrice = 0;
+
+        if ($cartItem->save()) {
+            $cart = Cart::find($cartItem->cart_id);
+            $cartItems = $cart ? $cart->items()->with(['productDetails.activation', 'productDetails.certificate'])->get() : collect();
+
+            // Initialize variables for subtotal and delivery price
+            $totalDelPrice = 0;
+            $subtotal = 0;
+
+            // Flag to check if an item with courierTypeId of 2 has been found
+            $foundCourierTypeId2 = false;
+
+            // Calculate subtotal
+            $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice, &$cartItemId, &$itemTotal, &$itemDeliveryPrice, &$foundCourierTypeId2) {
+                $product = Product::find($item->product_id);
+                $courierType = Couriertype::find($item->productDetails->courierTypeId);
+
+                // Determine delivery price
+                if ($courierType) {
+                    $deliveryPrice = $courierType->courier_price;
+
+                    // Check if the current item has courierTypeId of 2
+                    if ($courierType->id == 2) {
+                        if (!$foundCourierTypeId2) {
+                            // If this is the first item with courierTypeId 2, keep the delivery price
+                            $foundCourierTypeId2 = true; // Set the flag
+                        } else {
+                            // If another item with courierTypeId 2 is found, set delivery price to 0
+                            $deliveryPrice = 0;
+                        }
+                    } elseif ($courierType->id == 3 || ($courierType->id == 4 && $product->categoryId != 1)) {
+                        $deliveryPrice = $deliveryPrice * $item->quantity;
+                    }
+                } else {
+                    $deliveryPrice = 0; // Default to 0 if no courier type is found
+                }
+
+                $totalDelPrice += $deliveryPrice;
+                $item->deliveryPrice = $deliveryPrice;
+
+                // Calculate total price based on product category
+                if ($product->categoryId != 1) {
+                    $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                    if ($item->id == $cartItemId) {
+                        $itemTotal = $item->totalPrice;
+                        $itemDeliveryPrice = $deliveryPrice;
+                    }
+                    return $item->totalPrice;
+                } else {
+                    $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                    if ($item->id == $cartItemId) {
+                        $itemTotal = $item->totalPrice;
+                        $itemDeliveryPrice = $deliveryPrice;
+                    }
+                    return $item->totalPrice;
+                }
+            });
+
+            $total = $subtotal - $totalDelPrice;
+
+            return response()->json([
+                'message' => "Successfully updated the cart",
+                'totalDelPrice' => $totalDelPrice,
+                'subtotal' => $subtotal,
+                'total' => $total,
+                'itemTotal' => $itemTotal,
+                'itemDeliveryPrice' => $itemDeliveryPrice,
+            ]);
+        }
+    }
 
     public function changeAddSettings(Request $req)
     {

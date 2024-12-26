@@ -637,7 +637,7 @@ a,a:hover,a:focus,a:visited{
 .as_cart_list .as_cart_info a{
 	font-size:16px;
 	font-weight:500;
-	
+
 	margin-bottom:5px;
 	width:110px;
 	text-transform:capitalize;
@@ -674,7 +674,7 @@ a,a:hover,a:focus,a:visited{
 }
 .as_cart_box .as_cart_total p span{
 	float:right;
-	
+
 }
 .as_cart_box .as_cart_btn{
 	text-align:center;
@@ -5547,6 +5547,14 @@ form.d_block {
 .header-login-dropdown ul li a:hover, .header-login-dropdown ul li a:hover i {
     color: #e6b317;
 }
+
+.dropdown-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    color: #f0f0f0;
+}
 .view-all a {
     text-transform: uppercase;
     font-weight: 600 !important;
@@ -6317,7 +6325,7 @@ small {
 @media only screen and (max-width: 600px) {
     .review_order .form-group h4 {
         font-size: 13px !important;
-        margin: 0 0 5px 
+        margin: 0 0 5px
     }
 
     .checkout_style .small,

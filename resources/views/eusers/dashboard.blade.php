@@ -1,14 +1,14 @@
 @extends('user.layout')
 @section('content')
-@include('eusers.partials.header')
-<section class="container mb-5">
+    @include('eusers.partials.header')
+    <section class="container mb-5">
         <div class="account-body">
             <div class="row">
                 <div class="col-lg-4 col-md-4 col-12">
                     <a href="my-order.html" class="card_box">
                         <img src="../assets/images/my-orders.png" alt="image">
                         <h4>My Orders</h4>
-                        <span>10</span>
+                        <span>{{ $orderCount }}</span>
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4 col-12">
@@ -21,7 +21,7 @@
                 <div class="col-lg-4 col-md-4 col-12">
                     <a href="my-profile.html" class="card_box">
                         <img src="../assets/images/profile-img.jpg" alt="image">
-                        <h4>Ram Shankar Dash</h4>
+                        <h4>{{ $user->first_name ." ". $user->last_name }}</h4>
                         <span>View Profile</span>
                     </a>
                 </div>
