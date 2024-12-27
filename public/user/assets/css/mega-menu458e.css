@@ -196,15 +196,30 @@ nav {
     overflow-y: scroll;
     padding: 0 5px !important;
 }
-    .form input {
-        height: 45px !important;
-        padding: 10px 45px 12px 15px !important;
-        margin-bottom: 15px !important;
-        margin-top: 15px !important;
-    }
-    .closed_btn {
-        bottom: 1px !important;
-    }
+.form input {
+    height: 45px !important;
+    padding: 10px 15px 12px 15px !important;
+    margin-bottom: 5px !important;
+    margin-top: 15px !important;
+}
+.closed_btn {
+    position: absolute;
+    bottom: 56px !important;
+    right: 20px !important;
+    height: 40px !important;
+    width: 40px !important;
+}
+.search-button .as_btn:after {
+    background: transparent !important;
+}
+.search-form .col-10 {
+    width: 100% !important;
+}
+.search-button .as_btn {
+    padding: 1.5em 20px !important;
+    width: 100% !important;
+    margin-top: 5px !important;
+}
   .logo {
     display: none;
   }
