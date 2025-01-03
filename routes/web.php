@@ -24,8 +24,6 @@ use App\Http\Controllers\WishlistController;
 use Illuminate\Support\Facades\Route;
 
 
-
-
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::resource('coupons', CouponController::class);
