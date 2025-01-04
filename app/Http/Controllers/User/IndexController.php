@@ -142,35 +142,49 @@ class IndexController extends Controller
         // If there's a search query, modify the product search and apply the same ordering
         if ($search) {
             $substrings = [];
-
+        
             // Generate substrings of length 3 from the search term
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
                 $substrings[] = substr($search, $i, 3);
             }
-
+        
             // Create a regex pattern from the substrings
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
-
-            $subcategoryproducts = Product::where('categoryId', $id)
-                ->where('status', 1) // Filter by status
-                ->where(function ($query) use ($pattern, $search) {
-                    $query->where('productName', 'REGEXP', $pattern)
-                        ->orWhere('productName', 'LIKE', '%' . $search . '%'); // Flexible matching
-                })
-                ->orderByRaw("CASE WHEN subCategoryId IS NULL THEN 0 ELSE 1 END") // Main category products first
-                ->orderByRaw("CASE WHEN sortOrder IS NULL OR sortOrder = 0 THEN 1 ELSE 0 END") // Place 0 or NULL sortOrder at the end
-                ->orderBy('sortOrder', 'asc') // Then order by sortOrder
-                ->orderBy('created_at', 'asc') // Finally order by created_at
-                ->paginate(16); // Paginate the result
-
-            // Return the search view with products
+        
+            // First condition: Exact or partial matches
+            $query1 = Product::where('status', 1)
+                ->where('productName', 'LIKE', '%' . $search . '%');
+        
+            // Second condition: 3-character substring matches from the start
+            $query2 = Product::where('status', 1)
+                ->where('productName', 'REGEXP', '^' . $pattern);
+        
+            // Third condition: 3-character substring matches from anywhere
+            $query3 = Product::where('status', 1)
+                ->where('productName', 'REGEXP', $pattern);
+        
+            // Combine the queries using union
+            $subcategoryproducts = $query1
+                ->union($query2)
+                ->union($query3)
+                ->orderByRaw("
+                    CASE 
+                        WHEN productName LIKE '%{$search}%' THEN 1 
+                        WHEN productName REGEXP '^{$pattern}' THEN 2 
+                        WHEN productName REGEXP '{$pattern}' THEN 3 
+                        ELSE 4 
+                    END
+                ")
+                ->paginate(16);
+        
             return view('user.category.searchProducts', compact(
                 'subcategoryproducts',
                 'search'
             ));
         }
+        
 
 
 
@@ -256,34 +270,51 @@ class IndexController extends Controller
         // $subcategoryproducts = Product::where('categoryId', $id)->orWhere('subCategoryId', $id)->where('status', 1)->paginate(8);
         $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
             ->orderBy('created_at', 'asc')->paginate(16);
-        if ($search) {
-            $substrings = [];
-
-            // Generate substrings of length 3 from the search term
-            for ($i = 0; $i <= strlen($search) - 3; $i++) {
-                $substrings[] = substr($search, $i, 3);
+            if ($search) {
+                $substrings = [];
+            
+                // Generate substrings of length 3 from the search term
+                for ($i = 0; $i <= strlen($search) - 3; $i++) {
+                    $substrings[] = substr($search, $i, 3);
+                }
+            
+                // Create a regex pattern from the substrings
+                $pattern = implode('|', array_map(function ($substr) {
+                    return preg_quote($substr, '/');
+                }, $substrings));
+            
+                // First condition: Exact or partial matches
+                $query1 = Product::where('status', 1)
+                    ->where('productName', 'LIKE', '%' . $search . '%');
+            
+                // Second condition: 3-character substring matches from the start
+                $query2 = Product::where('status', 1)
+                    ->where('productName', 'REGEXP', '^' . $pattern);
+            
+                // Third condition: 3-character substring matches from anywhere
+                $query3 = Product::where('status', 1)
+                    ->where('productName', 'REGEXP', $pattern);
+            
+                // Combine the queries using union
+                $subcategoryproducts = $query1
+                    ->union($query2)
+                    ->union($query3)
+                    ->orderByRaw("
+                        CASE 
+                            WHEN productName LIKE '%{$search}%' THEN 1 
+                            WHEN productName REGEXP '^{$pattern}' THEN 2 
+                            WHEN productName REGEXP '{$pattern}' THEN 3 
+                            ELSE 4 
+                        END
+                    ")
+                    ->paginate(16);
+            
+                return view('user.category.searchProducts', compact(
+                    'subcategoryproducts',
+                    'search'
+                ));
             }
-
-            // Create a regex pattern from the substrings
-            $pattern = implode('|', array_map(function ($substr) {
-                return preg_quote($substr, '/');
-            }, $substrings));
-
-            $subcategoryproducts = Product::where('subCategoryId', $id)
-                ->where('status', 1)
-                ->where(function ($query) use ($pattern) {
-                    $query->where('productName', 'REGEXP', $pattern);
-                })
-                ->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")
-                ->orderBy('sortOrderSubCategory')
-                ->orderBy('created_at', 'asc')
-                ->paginate(16);
-
-            return view('user.category.searchProducts', compact(
-                'subcategoryproducts',
-                'search'
-            ));
-        }
+            
 
 
         $category = SubCategory::find($id);
@@ -347,33 +378,51 @@ class IndexController extends Controller
 
         $category = SubCategory::find(1);
         if ($search) {
-            $searchTerm = $search;
             $substrings = [];
-
+        
             // Generate substrings of length 3 from the search term
-            for ($i = 0; $i <= strlen($searchTerm) - 3; $i++) {
-                $substrings[] = substr($searchTerm, $i, 3);
+            for ($i = 0; $i <= strlen($search) - 3; $i++) {
+                $substrings[] = substr($search, $i, 3);
             }
-
+        
             // Create a regex pattern from the substrings
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
-
-            // Build the query with both REGEXP and LIKE
-            $subcategoryproducts = Product::where('status', 1)
-                ->where(function ($query) use ($pattern, $searchTerm) {
-                    $query->where('productName', 'REGEXP', $pattern) // Substring-based search
-                        ->orWhere('productName', 'like', '%' . $searchTerm . '%'); // Flexible match
-                })
-                ->paginate(16); // Paginate the results
-
+        
+            // First condition: Exact or partial matches
+            $query1 = Product::where('status', 1)
+                ->where('productName', 'LIKE', '%' . $search . '%');
+        
+            // Second condition: 3-character substring matches from the start
+            $query2 = Product::where('status', 1)
+                ->where('productName', 'REGEXP', '^' . $pattern);
+        
+            // Third condition: 3-character substring matches from anywhere
+            $query3 = Product::where('status', 1)
+                ->where('productName', 'REGEXP', $pattern);
+        
+            // Combine the queries using union
+            $subcategoryproducts = $query1
+                ->union($query2)
+                ->union($query3)
+                ->orderByRaw("
+                    CASE 
+                        WHEN productName LIKE '%{$search}%' THEN 1 
+                        WHEN productName REGEXP '^{$pattern}' THEN 2 
+                        WHEN productName REGEXP '{$pattern}' THEN 3 
+                        ELSE 4 
+                    END
+                ")
+                ->paginate(16);
+        
             return view('user.category.searchProducts', compact(
                 'category',
                 'subcategoryproducts',
                 'search'
             ));
         }
+        
 
         return view('user.category.searchProducts', compact(
             'category',
