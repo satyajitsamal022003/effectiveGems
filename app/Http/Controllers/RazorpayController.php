@@ -85,7 +85,13 @@ class RazorpayController extends Controller
         $order->save();
 
         // Send confirmation email
-        Mail::to($order->email)->send(new OrderConfirmation($order));
+        try{
+            Mail::to($order->email)->send(new OrderConfirmation($order));
+        }
+        catch (\Exception $e){
+
+        }
+        $userId='';
         if (Auth::guard('euser')->check()) {
             $euser = Auth::guard('euser')->user();
             $userId = $euser->id;
