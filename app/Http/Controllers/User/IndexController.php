@@ -142,6 +142,7 @@ class IndexController extends Controller
         // If there's a search query, modify the product search and apply the same ordering
         if ($search) {
             $substrings = [];
+            $searchWords = explode(' ', $search);
         
             // Generate substrings of length 3 from the search term
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
@@ -159,11 +160,17 @@ class IndexController extends Controller
         
             // Second condition: 3-character substring matches from the start
             $query2 = Product::where('status', 1)
-                ->where('productName', 'REGEXP', '^' . $pattern);
-        
-            // Third condition: 3-character substring matches from anywhere
-            $query3 = Product::where('status', 1)
-                ->where('productName', 'REGEXP', $pattern);
+                ->where(function ($query) use ($search) {
+                    // Check if the productName starts with the search term's first 3 characters
+                    $query->where('productName', 'LIKE', $search . '%');
+                });
+
+                $query3 = Product::where('status', 1)
+                ->where(function ($query) use ($searchWords) {
+                    foreach ($searchWords as $word) {
+                        $query->where('productName', 'LIKE', '%' . $word . '%');
+                    }
+                });
         
             // Combine the queries using union
             $subcategoryproducts = $query1
@@ -173,8 +180,8 @@ class IndexController extends Controller
                     CASE 
                         WHEN productName LIKE '%{$search}%' THEN 1 
                         WHEN productName REGEXP '^{$pattern}' THEN 2 
-                        WHEN productName REGEXP '{$pattern}' THEN 3 
-                        ELSE 4 
+                        WHEN productName REGEXP '^{$pattern}' THEN 3
+                        ELSE 4
                     END
                 ")
                 ->paginate(16);
@@ -272,6 +279,7 @@ class IndexController extends Controller
             ->orderBy('created_at', 'asc')->paginate(16);
             if ($search) {
                 $substrings = [];
+                $searchWords = explode(' ', $search);
             
                 // Generate substrings of length 3 from the search term
                 for ($i = 0; $i <= strlen($search) - 3; $i++) {
@@ -289,11 +297,18 @@ class IndexController extends Controller
             
                 // Second condition: 3-character substring matches from the start
                 $query2 = Product::where('status', 1)
-                    ->where('productName', 'REGEXP', '^' . $pattern);
-            
-                // Third condition: 3-character substring matches from anywhere
+                    ->where(function ($query) use ($search) {
+                        // Check if the productName starts with the search term's first 3 characters
+                        $query->where('productName', 'LIKE', $search . '%');
+                    });
+
                 $query3 = Product::where('status', 1)
-                    ->where('productName', 'REGEXP', $pattern);
+                    ->where(function ($query) use ($searchWords) {
+                        foreach ($searchWords as $word) {
+                            $query->where('productName', 'LIKE', '%' . $word . '%');
+                        }
+                    });
+
             
                 // Combine the queries using union
                 $subcategoryproducts = $query1
@@ -303,8 +318,8 @@ class IndexController extends Controller
                         CASE 
                             WHEN productName LIKE '%{$search}%' THEN 1 
                             WHEN productName REGEXP '^{$pattern}' THEN 2 
-                            WHEN productName REGEXP '{$pattern}' THEN 3 
-                            ELSE 4 
+                            WHEN productName REGEXP '^{$pattern}' THEN 3
+                            ELSE 4
                         END
                     ")
                     ->paginate(16);
@@ -379,6 +394,7 @@ class IndexController extends Controller
         $category = SubCategory::find(1);
         if ($search) {
             $substrings = [];
+            $searchWords = explode(' ', $search);
         
             // Generate substrings of length 3 from the search term
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
@@ -396,11 +412,18 @@ class IndexController extends Controller
         
             // Second condition: 3-character substring matches from the start
             $query2 = Product::where('status', 1)
-                ->where('productName', 'REGEXP', '^' . $pattern);
-        
-            // Third condition: 3-character substring matches from anywhere
+                ->where(function ($query) use ($search) {
+                    // Check if the productName starts with the search term's first 3 characters
+                    $query->where('productName', 'LIKE', $search . '%');
+                });
+
             $query3 = Product::where('status', 1)
-                ->where('productName', 'REGEXP', $pattern);
+                ->where(function ($query) use ($searchWords) {
+                    foreach ($searchWords as $word) {
+                        $query->where('productName', 'LIKE', '%' . $word . '%');
+                    }
+                });
+
         
             // Combine the queries using union
             $subcategoryproducts = $query1
@@ -410,8 +433,8 @@ class IndexController extends Controller
                     CASE 
                         WHEN productName LIKE '%{$search}%' THEN 1 
                         WHEN productName REGEXP '^{$pattern}' THEN 2 
-                        WHEN productName REGEXP '{$pattern}' THEN 3 
-                        ELSE 4 
+                        WHEN productName REGEXP '^{$pattern}' THEN 3
+                        ELSE 4
                     END
                 ")
                 ->paginate(16);
