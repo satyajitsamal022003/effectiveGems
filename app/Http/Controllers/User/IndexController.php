@@ -160,10 +160,9 @@ class IndexController extends Controller
         
             // Second condition: 3-character substring matches from the start
             $query2 = Product::where('status', 1)
-                ->where(function ($query) use ($search) {
-                    // Check if the productName starts with the search term's first 3 characters
-                    $query->where('productName', 'LIKE', $search . '%');
-                });
+            ->where(function ($query) use ($searchWords) {
+                $query->where('productName', 'LIKE', $searchWords[0] . '%'); // Start with the first word
+            });
 
                 $query3 = Product::where('status', 1)
                 ->where(function ($query) use ($searchWords) {
@@ -171,17 +170,28 @@ class IndexController extends Controller
                         $query->where('productName', 'LIKE', '%' . $word . '%');
                     }
                 });
+
+                $query4 = Product::where('status', 1)
+                ->where(function ($query) use ($pattern) {
+                    $query->whereRaw("productName REGEXP '{$pattern}'");
+                });
         
             // Combine the queries using union
             $subcategoryproducts = $query1
                 ->union($query2)
                 ->union($query3)
+                ->union($query4)
                 ->orderByRaw("
                     CASE 
-                        WHEN productName LIKE '%{$search}%' THEN 1 
-                        WHEN productName REGEXP '^{$pattern}' THEN 2 
-                        WHEN productName REGEXP '^{$pattern}' THEN 3
-                        ELSE 4
+                        WHEN productName LIKE '%{$search}%' THEN 1 -- Full match
+                        WHEN (
+                            " . implode(' AND ', array_map(function ($word) {
+                                return "productName LIKE '%{$word}%'";
+                            }, $searchWords)) . "
+                        ) THEN 2 -- All words matched in any order
+                        WHEN productName LIKE '{$searchWords[0]}%' THEN 3 -- Starts with the first word
+                        WHEN productName REGEXP '{$pattern}' THEN 4 -- Matches any 3-character substring
+                        ELSE 5 -- Remaining results
                     END
                 ")
                 ->paginate(16);
@@ -297,9 +307,8 @@ class IndexController extends Controller
             
                 // Second condition: 3-character substring matches from the start
                 $query2 = Product::where('status', 1)
-                    ->where(function ($query) use ($search) {
-                        // Check if the productName starts with the search term's first 3 characters
-                        $query->where('productName', 'LIKE', $search . '%');
+                    ->where(function ($query) use ($searchWords) {
+                        $query->where('productName', 'LIKE', $searchWords[0] . '%'); // Start with the first word
                     });
 
                 $query3 = Product::where('status', 1)
@@ -309,17 +318,28 @@ class IndexController extends Controller
                         }
                     });
 
+                $query4 = Product::where('status', 1)
+                    ->where(function ($query) use ($pattern) {
+                        $query->whereRaw("productName REGEXP '{$pattern}'");
+                    });
+
             
                 // Combine the queries using union
                 $subcategoryproducts = $query1
                     ->union($query2)
                     ->union($query3)
+                    ->union($query4)
                     ->orderByRaw("
                         CASE 
-                            WHEN productName LIKE '%{$search}%' THEN 1 
-                            WHEN productName REGEXP '^{$pattern}' THEN 2 
-                            WHEN productName REGEXP '^{$pattern}' THEN 3
-                            ELSE 4
+                            WHEN productName LIKE '%{$search}%' THEN 1 -- Full match
+                            WHEN (
+                                " . implode(' AND ', array_map(function ($word) {
+                                    return "productName LIKE '%{$word}%'";
+                                }, $searchWords)) . "
+                            ) THEN 2 -- All words matched in any order
+                            WHEN productName LIKE '{$searchWords[0]}%' THEN 3 -- Starts with the first word
+                            WHEN productName REGEXP '{$pattern}' THEN 4 -- Matches any 3-character substring
+                            ELSE 5 -- Remaining results
                         END
                     ")
                     ->paginate(16);
@@ -412,9 +432,8 @@ class IndexController extends Controller
         
             // Second condition: 3-character substring matches from the start
             $query2 = Product::where('status', 1)
-                ->where(function ($query) use ($search) {
-                    // Check if the productName starts with the search term's first 3 characters
-                    $query->where('productName', 'LIKE', $search . '%');
+                ->where(function ($query) use ($searchWords) {
+                    $query->where('productName', 'LIKE', $searchWords[0] . '%'); // Start with the first word
                 });
 
             $query3 = Product::where('status', 1)
@@ -424,17 +443,28 @@ class IndexController extends Controller
                     }
                 });
 
+            $query4 = Product::where('status', 1)
+            ->where(function ($query) use ($pattern) {
+                $query->whereRaw("productName REGEXP '{$pattern}'");
+            });
+
         
             // Combine the queries using union
             $subcategoryproducts = $query1
                 ->union($query2)
                 ->union($query3)
+                ->union($query4)
                 ->orderByRaw("
                     CASE 
-                        WHEN productName LIKE '%{$search}%' THEN 1 
-                        WHEN productName REGEXP '^{$pattern}' THEN 2 
-                        WHEN productName REGEXP '^{$pattern}' THEN 3
-                        ELSE 4
+                        WHEN productName LIKE '%{$search}%' THEN 1 -- Full match
+                        WHEN (
+                            " . implode(' AND ', array_map(function ($word) {
+                                return "productName LIKE '%{$word}%'";
+                            }, $searchWords)) . "
+                        ) THEN 2 -- All words matched in any order
+                        WHEN productName LIKE '{$searchWords[0]}%' THEN 3 -- Starts with the first word
+                        WHEN productName REGEXP '{$pattern}' THEN 4 -- Matches any 3-character substring
+                        ELSE 5 -- Remaining results
                     END
                 ")
                 ->paginate(16);
