@@ -198,11 +198,17 @@ Route::group(['prefix' => 'user'], function () {
     })->name('eusers.signup');
 
     Route::post('/post-sign-up', [RegisterController::class, 'postsignup'])->name('eusers.postsignup');
+    Route::post('/send-otp', [RegisterController::class, 'sendOtp']);
+    Route::post('/verify-otp', [RegisterController::class, 'verifyOtp']);
+
+    Route::post('/checkout-send-otp', [OrderController::class, 'sendOtp']);
+    Route::post('/checkout-verify-otp', [OrderController::class, 'verifyOtp']);
 
     Route::get('/sign-in', function () {
         return view('eusers.login');
     })->name('eusers.login');
 
+    
     Route::post('/post-sign-in', [EuserController::class, 'postsignin'])->name('eusers.postsignin');
     Route::post('/logout', [EuserController::class, 'logout'])->name('euser.logout');
 

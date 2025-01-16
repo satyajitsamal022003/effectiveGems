@@ -7,13 +7,16 @@ use App\Models\Activations;
 use App\Models\Cart;
 use App\Models\Certification;
 use App\Models\Couriertype;
+use App\Models\Euser;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\State;
 use App\Models\UserAddress;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Razorpay\Api\Api;
 
 
@@ -113,6 +116,14 @@ class OrderController extends Controller
         } else {
             $order->ip = $ip;
         }
+
+        $usermobile= Euser::where('mobile', $request->phoneNumber)->first();
+
+        if(!$userId && !$usermobile){
+            return back()->with('error', 'Please Verify Your Mobile Number.');
+        }else if(!$userId && $usermobile && $usermobile->is_mobile_verified ==0){
+            return back()->with('error', 'Please Verify Your Mobile Number.');
+        }else{
         $order->email = $request->email;
         $order->firstName = $request->firstName;
         $order->middleName = $request->middleName;
@@ -220,6 +231,8 @@ class OrderController extends Controller
                 dd($th);
             }
         }
+      }
+
     }
 
     /**
@@ -252,5 +265,91 @@ class OrderController extends Controller
     public function destroy(Order $order)
     {
         //
+    }
+
+    public function sendOtp(Request $request)
+    {
+        $request->validate(['mobile' => 'required|digits:10']);
+
+        $mobile = $request->mobile;
+
+        $otp = rand(100000, 999999);
+
+        $apikey = '5xP9YXeSUnRUqqEw';
+        $senderid = 'EFGEMS';
+        $templateid = '110xxxxxxxxxx592';
+        $message_content = urlencode("Dear User, Your OTP For Login is $otp. Regards -Effective Gems");
+        $url = "http://text2india.store/vb/apikey.php?apikey=$apikey&senderid=$senderid&number=$mobile&message=$message_content&templateid=$templateid";
+
+        try {
+            $response = file_get_contents($url);
+
+            if ($response) {
+                session(['otp' => $otp, 'mobile' => $mobile, 'otp_created_at' => now(),]);
+
+                return response()->json(['success' => true, 'message' => 'OTP sent successfully.']);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Failed to send OTP.']);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => 'Error occurred: ' . $e->getMessage()]);
+        }
+    }
+
+
+
+
+    public function verifyOtp(Request $request)
+    {
+        $request->validate([
+            'mobile' => 'required|digits:10',
+            'otp' => 'required|digits:6',
+        ]);
+
+        $otpCreatedAt = session('otp_created_at');
+        if (session('otp') == $request->otp && session('mobile') == $request->mobile) {
+            if (now()->diffInMinutes($otpCreatedAt) > 5) {
+                return response()->json(['success' => false, 'message' => 'OTP has expired.']);
+            }
+            $user = Euser::where('mobile', $request->mobile)->first();
+
+            if ($user) {
+                Auth::guard('euser')->login($user);
+                return response()->json(['success' => true, 'message' => 'Mobile Number Verified.']);
+            }
+
+            $randomPassword = Str::random(8);
+            $mobile = $request->mobile;
+
+            $newUser = Euser::create([
+                'mobile' => $request->mobile,
+                'password' => Hash::make($randomPassword),
+                'is_mobile_verified' => 1
+            ]);
+
+            $apikey = '5xP9YXeSUnRUqqEw';
+            $senderid = 'EFGEMS';
+            $templateid = '110xxxxxxxxxx592';
+            $message = "Welcome! Your account has been created. Mobile: $mobile, Password: $randomPassword";
+            $message_content = urlencode($message);
+            $url = "http://text2india.store/vb/apikey.php?apikey=$apikey&senderid=$senderid&number=$mobile&message=$message_content&templateid=$templateid";
+
+            try {
+                $response = file_get_contents($url);
+
+                if ($response) {
+                    \Log::info("SMS sent successfully to {$request->mobile}: Response = $response");
+                } else {
+                    \Log::error("SMS sending failed for {$request->mobile}: No response received.");
+                }
+            } catch (\Exception $e) {
+                \Log::error("Error sending SMS to {$request->mobile}: " . $e->getMessage());
+            }
+
+            Auth::guard('euser')->login($newUser);
+            return response()->json(['success' => true, 'message' => 'Mobile Number Verified successfully.']);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Invalid OTP.']);
     }
 }

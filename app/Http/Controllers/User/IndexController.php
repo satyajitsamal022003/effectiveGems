@@ -141,10 +141,11 @@ class IndexController extends Controller
 
         // If there's a search query, modify the product search and apply the same ordering
         if ($search) {
-            $substrings = [];
-            $searchWords = explode(' ', $search);
+            $subcategoryproducts = null;
+            $searchWords = explode(' ', strtolower($search));
         
             // Generate substrings of length 3 from the search term
+            $substrings = [];
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
                 $substrings[] = substr($search, $i, 3);
             }
@@ -154,53 +155,90 @@ class IndexController extends Controller
                 return preg_quote($substr, '/');
             }, $substrings));
         
-            // First condition: Exact or partial matches
-            $query1 = Product::where('status', 1)
-                ->where('productName', 'LIKE', '%' . $search . '%');
-        
-            // Second condition: 3-character substring matches from the start
-            $query2 = Product::where('status', 1)
-            ->where(function ($query) use ($searchWords) {
-                $query->where('productName', 'LIKE', $searchWords[0] . '%'); // Start with the first word
-            });
-
-                $query3 = Product::where('status', 1)
-                ->where(function ($query) use ($searchWords) {
-                    foreach ($searchWords as $word) {
-                        $query->where('productName', 'LIKE', '%' . $word . '%');
-                    }
-                });
-
-                $query4 = Product::where('status', 1)
-                ->where(function ($query) use ($pattern) {
-                    $query->whereRaw("productName REGEXP '{$pattern}'");
-                });
-        
-            // Combine the queries using union
-            $subcategoryproducts = $query1
-                ->union($query2)
-                ->union($query3)
-                ->union($query4)
-                ->orderByRaw("
-                    CASE 
-                        WHEN productName LIKE '%{$search}%' THEN 1 -- Full match
-                        WHEN (
-                            " . implode(' AND ', array_map(function ($word) {
-                                return "productName LIKE '%{$word}%'";
-                            }, $searchWords)) . "
-                        ) THEN 2 -- All words matched in any order
-                        WHEN productName LIKE '{$searchWords[0]}%' THEN 3 -- Starts with the first word
-                        WHEN productName REGEXP '{$pattern}' THEN 4 -- Matches any 3-character substring
-                        ELSE 5 -- Remaining results
-                    END
-                ")
+            // Condition 1: Exact match
+            $subcategoryproducts = Product::where('status', 1)
+                ->where('productName', 'LIKE', '%' . $search . '%')
                 ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+            }
         
-            return view('user.category.searchProducts', compact(
-                'subcategoryproducts',
-                'search'
-            ));
+            // Condition 2: 3-character substring matches
+            $subcategoryproducts = Product::where('status', 1)
+                ->selectRaw("
+                    *,
+                    (
+                        " . implode(' + ', array_map(function ($word, $index) {
+                            return "IF(LOWER(productName) LIKE '{$word}%', " . (20 - $index) . ", 0)";
+                        }, $searchWords, array_keys($searchWords))) . "
+                        +
+                        " . implode(' + ', array_map(function ($word) {
+                            return "IF(LOWER(productName) LIKE '%{$word}%', 10, 0)";
+                        }, $searchWords)) . "
+                        +
+                        " . implode(' + ', array_map(function ($substr) {
+                            return "IF(LOWER(productName) LIKE '%{$substr}%', 5, 0)";
+                        }, $substrings)) . "
+                    ) AS relevance_score
+                ")
+                ->where(function ($query) use ($searchWords, $substrings) {
+                    // Match full words
+                    foreach ($searchWords as $word) {
+                        $query->orWhere('productName', 'LIKE', '%' . $word . '%');
+                    }
+                    // Match substrings
+                    foreach ($substrings as $substr) {
+                        $query->orWhere('productName', 'LIKE', '%' . $substr . '%');
+                    }
+                })
+                ->orderByDesc('relevance_score') // Order by highest relevance score
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+            }
+        
+            // Condition 3: Any word matches in any order
+            $subcategoryproducts = Product::where('status', 1)
+                ->where(function ($query) use ($substrings) {
+                    foreach ($substrings as $substr) {
+                        $query->orWhere('productName', 'LIKE', '%' . $substr . '%');
+                    }
+                })
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+            }
+        
+            // Condition 4: Combination of words in any order
+            $subcategoryproducts = Product::where('status', 1)
+                ->where(function ($query) use ($searchWords) {
+                    foreach ($searchWords as $word1) {
+                        foreach ($searchWords as $word2) {
+                            if ($word1 !== $word2) {
+                                $query->orWhere('productName', 'LIKE', '%' . $word1 . $word2 . '%');
+                                $query->orWhere('productName', 'LIKE', '%' . $word2 . $word1 . '%');
+                            }
+                        }
+                    }
+                })
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+            }
+        
+            // Condition 5: Regex for 3-character substring match
+            $subcategoryproducts = Product::where('status', 1)
+                ->whereRaw("productName REGEXP '{$pattern}'")
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+            }
+        
+            // If no matches found, return empty results
+            $subcategoryproducts = collect([]);
+            return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
         }
+        
         
 
 
@@ -288,10 +326,11 @@ class IndexController extends Controller
         $subcategoryproducts = Product::where('subCategoryId', $id)->where('status', 1)->orderByRaw("CASE WHEN sortOrderSubCategory = 0 OR sortOrderSubCategory IS NULL THEN 1 ELSE 0 END")->orderBy('sortOrderSubCategory')
             ->orderBy('created_at', 'asc')->paginate(16);
             if ($search) {
-                $substrings = [];
-                $searchWords = explode(' ', $search);
+                $subcategoryproducts = null;
+                $searchWords = explode(' ', strtolower($search));
             
                 // Generate substrings of length 3 from the search term
+                $substrings = [];
                 for ($i = 0; $i <= strlen($search) - 3; $i++) {
                     $substrings[] = substr($search, $i, 3);
                 }
@@ -301,54 +340,90 @@ class IndexController extends Controller
                     return preg_quote($substr, '/');
                 }, $substrings));
             
-                // First condition: Exact or partial matches
-                $query1 = Product::where('status', 1)
-                    ->where('productName', 'LIKE', '%' . $search . '%');
-            
-                // Second condition: 3-character substring matches from the start
-                $query2 = Product::where('status', 1)
-                    ->where(function ($query) use ($searchWords) {
-                        $query->where('productName', 'LIKE', $searchWords[0] . '%'); // Start with the first word
-                    });
-
-                $query3 = Product::where('status', 1)
-                    ->where(function ($query) use ($searchWords) {
-                        foreach ($searchWords as $word) {
-                            $query->where('productName', 'LIKE', '%' . $word . '%');
-                        }
-                    });
-
-                $query4 = Product::where('status', 1)
-                    ->where(function ($query) use ($pattern) {
-                        $query->whereRaw("productName REGEXP '{$pattern}'");
-                    });
-
-            
-                // Combine the queries using union
-                $subcategoryproducts = $query1
-                    ->union($query2)
-                    ->union($query3)
-                    ->union($query4)
-                    ->orderByRaw("
-                        CASE 
-                            WHEN productName LIKE '%{$search}%' THEN 1 -- Full match
-                            WHEN (
-                                " . implode(' AND ', array_map(function ($word) {
-                                    return "productName LIKE '%{$word}%'";
-                                }, $searchWords)) . "
-                            ) THEN 2 -- All words matched in any order
-                            WHEN productName LIKE '{$searchWords[0]}%' THEN 3 -- Starts with the first word
-                            WHEN productName REGEXP '{$pattern}' THEN 4 -- Matches any 3-character substring
-                            ELSE 5 -- Remaining results
-                        END
-                    ")
+                // Condition 1: Exact match
+                $subcategoryproducts = Product::where('status', 1)
+                    ->where('productName', 'LIKE', '%' . $search . '%')
                     ->paginate(16);
+                if ($subcategoryproducts->isNotEmpty()) {
+                    return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+                }
             
-                return view('user.category.searchProducts', compact(
-                    'subcategoryproducts',
-                    'search'
-                ));
+                // Condition 2: 3-character substring matches
+                $subcategoryproducts = Product::where('status', 1)
+                    ->selectRaw("
+                        *,
+                        (
+                            " . implode(' + ', array_map(function ($word, $index) {
+                                return "IF(LOWER(productName) LIKE '{$word}%', " . (20 - $index) . ", 0)";
+                            }, $searchWords, array_keys($searchWords))) . "
+                            +
+                            " . implode(' + ', array_map(function ($word) {
+                                return "IF(LOWER(productName) LIKE '%{$word}%', 10, 0)";
+                            }, $searchWords)) . "
+                            +
+                            " . implode(' + ', array_map(function ($substr) {
+                                return "IF(LOWER(productName) LIKE '%{$substr}%', 5, 0)";
+                            }, $substrings)) . "
+                        ) AS relevance_score
+                    ")
+                    ->where(function ($query) use ($searchWords, $substrings) {
+                        // Match full words
+                        foreach ($searchWords as $word) {
+                            $query->orWhere('productName', 'LIKE', '%' . $word . '%');
+                        }
+                        // Match substrings
+                        foreach ($substrings as $substr) {
+                            $query->orWhere('productName', 'LIKE', '%' . $substr . '%');
+                        }
+                    })
+                    ->orderByDesc('relevance_score') // Order by highest relevance score
+                    ->paginate(16);
+                if ($subcategoryproducts->isNotEmpty()) {
+                    return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+                }
+            
+                // Condition 3: Any word matches in any order
+                $subcategoryproducts = Product::where('status', 1)
+                    ->where(function ($query) use ($substrings) {
+                        foreach ($substrings as $substr) {
+                            $query->orWhere('productName', 'LIKE', '%' . $substr . '%');
+                        }
+                    })
+                    ->paginate(16);
+                if ($subcategoryproducts->isNotEmpty()) {
+                    return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+                }
+            
+                // Condition 4: Combination of words in any order
+                $subcategoryproducts = Product::where('status', 1)
+                    ->where(function ($query) use ($searchWords) {
+                        foreach ($searchWords as $word1) {
+                            foreach ($searchWords as $word2) {
+                                if ($word1 !== $word2) {
+                                    $query->orWhere('productName', 'LIKE', '%' . $word1 . $word2 . '%');
+                                    $query->orWhere('productName', 'LIKE', '%' . $word2 . $word1 . '%');
+                                }
+                            }
+                        }
+                    })
+                    ->paginate(16);
+                if ($subcategoryproducts->isNotEmpty()) {
+                    return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+                }
+            
+                // Condition 5: Regex for 3-character substring match
+                $subcategoryproducts = Product::where('status', 1)
+                    ->whereRaw("productName REGEXP '{$pattern}'")
+                    ->paginate(16);
+                if ($subcategoryproducts->isNotEmpty()) {
+                    return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
+                }
+            
+                // If no matches found, return empty results
+                $subcategoryproducts = collect([]);
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
+            
             
 
 
@@ -413,10 +488,11 @@ class IndexController extends Controller
 
         $category = SubCategory::find(1);
         if ($search) {
-            $substrings = [];
-            $searchWords = explode(' ', $search);
+            $subcategoryproducts = null;
+            $searchWords = explode(' ', strtolower($search));
         
             // Generate substrings of length 3 from the search term
+            $substrings = [];
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
                 $substrings[] = substr($search, $i, 3);
             }
@@ -426,55 +502,90 @@ class IndexController extends Controller
                 return preg_quote($substr, '/');
             }, $substrings));
         
-            // First condition: Exact or partial matches
-            $query1 = Product::where('status', 1)
-                ->where('productName', 'LIKE', '%' . $search . '%');
-        
-            // Second condition: 3-character substring matches from the start
-            $query2 = Product::where('status', 1)
-                ->where(function ($query) use ($searchWords) {
-                    $query->where('productName', 'LIKE', $searchWords[0] . '%'); // Start with the first word
-                });
-
-            $query3 = Product::where('status', 1)
-                ->where(function ($query) use ($searchWords) {
-                    foreach ($searchWords as $word) {
-                        $query->where('productName', 'LIKE', '%' . $word . '%');
-                    }
-                });
-
-            $query4 = Product::where('status', 1)
-            ->where(function ($query) use ($pattern) {
-                $query->whereRaw("productName REGEXP '{$pattern}'");
-            });
-
-        
-            // Combine the queries using union
-            $subcategoryproducts = $query1
-                ->union($query2)
-                ->union($query3)
-                ->union($query4)
-                ->orderByRaw("
-                    CASE 
-                        WHEN productName LIKE '%{$search}%' THEN 1 -- Full match
-                        WHEN (
-                            " . implode(' AND ', array_map(function ($word) {
-                                return "productName LIKE '%{$word}%'";
-                            }, $searchWords)) . "
-                        ) THEN 2 -- All words matched in any order
-                        WHEN productName LIKE '{$searchWords[0]}%' THEN 3 -- Starts with the first word
-                        WHEN productName REGEXP '{$pattern}' THEN 4 -- Matches any 3-character substring
-                        ELSE 5 -- Remaining results
-                    END
-                ")
+            // Condition 1: Exact match
+            $subcategoryproducts = Product::where('status', 1)
+                ->where('productName', 'LIKE', '%' . $search . '%')
                 ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category'));
+            }
         
-            return view('user.category.searchProducts', compact(
-                'category',
-                'subcategoryproducts',
-                'search'
-            ));
+            // Condition 2: 3-character substring matches
+            $subcategoryproducts = Product::where('status', 1)
+            ->selectRaw("
+                *,
+                (
+                    " . implode(' + ', array_map(function ($word, $index) {
+                        return "IF(LOWER(productName) LIKE '{$word}%', " . (20 - $index) . ", 0)";
+                    }, $searchWords, array_keys($searchWords))) . "
+                    +
+                    " . implode(' + ', array_map(function ($word) {
+                        return "IF(LOWER(productName) LIKE '%{$word}%', 10, 0)";
+                    }, $searchWords)) . "
+                    +
+                    " . implode(' + ', array_map(function ($substr) {
+                        return "IF(LOWER(productName) LIKE '%{$substr}%', 5, 0)";
+                    }, $substrings)) . "
+                ) AS relevance_score
+            ")
+            ->where(function ($query) use ($searchWords, $substrings) {
+                // Match full words
+                foreach ($searchWords as $word) {
+                    $query->orWhere('productName', 'LIKE', '%' . $word . '%');
+                }
+                // Match substrings
+                foreach ($substrings as $substr) {
+                    $query->orWhere('productName', 'LIKE', '%' . $substr . '%');
+                }
+            })
+            ->orderByDesc('relevance_score') // Order by highest relevance score
+            ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
+            }
+        
+            // Condition 3: Any word matches in any order
+            $subcategoryproducts = Product::where('status', 1)
+                ->where(function ($query) use ($substrings) {
+                    foreach ($substrings as $substr) {
+                        $query->orWhere('productName', 'LIKE', '%' . $substr . '%');
+                    }
+                })
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
+            }
+        
+            // Condition 4: Combination of words in any order
+            $subcategoryproducts = Product::where('status', 1)
+                ->where(function ($query) use ($searchWords) {
+                    foreach ($searchWords as $word1) {
+                        foreach ($searchWords as $word2) {
+                            if ($word1 !== $word2) {
+                                $query->orWhere('productName', 'LIKE', '%' . $word1 . $word2 . '%');
+                                $query->orWhere('productName', 'LIKE', '%' . $word2 . $word1 . '%');
+                            }
+                        }
+                    }
+                })
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
+            }
+        
+            // Condition 5: Regex for 3-character substring match
+            $subcategoryproducts = Product::where('status', 1)
+                ->whereRaw("productName REGEXP '{$pattern}'")
+                ->paginate(16);
+            if ($subcategoryproducts->isNotEmpty()) {
+                return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
+            }
+        
+            // If no matches found, return empty results
+            $subcategoryproducts = collect([]);
+            return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
         }
+        
         
 
         return view('user.category.searchProducts', compact(

@@ -210,6 +210,7 @@
                                 @endforeach
 
                                 <li><a href="{{ route('user.index') }}">View All Categories</a></li>
+                                <li><a href="/blog">Blogs</a></li>
                             </ul>
 
 
