@@ -6,13 +6,14 @@ use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Razorpay\Api\Api;
 use Session;
 use Exception;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Razorpay\Api\Api;
+use Razorpay\Api\Errors\SignatureVerificationError;
 
 class RazorpayController extends Controller
 {
@@ -160,9 +161,35 @@ class RazorpayController extends Controller
                 }
 
                 $paymentDetails = $api->payment->fetch($paymentId);
+                $details = $paymentDetails->toArray();
+                Log::info('Payment status check:', $details);
+
+                // For UPI payments, check additional fields
+                $isUPI = isset($details['method']) && $details['method'] === 'upi';
+                $isSuccess = false;
+
+                if ($isUPI) {
+                    // For UPI, check various possible success states
+                    $isSuccess = in_array($details['status'], ['captured', 'authorized', 'processed']) ||
+                               (isset($details['captured']) && $details['captured'] === true);
+
+                    Log::info('UPI payment check:', [
+                        'payment_id' => $paymentId,
+                        'vpa' => isset($details['vpa']) ? $details['vpa'] : null,
+                        'is_success' => $isSuccess,
+                        'captured' => isset($details['captured']) ? $details['captured'] : false,
+                        'status' => $details['status']
+                    ]);
+                } else {
+                    // For non-UPI payments, be more strict
+                    $isSuccess = in_array($details['status'], ['captured', 'authorized']);
+                }
+
                 return response()->json([
-                    'status' => $paymentDetails['status'],
-                    'order_id' => $paymentDetails['order_id']
+                    'status' => $isSuccess ? 'captured' : $details['status'],
+                    'order_id' => isset($details['order_id']) ? $details['order_id'] : null,
+                    'method' => isset($details['method']) ? $details['method'] : 'unknown',
+                    'is_upi' => $isUPI
                 ]);
             } catch (\Exception $e) {
                 Log::error('Error checking payment status: ' . $e->getMessage());
