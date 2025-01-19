@@ -11,24 +11,24 @@
 <body>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        let paymentId = null;
+        let orderId = "{{ isset($razorpayOrderId) ? $razorpayOrderId : '' }}";
         let isPolling = false;
         let pollInterval = null;
 
         // Function to check payment status
         function checkPaymentStatus() {
-            if (!paymentId) return;
+            if (!orderId) return;
 
-            $.get(`/check-payment-status/${paymentId}`)
+            $.get(`/check-payment-status/${orderId}`)
                 .done(function(response) {
-                    if (response.status === 'captured') {
+                    if (response.status === 'paid') {
                         stopPolling();
                         // Submit form with payment details
-                        document.querySelector('#razorpay-payment-id').value = paymentId;
+                        document.querySelector('#razorpay-payment-id').value = response.payment_id;
                         document.querySelector('#razorpay-order-id').value = response.order_id;
                         document.querySelector('#razorpay-signature').value = response.signature;
                         document.querySelector('#razorpay-form').submit();
-                    } else if (response.status === 'failed') {
+                    } else if (response.payment_status === 'failed') {
                         stopPolling();
                         window.location.href = "{{ route('payment.failed') }}";
                     }
@@ -41,7 +41,7 @@
 
         // Start polling
         function startPolling() {
-            if (!isPolling && paymentId) {
+            if (!isPolling && orderId) {
                 isPolling = true;
                 pollInterval = setInterval(checkPaymentStatus, 3000); // Check every 3 seconds
                 // Stop polling after 5 minutes (300000 ms) if payment not completed
@@ -96,10 +96,8 @@
             window.location.href = "{{ route('payment.failed') }}";
         });
 
-        razorpay.on('payment.created', function(response) {
-            paymentId = response.razorpay_payment_id;
-            startPolling();
-        });
+        // Start polling when payment modal opens
+        startPolling();
 
         razorpay.open();
     </script>

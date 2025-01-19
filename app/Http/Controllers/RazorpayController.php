@@ -17,30 +17,53 @@ use Illuminate\Support\Facades\Log;
 class RazorpayController extends Controller
 {
     /**
-     * Check the status of a payment
+     * Check the status of a payment using order ID
      */
-    public function checkPaymentStatus($paymentId)
+    public function checkPaymentStatus($orderId)
     {
         $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
-
+        
         try {
-            $payment = $api->payment->fetch($paymentId);
+            // Fetch order details
+            $order = $api->order->fetch($orderId);
             
-            if ($payment['status'] === 'captured') {
-                // Payment successful
-                return response()->json([
-                    'status' => 'captured',
-                    'order_id' => $payment['order_id'],
-                    'signature' => $payment['order_id'] // You'll need to generate proper signature here
-                ]);
-            } else if ($payment['status'] === 'failed') {
-                return response()->json(['status' => 'failed']);
-            } else {
-                // Payment still processing
-                return response()->json(['status' => 'processing']);
+            // Check if payment is done
+            if ($order['status'] === 'paid') {
+                // Get the payment details
+                $payments = $api->order->fetch($orderId)->payments()->items;
+                
+                if (!empty($payments)) {
+                    $payment = $payments[0]; // Get the latest payment
+                    
+                    // Generate signature
+                    $attributes = [
+                        'razorpay_order_id' => $orderId,
+                        'razorpay_payment_id' => $payment['id'],
+                    ];
+                    $signature = $api->utility->verifyPaymentSignature($attributes);
+                    
+                    return response()->json([
+                        'status' => 'paid',
+                        'payment_id' => $payment['id'],
+                        'order_id' => $orderId,
+                        'signature' => $signature
+                    ]);
+                }
             }
+            
+            // Check if payment failed
+            if ($order['status'] === 'attempted') {
+                $payments = $api->order->fetch($orderId)->payments()->items;
+                if (!empty($payments) && $payments[0]['status'] === 'failed') {
+                    return response()->json(['status' => 'failed']);
+                }
+            }
+            
+            // Payment still processing
+            return response()->json(['status' => 'processing']);
+            
         } catch (\Exception $e) {
-            \Log::error('Payment status check failed: ' . $e->getMessage());
+            Log::error('Payment status check failed: ' . $e->getMessage());
             return response()->json(['status' => 'error'], 500);
         }
     }
@@ -54,6 +77,7 @@ class RazorpayController extends Controller
     {
         return view('user.checkout.razorpay');
     }
+    
     public function testRazorpayCredentials()
     {
         $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
