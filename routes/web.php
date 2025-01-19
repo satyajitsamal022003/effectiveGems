@@ -15,6 +15,7 @@ use App\Http\Controllers\eusers\EuserController;
 use App\Http\Controllers\eusers\RegisterController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RazorpayController;
+use App\Http\Controllers\RazorpayWebhookController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\SiteMapController;
 use App\Http\Controllers\User\CartController;
@@ -154,6 +155,12 @@ Route::get('razorpay', [RazorpayController::class, 'createOrder'])->name('razorp
 Route::post('razorpay-payment', [RazorpayController::class, 'storePayment'])->name('razorpay.payment.store');
 Route::post('razorpay-callback', [RazorpayController::class, 'paymentCallback'])->name('razorpay.callback');
 Route::get('razorpay-test', [RazorpayController::class, 'testRazorpayCredentials'])->name('razorpay.testRazorpayCredentials');
+Route::post('check-payment-status', [RazorpayController::class, 'checkPaymentStatus'])->name('razorpay.checkStatus');
+
+// Razorpay Webhook (exclude from CSRF protection)
+Route::post('razorpay-webhook', [RazorpayWebhookController::class, 'handle'])
+    ->name('razorpay.webhook')
+    ->withoutMiddleware([\App\Http\Middleware\VerifyCsrfToken::class]);
 
 Route::get('optimize', [IndexController::class, 'optimize'])->name('user.optmize');
 Route::get('/pages/{url}', [IndexController::class, 'pages'])->name('pages');

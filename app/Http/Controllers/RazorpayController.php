@@ -12,6 +12,8 @@ use Exception;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
 
 class RazorpayController extends Controller
 {
@@ -71,58 +73,112 @@ class RazorpayController extends Controller
         $ip = $request->getClientIp();
         $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
 
-
         $order = Order::find($request->orderId);
+        
         try {
-            $paymentDetails = $api->payment->fetch($request->razorpay_payment_id);
-            $paymentMode = $paymentDetails['method'];
-            $order->paymentMode = $paymentMode;
-        } catch (\Throwable $th) {
-        }
-        $order->paymentCompleted = 1;
-        $order->orderStatus = 'Placed';
-        $order->transactionId = $request->razorpay_payment_id;
-        $order->save();
+            // For UPI/QR payments, we'll handle the status in webhook
+            if ($request->has('razorpay_payment_id')) {
+                $attributes = [
+                    'razorpay_order_id' => $request->razorpay_order_id,
+                    'razorpay_payment_id' => $request->razorpay_payment_id,
+                    'razorpay_signature' => $request->razorpay_signature
+                ];
 
-        // Send confirmation email
-        try{
-            Mail::to($order->email)->send(new OrderConfirmation($order));
-        }
-        catch (\Exception $e){
-
-        }
-        $userId='';
-        if (Auth::guard('euser')->check()) {
-            $euser = Auth::guard('euser')->user();
-            $userId = $euser->id;
-        }
-
-        if ($userId) {
-            $cart = Cart::where("userId", $userId)->first();
-            $cartId = $cart->id;
-        } else {
-            $cart = Cart::where("ip", $ip)->first();
-            $cartId = $cart->id;
-        }
-        // $cart = Cart::where("ip", $ip)->first();
-        // $cartItems = CartItem::where("cart_id", $cart->id)->delete();
-        $cart->delete();
-        try {
-            $attributes = array(
-                'razorpay_order_id' => $request->razorpay_order_id,
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_signature' => $request->razorpay_signature
-            );
-
-            $api->utility->verifyPaymentSignature($attributes);
-
-            // Payment verified successfully
-            // Session::flash('success', 'Payment successful');
-            return redirect()->route('payment.success');
+                // Verify signature for immediate payments (card, UPI intent)
+                $api->utility->verifyPaymentSignature($attributes);
+                
+                // Fetch payment details
+                $paymentDetails = $api->payment->fetch($request->razorpay_payment_id);
+                
+                // Update order status for immediate payments
+                $this->updateOrderStatus($order, $paymentDetails, $ip);
+                
+                return redirect()->route('payment.success');
+            }
+            
+            // For QR/Scan & Pay, redirect to a waiting page
+            // The webhook will handle the status update
+            return view('user.checkout.payment-waiting', [
+                'orderId' => $order->id,
+                'razorpayOrderId' => $request->razorpay_order_id
+            ]);
+            
         } catch (Exception $e) {
-            // Payment verification failed
-            // Session::flash('error', 'Payment failed');
+            \Log::error('Payment verification failed: ' . $e->getMessage());
             return redirect()->route('payment.failure');
+        }
+    }
+
+    /**
+     * Check payment status for async payments (UPI QR)
+     */
+    public function checkPaymentStatus(Request $request)
+    {
+        try {
+            $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
+            
+            // Get the order from Razorpay
+            $razorpayOrder = $api->order->fetch($request->razorpayOrderId);
+            
+            // If payment is successful
+            if ($razorpayOrder->status === 'paid') {
+                $order = Order::find($request->orderId);
+                
+                // Get the payment details
+                $payments = $api->order->fetch($request->razorpayOrderId)->payments();
+                $payment = $payments->items[0];
+                
+                // Update order status
+                $this->updateOrderStatus($order, $payment, $request->getClientIp());
+                
+                return response()->json(['status' => 'success']);
+            }
+            
+            // If order is still pending
+            return response()->json(['status' => 'pending']);
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to check payment status: ' . $e->getMessage());
+            return response()->json(['status' => 'error']);
+        }
+    }
+
+    private function updateOrderStatus($order, $paymentDetails, $ip)
+    {
+        try {
+            $order->paymentMode = $paymentDetails['method'];
+            $order->paymentCompleted = 1;
+            $order->orderStatus = 'Placed';
+            $order->transactionId = $paymentDetails['id'];
+            $order->save();
+
+            // Send confirmation email
+            try {
+                Mail::to($order->email)->send(new OrderConfirmation($order));
+            } catch (\Exception $e) {
+                \Log::error('Failed to send confirmation email: ' . $e->getMessage());
+            }
+
+            // Clear cart
+            $userId = '';
+            if (Auth::guard('euser')->check()) {
+                $euser = Auth::guard('euser')->user();
+                $userId = $euser->id;
+            }
+
+            if ($userId) {
+                $cart = Cart::where("userId", $userId)->first();
+            } else {
+                $cart = Cart::where("ip", $ip)->first();
+            }
+
+            if ($cart) {
+                $cart->delete();
+            }
+
+        } catch (\Exception $e) {
+            \Log::error('Failed to update order status: ' . $e->getMessage());
+            throw $e;
         }
     }
 }
