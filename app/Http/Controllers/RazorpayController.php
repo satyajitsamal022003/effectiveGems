@@ -152,57 +152,67 @@ class RazorpayController extends Controller
         $ip = $request->getClientIp();
         $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
 
-
-        $order = Order::find($request->orderId);
         try {
+            $order = Order::find($request->orderId);
+            if (!$order) {
+                Log::error('Order not found: ' . $request->orderId);
+                return redirect()->route('payment.failure');
+            }
+
+            // Double-check payment status with Razorpay
             $paymentDetails = $api->payment->fetch($request->razorpay_payment_id);
-            $paymentMode = $paymentDetails['method'];
-            $order->paymentMode = $paymentMode;
-        } catch (\Throwable $th) {
-        }
-        $order->paymentCompleted = 1;
-        $order->orderStatus = 'Placed';
-        $order->transactionId = $request->razorpay_payment_id;
-        $order->save();
+            
+            if ($paymentDetails['status'] !== 'captured' && $paymentDetails['status'] !== 'authorized') {
+                Log::error('Payment not successful. Status: ' . $paymentDetails['status']);
+                return redirect()->route('payment.failure');
+            }
 
-        // Send confirmation email
-        try{
-            Mail::to($order->email)->send(new OrderConfirmation($order));
-        }
-        catch (\Exception $e){
+            // Update order details
+            $order->paymentMode = $paymentDetails['method'];
+            $order->paymentCompleted = 1;
+            $order->orderStatus = 'Placed';
+            $order->transactionId = $request->razorpay_payment_id;
+            $order->save();
 
-        }
-        $userId='';
-        if (Auth::guard('euser')->check()) {
-            $euser = Auth::guard('euser')->user();
-            $userId = $euser->id;
-        }
+            // Send confirmation email
+            try {
+                Mail::to($order->email)->send(new OrderConfirmation($order));
+            } catch (\Exception $e) {
+                Log::error('Failed to send confirmation email: ' . $e->getMessage());
+            }
 
-        if ($userId) {
-            $cart = Cart::where("userId", $userId)->first();
-            $cartId = $cart->id;
-        } else {
-            $cart = Cart::where("ip", $ip)->first();
-            $cartId = $cart->id;
-        }
-        // $cart = Cart::where("ip", $ip)->first();
-        // $cartItems = CartItem::where("cart_id", $cart->id)->delete();
-        $cart->delete();
-        try {
-            $attributes = array(
-                'razorpay_order_id' => $request->razorpay_order_id,
-                'razorpay_payment_id' => $request->razorpay_payment_id,
-                'razorpay_signature' => $request->razorpay_signature
-            );
+            // Clear cart
+            $userId = '';
+            if (Auth::guard('euser')->check()) {
+                $euser = Auth::guard('euser')->user();
+                $userId = $euser->id;
+                $cart = Cart::where("userId", $userId)->first();
+            } else {
+                $cart = Cart::where("ip", $ip)->first();
+            }
 
-            $api->utility->verifyPaymentSignature($attributes);
+            if ($cart) {
+                $cart->delete();
+            }
+            // Verify payment signature if provided
+            if ($request->razorpay_signature) {
+                $attributes = array(
+                    'razorpay_order_id' => $request->razorpay_order_id,
+                    'razorpay_payment_id' => $request->razorpay_payment_id,
+                    'razorpay_signature' => $request->razorpay_signature
+                );
 
-            // Payment verified successfully
-            // Session::flash('success', 'Payment successful');
+                try {
+                    $api->utility->verifyPaymentSignature($attributes);
+                } catch (\Exception $e) {
+                    Log::error('Payment signature verification failed: ' . $e->getMessage());
+                    return redirect()->route('payment.failure');
+                }
+            }
+
             return redirect()->route('payment.success');
-        } catch (Exception $e) {
-            // Payment verification failed
-            // Session::flash('error', 'Payment failed');
+        } catch (\Exception $e) {
+            Log::error('Payment processing error: ' . $e->getMessage());
             return redirect()->route('payment.failure');
         }
     }
