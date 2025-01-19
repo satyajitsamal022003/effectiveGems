@@ -152,7 +152,7 @@ Route::get('/view-cart', [CartController::class, 'viewCart'])->name('viewCart');
 // RazorPay
 Route::get('razorpay', [RazorpayController::class, 'createOrder'])->name('razorpay.order');
 Route::post('razorpay-payment', [RazorpayController::class, 'storePayment'])->name('razorpay.payment.store');
-Route::post('razorpay-callback', [RazorpayController::class, 'paymentCallback'])->name('razorpay.callback');
+Route::match(['get', 'post'], 'razorpay-callback', [RazorpayController::class, 'paymentCallback'])->name('razorpay.callback');
 Route::post('razorpay-webhook', [RazorpayController::class, 'webhook'])->name('razorpay.webhook');
 Route::get('razorpay-test', [RazorpayController::class, 'testRazorpayCredentials'])->name('razorpay.testRazorpayCredentials');
 

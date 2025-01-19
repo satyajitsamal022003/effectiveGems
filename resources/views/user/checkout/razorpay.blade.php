@@ -10,43 +10,72 @@
 <body>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <script>
-        let pollCount = 0;
-        const MAX_POLLS = 240; // 2 minutes (with 500ms interval)
-        let pollInterval;
+        var pollTimer = null;
+        var POLL_INTERVAL = 3000; // 3 seconds
+        var MAX_POLL_TIME = 300000; // 5 minutes
+        var startTime = Date.now();
 
-        // Function to check order status using Razorpay's QR status API
-        function checkOrderStatus(paymentId) {
-            var checkUrl = 'https://api.razorpay.com/v1/payments/' + paymentId;
-            
-            fetch(checkUrl, {
+        function submitPaymentForm(paymentId, orderId, signature) {
+            // Clear any existing polling
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+                pollTimer = null;
+            }
+
+            // Prevent duplicate submissions
+            if (document.querySelector('#razorpay-payment-id').value) {
+                return;
+            }
+
+            // Submit the form
+            document.querySelector('#razorpay-payment-id').value = paymentId;
+            if (orderId) {
+                document.querySelector('#razorpay-order-id').value = orderId;
+            }
+            if (signature) {
+                document.querySelector('#razorpay-signature').value = signature;
+            }
+            document.querySelector('#razorpay-form').submit();
+        }
+
+        function checkPaymentStatus(paymentId) {
+            // Check if we've exceeded the maximum polling time
+            if (Date.now() - startTime >= MAX_POLL_TIME) {
+                if (pollTimer) {
+                    clearTimeout(pollTimer);
+                }
+                window.location.href = '{{ route('payment.failed') }}';
+                return;
+            }
+
+            fetch('{{ route('razorpay.callback') }}?razorpay_payment_id=' + paymentId, {
                 headers: {
-                    'Authorization': 'Basic ' + btoa('{{ env('RAZORPAY_KEY') }}:{{ env('RAZORPAY_SECRET') }}')
+                    'Accept': 'application/json'
                 }
             })
-            .then(function(response) { 
-                return response.json(); 
+            .then(function(response) {
+                return response.json();
             })
             .then(function(data) {
                 if (data.status === 'captured' || data.status === 'authorized') {
-                    clearInterval(pollInterval);
-                    // Submit the form with payment details
-                    document.querySelector('#razorpay-payment-id').value = paymentId;
-                    document.querySelector('#razorpay-order-id').value = data.order_id;
-                    document.querySelector('#razorpay-form').submit();
-                }
-                
-                pollCount++;
-                if (pollCount >= MAX_POLLS) {
-                    clearInterval(pollInterval);
-                    window.location.href = '{{ route('payment.failure') }}';
+                    submitPaymentForm(paymentId, data.order_id);
+                } else {
+                    // Continue polling
+                    pollTimer = setTimeout(function() {
+                        checkPaymentStatus(paymentId);
+                    }, POLL_INTERVAL);
                 }
             })
             .catch(function(error) {
                 console.error('Error checking payment status:', error);
+                // Continue polling on error
+                pollTimer = setTimeout(function() {
+                    checkPaymentStatus(paymentId);
+                }, POLL_INTERVAL);
             });
         }
 
-        const options = {
+        var options = {
             "key": "{{ env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T') }}", // Razorpay Key ID
             "amount": "{{ isset($razorpayOrderId) ? $subtotal : 0 }}", // Amount in paisa
             "currency": "INR",
@@ -67,42 +96,56 @@
             },
             "modal": {
                 "ondismiss": function() {
-                    clearInterval(pollInterval);
-                    window.location.href = '{{ route('payment.failure') }}';
+                    if (pollTimer) {
+                        clearTimeout(pollTimer);
+                    }
+                    window.location.href = '{{ route('payment.failed') }}';
                 }
             },
-            "callback_url": "{{ route('razorpay.callback') }}",
+            "callback_url": "{{ route('razorpay.callback') }}"
         };
 
-        const razorpay = new Razorpay(options);
+        var razorpay = new Razorpay(options);
         razorpay.open();
 
-        // Handle QR code payments
+        // Handle payment failures
         razorpay.on('payment.failed', function(response) {
-            clearInterval(pollInterval);
-            window.location.href = '{{ route('payment.failure') }}';
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+            }
+            window.location.href = '{{ route('payment.failed') }}';
         });
 
         razorpay.on('payment.error', function(response) {
-            clearInterval(pollInterval);
-            window.location.href = '{{ route('payment.failure') }}';
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+            }
+            window.location.href = '{{ route('payment.failed') }}';
         });
 
-        // Start polling when QR is scanned
+        // Handle QR code and processing events
         razorpay.on('qr.scanned', function(response) {
             if (response.payment_id) {
-                pollInterval = setInterval(function() {
-                    checkOrderStatus(response.payment_id);
-                }, 2000); // Poll every 2 seconds instead of 500ms
+                checkPaymentStatus(response.payment_id);
             }
         });
 
-        // Also check status when payment is processing
         razorpay.on('payment.processing', function(response) {
             if (response.payment_id) {
-                pollInterval = setInterval(function() {
-                    checkOrderStatus(response.payment_id);
-                }, 2000);
+                checkPaymentStatus(response.payment_id);
+            }
+        });
+
+        // Cleanup on page unload or modal close
+        window.addEventListener('beforeunload', function() {
+            if (pollTimer) {
+                clearTimeout(pollTimer);
+            }
+        });
+
+        razorpay.on('modal.closed', function() {
+            if (pollTimer) {
+                clearTimeout(pollTimer);
             }
         });
     </script>

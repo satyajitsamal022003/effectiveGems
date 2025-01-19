@@ -149,14 +149,34 @@ class RazorpayController extends Controller
      */
     public function paymentCallback(Request $request)
     {
-        $ip = $request->getClientIp();
         $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
 
+        // Handle GET request for payment status check
+        if ($request->isMethod('get')) {
+            try {
+                $paymentId = $request->razorpay_payment_id;
+                if (!$paymentId) {
+                    return response()->json(['error' => 'Payment ID required'], 400);
+                }
+
+                $paymentDetails = $api->payment->fetch($paymentId);
+                return response()->json([
+                    'status' => $paymentDetails['status'],
+                    'order_id' => $paymentDetails['order_id']
+                ]);
+            } catch (\Exception $e) {
+                Log::error('Error checking payment status: ' . $e->getMessage());
+                return response()->json(['error' => 'Failed to check payment status'], 500);
+            }
+        }
+
+        // Handle POST request for payment completion
+        $ip = $request->getClientIp();
         try {
             $order = Order::find($request->orderId);
             if (!$order) {
                 Log::error('Order not found: ' . $request->orderId);
-                return redirect()->route('payment.failure');
+                return redirect()->route('payment.failed');
             }
 
             // Double-check payment status with Razorpay
@@ -164,7 +184,7 @@ class RazorpayController extends Controller
             
             if ($paymentDetails['status'] !== 'captured' && $paymentDetails['status'] !== 'authorized') {
                 Log::error('Payment not successful. Status: ' . $paymentDetails['status']);
-                return redirect()->route('payment.failure');
+                return redirect()->route('payment.failed');
             }
 
             // Update order details
@@ -206,14 +226,14 @@ class RazorpayController extends Controller
                     $api->utility->verifyPaymentSignature($attributes);
                 } catch (\Exception $e) {
                     Log::error('Payment signature verification failed: ' . $e->getMessage());
-                    return redirect()->route('payment.failure');
+                    return redirect()->route('payment.failed');
                 }
             }
 
             return redirect()->route('payment.success');
         } catch (\Exception $e) {
             Log::error('Payment processing error: ' . $e->getMessage());
-            return redirect()->route('payment.failure');
+            return redirect()->route('payment.failed');
         }
     }
 }
