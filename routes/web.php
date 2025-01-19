@@ -153,6 +153,7 @@ Route::get('/view-cart', [CartController::class, 'viewCart'])->name('viewCart');
 Route::get('razorpay', [RazorpayController::class, 'createOrder'])->name('razorpay.order');
 Route::post('razorpay-payment', [RazorpayController::class, 'storePayment'])->name('razorpay.payment.store');
 Route::post('razorpay-callback', [RazorpayController::class, 'paymentCallback'])->name('razorpay.callback');
+Route::get('check-payment-status/{paymentId}', [RazorpayController::class, 'checkPaymentStatus'])->name('razorpay.checkStatus');
 Route::get('razorpay-test', [RazorpayController::class, 'testRazorpayCredentials'])->name('razorpay.testRazorpayCredentials');
 
 Route::get('optimize', [IndexController::class, 'optimize'])->name('user.optmize');

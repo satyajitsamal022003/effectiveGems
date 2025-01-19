@@ -12,9 +12,39 @@ use Exception;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RazorpayController extends Controller
 {
+    /**
+     * Check the status of a payment
+     */
+    public function checkPaymentStatus($paymentId)
+    {
+        $api = new Api(env('RAZORPAY_KEY', 'rzp_live_aseSEVdODAvC9T'), env('RAZORPAY_SECRET', 'CuE9QlvenogbMuLlt3aVCGIJ'));
+
+        try {
+            $payment = $api->payment->fetch($paymentId);
+            
+            if ($payment['status'] === 'captured') {
+                // Payment successful
+                return response()->json([
+                    'status' => 'captured',
+                    'order_id' => $payment['order_id'],
+                    'signature' => $payment['order_id'] // You'll need to generate proper signature here
+                ]);
+            } else if ($payment['status'] === 'failed') {
+                return response()->json(['status' => 'failed']);
+            } else {
+                // Payment still processing
+                return response()->json(['status' => 'processing']);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Payment status check failed: ' . $e->getMessage());
+            return response()->json(['status' => 'error'], 500);
+        }
+    }
+
     /**
      * Show the payment page.
      *
