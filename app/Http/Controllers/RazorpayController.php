@@ -33,20 +33,20 @@ class RazorpayController extends Controller
                 $payments = $api->order->fetch($orderId)->payments()->items;
                 
                 if (!empty($payments)) {
-                    $payment = $payments[0]; // Get the latest payment
+                    // $payment = $payments[0]; // Get the latest payment
                     
                     // Generate signature
-                    $attributes = [
-                        'razorpay_order_id' => $orderId,
-                        'razorpay_payment_id' => $payment['id'],
-                    ];
-                    $signature = $api->utility->verifyPaymentSignature($attributes);
+                    // $attributes = [
+                    //     'razorpay_order_id' => $orderId,
+                    //     'razorpay_payment_id' => $payment['id'],
+                    // ];
+                    // $signature = $api->utility->verifyPaymentSignature($attributes);
                     
                     return response()->json([
                         'status' => 'paid',
-                        'payment_id' => $payment['id'],
-                        'order_id' => $orderId,
-                        'signature' => $signature
+                        // 'payment_id' => $payment['id'],
+                        // 'order_id' => $orderId,
+                        'payments' => $payments
                     ]);
                 }
             }
@@ -59,12 +59,29 @@ class RazorpayController extends Controller
                 }
             }
             
-            // Payment still processing
-            return response()->json(['status' => 'processing']);
+            // Payment still processing - include order details
+            return response()->json([
+                'status' => 'processing',
+                'order_status' => $order['status'],
+                'order_details' => [
+                    'status' => $order['status'],
+                    'amount_paid' => $order['amount_paid'],
+                    'amount' => $order['amount']
+                ]
+            ]);
             
         } catch (\Exception $e) {
             Log::error('Payment status check failed: ' . $e->getMessage());
-            return response()->json(['status' => 'error'], 500);
+            return response()->json([
+                'status' => 'error',
+                'error' => $e->getMessage(),
+                'error_code' => $e->getCode(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'error_trace' => $e->getTraceAsString(),
+                'order_id' => $orderId,
+                'full_error' => json_encode($e)
+            ], 500);
         }
     }
 

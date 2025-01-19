@@ -21,6 +21,8 @@
 
             $.get(`/check-payment-status/${orderId}`)
                 .done(function(response) {
+                    console.log('Payment status response:', response);
+                    
                     if (response.status === 'paid') {
                         stopPolling();
                         // Submit form with payment details
@@ -33,9 +35,19 @@
                         window.location.href = "{{ route('payment.failed') }}";
                     }
                 })
-                .fail(function() {
+                .fail(function(response) {
+                    console.log('Payment status check failed - Full Response:', response.responseJSON);
+                    if (response.responseJSON) {
+                        console.log('Error Message:', response.responseJSON.error);
+                        console.log('Error Code:', response.responseJSON.error_code);
+                        console.log('Error File:', response.responseJSON.error_file);
+                        console.log('Error Line:', response.responseJSON.error_line);
+                        console.log('Error Trace:', response.responseJSON.error_trace);
+                        console.log('Order ID:', response.responseJSON.order_id);
+                        console.log('Full Error Object:', response.responseJSON.full_error);
+                    }
                     stopPolling();
-                    window.location.href = "{{ route('payment.failed') }}";
+                    // Don't redirect on error, keep polling
                 });
         }
 
