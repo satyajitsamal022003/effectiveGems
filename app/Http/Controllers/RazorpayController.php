@@ -12,9 +12,90 @@ use Exception;
 use App\Mail\OrderConfirmation;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class RazorpayController extends Controller
 {
+    /**
+     * Handle Razorpay webhook notifications
+     */
+    public function webhook(Request $request)
+    {
+        $webhookSecret = env('RAZORPAY_WEBHOOK_SECRET');
+        
+        // Verify webhook signature
+        $webhookSignature = $request->header('x-razorpay-signature');
+        $payload = $request->getContent();
+        
+        try {
+            // Verify webhook signature
+            $expectedSignature = hash_hmac('sha256', $payload, $webhookSecret);
+            if ($webhookSignature !== $expectedSignature) {
+                Log::error('Razorpay webhook signature verification failed');
+                return response()->json(['status' => 'error'], 400);
+            }
+
+            $data = json_decode($payload, true);
+            
+            // Handle payment.authorized event
+            if ($data['event'] === 'payment.authorized') {
+                $payment = $data['payload']['payment']['entity'];
+                
+                // Extract order ID from payment description or notes
+                $orderId = null;
+                if (isset($payment['notes']['order_id'])) {
+                    $orderId = $payment['notes']['order_id'];
+                } else {
+                    // Try to find order by payment ID
+                    $order = Order::where('transactionId', $payment['id'])->first();
+                    if ($order) {
+                        $orderId = $order->id;
+                    }
+                }
+
+                if ($orderId) {
+                    $order = Order::find($orderId);
+                    if ($order) {
+                        // Update order status
+                        $order->paymentCompleted = 1;
+                        $order->orderStatus = 'Placed';
+                        $order->transactionId = $payment['id'];
+                        $order->paymentMode = $payment['method'];
+                        $order->save();
+
+                        // Send confirmation email
+                        try {
+                            Mail::to($order->email)->send(new OrderConfirmation($order));
+                        } catch (\Exception $e) {
+                            Log::error('Failed to send order confirmation email: ' . $e->getMessage());
+                        }
+
+                        // Clear cart
+                        $userId = '';
+                        if (Auth::guard('euser')->check()) {
+                            $euser = Auth::guard('euser')->user();
+                            $userId = $euser->id;
+                            $cart = Cart::where("userId", $userId)->first();
+                        } else {
+                            // Since webhook is async, IP-based cart clearing might not be reliable
+                            // Consider other ways to identify the cart
+                            $cart = Cart::where("ip", $request->ip())->first();
+                        }
+
+                        if ($cart) {
+                            $cart->delete();
+                        }
+                    }
+                }
+            }
+
+            return response()->json(['status' => 'success']);
+        } catch (\Exception $e) {
+            Log::error('Razorpay webhook error: ' . $e->getMessage());
+            return response()->json(['status' => 'error'], 500);
+        }
+    }
+
     /**
      * Show the payment page.
      *

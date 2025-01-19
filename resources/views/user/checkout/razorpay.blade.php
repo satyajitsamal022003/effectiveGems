@@ -17,6 +17,9 @@
             "name": "Your Company Name",
             "description": "Payment for your order",
             "order_id": "{{ isset($razorpayOrderId) ? $razorpayOrderId : '' }}", // Razorpay order ID
+            "notes": {
+                "order_id": "{{ $orderId }}"
+            },
             "handler": function(response) {
                 // Submit the payment form
                 document.querySelector('#razorpay-payment-id').value = response.razorpay_payment_id;
