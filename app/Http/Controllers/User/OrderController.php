@@ -327,6 +327,12 @@ class OrderController extends Controller
                 'is_mobile_verified' => 1
             ]);
 
+            $ip = $request->getClientIp();
+
+            Cart::where('ip', $ip)
+            ->update(['userId' => $newUser->id, 'ip' => null]);
+
+
             $apikey = '5xP9YXeSUnRUqqEw';
             $senderid = 'EFGEMS';
             $templateid = '110xxxxxxxxxx592';
