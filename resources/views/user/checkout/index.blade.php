@@ -14,6 +14,7 @@
                             <div class="panel-heading">Contact</div>
                             {{-- <a href="login.html" class="edit-after-submit">Login</a> --}}
                         </div>
+                        @if (!Auth::guard('euser')->check())
                         <div class="row justify-content-center inline-shipping">
                             <div class="col-lg-12 col-12">
                                 <!--guest login area start-->
@@ -36,6 +37,7 @@
 
                             </div>
                         </div>
+                        @endif
 
                     </div>
                     <!--customer area end-->
@@ -209,7 +211,7 @@
                                                 </div>
                                                 @endif
                                                 @if (!Auth::guard('euser')->check())
-                                                <button type="button" class="as_btn" data-bs-toggle="modal" data-bs-target="#otpModal">Verify Mobile</button>
+                                                <button type="button" class="as_btn" data-bs-toggle="modal" data-bs-target="#otpModal" id="verifymobile">Verify Mobile</button>
                                                 @endif
                                             </div>
                                         </div>
@@ -826,7 +828,7 @@
             </div>
             <div class="modal-body">
                 <form id="otpForm">
-                    @csrf
+                    @csrf 
                     <div class="form-group">
                         <label for="mobile">Enter Mobile Number</label>
                         <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number" required style="background: #c6b5b5 !important;!i;!;color: black !important;!i;!;">
@@ -1207,6 +1209,12 @@
                         setTimeout(function() {
                             window.location.href = '/checkout';
                         }, 1000);
+
+                        // $('#verifymobile').hide();
+                        // $('#otpModal').modal('hide');
+                        // $('.modal-backdrop').remove();
+                        // $('body').removeClass('modal-open');
+                        // $('body').css('padding-right', ''); 
                     } else {
                         document.getElementById('otpError').textContent = data.message;
                     }

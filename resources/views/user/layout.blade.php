@@ -132,6 +132,14 @@
                                                             class="fa-light fa-box-taped"></i> My Order</a></li>
                                                 <li><a href="{{ route('euser.wishlist') }}"><i
                                                             class="fa-light fa-heart"></i> Wishlist</a></li>
+                                                <li><form action="{{ route('euser.logout') }}" method="POST">
+                                                                @csrf
+                                                                <button type="submit" style="background: none; border: none; color: white; cursor: pointer;">
+                                                                    <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
+                                                                </button>
+                                                            </form></li>
+
+                                                            
                                             </ul>
                                         </div>
                                     </div>
