@@ -2799,6 +2799,7 @@ li.as_info_box p {
     bottom: 0;
     right: 0;
     overflow-y: auto;
+    margin-top: 100px;phpo
 }
 
 .as_login_slider{
@@ -3641,6 +3642,54 @@ form.d_block {
     .for-mobile {
         display : block;
     }
+    .user-menu {
+        display: flex !important;
+        color: #ffffff;
+        gap: 10px;
+        margin-top: 15px;
+        background: #003399;
+        padding: 15px;
+        align-items: center;
+        cursor: pointer !important;
+    }
+    .account-header ul {
+        gap: 15px;
+        flex-direction: column;
+    }
+    .account-header ul li {
+        width: 100%;
+    }
+    .card_box {
+        margin-bottom: 15px;
+    }
+    .profile-img {
+        flex-direction: column;
+        gap: 10px;
+        width: 100% !important;
+        padding: 20px !important;
+    }
+    .account-body {
+        padding: 20px 20px !important;
+        margin-top: 10px;
+    }
+    .account-header {
+        margin-top: 10px !important;
+        display: none;
+    }
+    .address-info {
+        width: 100% !important;
+    }
+    .profile-info {
+        row-gap: 15px !important;
+        flex-direction: column !important;
+    }
+    .for-sm-input-file {
+        width: 100% !important;
+    }
+    .profile-edit-section {
+        width: 100% !important;
+        padding: 15px !important;
+    }
     .top-left ul li:last-child {
         display: none;
     }
@@ -3680,8 +3729,8 @@ form.d_block {
         display: flex;
         gap: 15px;
     }
-    .cart-page .rwd-table .main-btn {
-        padding: 0;
+    .details_text {
+        margin-bottom: 15px;
     }
     h2.resp-tab-active {
         background: #003399 !important;
@@ -3886,7 +3935,7 @@ form.d_block {
     .as_btn, .as_btn:focus, .as_btn:visited {
         height: 40px;
         min-width: 120px;
-        padding: 0;
+        padding: 0 15px;
         line-height: 18px;
         font-size: 14px;
     }
@@ -5491,6 +5540,9 @@ form.d_block {
     display: flex;
     align-items: center;
 }
+.header-login {
+    color: #fff;
+}
 .header-login a {
     color: #fff;
     font-size: 12px;
@@ -6053,13 +6105,18 @@ div.tabContainer {
 
 
 .form-group {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 label {
     font-weight: 500;
-    margin-bottom: 5px;
+    margin-bottom: 2px;
     color: #202020;
+    font-size: 14px;
+}
+.profile-edit-section select {
+    font-size: 14px;
+    height: 36px;
 }
 
 .text-info {
@@ -6531,7 +6588,7 @@ small {
     height: 40px;
 }
 .cart-page .rwd-table tr td:nth-child(2) {
-    width: 35%;
+    width: 20%;
 }
 .cart-page .rwd-table tr td:nth-child(1), .cart-page .rwd-table tr td:nth-child(3), .cart-page .rwd-table tr td:nth-child(4), .cart-page .rwd-table tr td:nth-child(5), .cart-page .rwd-table tr td:nth-child(6) {
     text-align: center;
@@ -6719,64 +6776,104 @@ input[type=number]::-webkit-outer-spin-button {
         account section start
 --------------------------------------------*/
 .account-header {
-    background: #d9e5ff;
+    background: #003399;
     padding: 20px 30px;
     border-radius: 6px 6px 0 0;
+    margin-top: 30px;
 }
 
 .account-header ul li a {
-    font-size: 18px;
-    color: #003399;
+    font-size: 15px;
+    text-transform: unset;
+    color: var(--secondary-color);
+    background: #ffffff26;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: all 0.3s linear;
+    display: flex;
+    align-items: center;
+    gap: 3px
 }
 
 .account-header ul li a:hover {
-    color: var(--secondary-color);
+    color: #003399;
+    background: #fff;
 }
 
 .account-header ul li a.active {
-    color: var(--secondary-color);
-    font-weight: 500;
+    color: #003399;
+    background: #fff;
 }
 
 .account-header ul {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     margin: 0;
+    padding: 0;
+    gap: 15px;
+}
+
+.logout-btn {
+    border: none;
+    background: #e52436;
+    cursor: pointer;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-size: 15px;
+    color: #fff;
+    transition: all 0.3s linear;
+}
+.logout-btn:hover {
+    color: #e52436;
+    background: #fff;
 }
 
 .account-body {
-    background: #f9f9f9;
+    background: #d9e5ff9c;
     padding: 30px 30px;
     border-radius: 0 0 6px 6px;
 }
 
 .card_box {
-    background: #ffffff;
+    background: #003399;
     box-shadow: 0 0 4px 0 #eeeeee;
-    border-radius: 6px;
+    border-radius: 100px 0;
     text-align: center;
     padding: 40px;
     display: block;
 }
 
+.order-filter {
+    font-size: 14px;
+}
+.rwd-table tr:first-child th:first-child {
+    width: 8%;
+}
+
 .card_box h4 {
-    font-weight: 700;
-    font-size: 24px;
+    font-weight: 600;
+    font-size: 20px;
     margin: 10px 0 5px 0;
-    color: #003399;
+    color: #ffffff;
 }
 
 .card_box span {
-    font-weight: 600;
-    font-size: 18px;
-    color: #525252;
+    background: #fff;
+    font-weight: 500;
+    font-size: 14px;
+    color: #003399;
+    padding: 5px 15px;
+    margin-top: 5px;
+    display: inline-block;
+    border-radius: 30px;
 }
 
 .card_box img {
     height: 64px;
     width: 64px;
     border-radius: 50%;
+    border: 2px solid #ffffff;
 }
 
 .account-body .rwd-table tr {
@@ -6806,26 +6903,43 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .details_text .details-pro-img {
-    width: 100px;
-    height: 100px;
+    width: 64px;
+    height: 64px;
     border-radius: 4px;
-    margin-right: 15px;
 }
 
 .pro-text h3 {
     font-size: 16px;
     margin-bottom: 5px;
-    color: #282828;
-    font-weight: 500;
+    color: rgb(0 51 153);
+    font-weight: 600;
 }
 
 .details_text {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 .pro-text span {
     display: block;
-    font-size: 15px;
+    font-size: 13px;
+    color: #000;
+    line-height: 20px;
+}
+
+.pro-text h6 {
+    font-size: 13px;
+    color: #003399;
+    line-height: 20px;
+}
+
+.pro-text.action-area {
+    margin-top: 8px;
+}
+.pro-text.action-area a {
+    font-size: 13px;
+    color: #000;
 }
 
 .action-area img {
@@ -6834,17 +6948,17 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .profile-img img {
-    width: 90px;
-    height: 90px;
+    width: 85px;
+    height: 85px;
     object-fit: cover;
-    overflow-clip-margin: unset;
     border-radius: 50%;
-    margin-right: 15px;
+    margin-right: 10px;
 }
 
 .profile-img h3 {
-    font-size: 20px;
+    font-size: 18px;
     margin-bottom: 5px;
+    color: #003399;
 }
 
 .profile-img {
@@ -6852,15 +6966,15 @@ input[type=number]::-webkit-outer-spin-button {
     width: 40%;
     position: relative;
     padding: 30px;
-    background: #fff;
-    border-radius: 6px;
+    background: #ffffff;
+    border-radius: 14px;
 }
 
 .text-3 h6 {
     margin-bottom: 5px;
     font-weight: 400;
-    color: #4a4a4a;
-    font-size: 15px;
+    color: #000;
+    font-size: 14px;
 }
 
 .edit-btn {
@@ -7000,10 +7114,19 @@ input[type=number]::-webkit-outer-spin-button {
 }
 .profile-edit-section h4 {
     color: #000000;
+    font-size: 20px;
 }
 .order-filter .form-select {
     border: 1px solid #d9d9d9;
+    font-size: 14px;
 }
+.gender-area h6 {
+    font-weight: 500;
+    margin-bottom: 2px;
+    color: #202020;
+    font-size: 14px;
+}
+
 
 /*--------------------------------------------
         account section end
@@ -7120,7 +7243,9 @@ input[type=number]::-webkit-outer-spin-button {
 .review_order .quantity-select .form-select {
     font-size: 12px;
 }
-
+.user-menu {
+    display: none;
+}
 
 
 

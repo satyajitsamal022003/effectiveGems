@@ -144,12 +144,32 @@
                                             <div class="text-danger">{{ $message }}</div>
                                         @enderror
                                     </div>
+                                    <div class="form-group col-lg-6 col-12">
+                                        <div class="gender-area">
+                                            <h6>Address Type:</h6>
+                                            <div class="d-flex">
+                                                <label>
+                                                    <input type="radio" class="input-radio" name="address_type" value="1"
+                                                        {{ old('address_type', $address->address_type ?? '') == 'Home' ? 'checked' : '' }}>
+                                                    Home
+                                                </label>
+                                                <label>
+                                                    <input type="radio" class="input-radio" name="address_type" value="2"
+                                                        {{ old('address_type', $address->address_type ?? '') == 'Work' ? 'checked' : '' }}>
+                                                    Work
+                                                </label>
+                                            </div>
+                                            @error('address_type')
+                                            <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                             <div class="form-group">
                                 <div class="row">
                                     <div class="col-lg-12 col-md-12 col-12">
-                                        <label for="address_2">Apartment/Suite/Building (Optional)</label>
+                                        <label for="address_2">Apartment/Suite/Building (Optional):</label>
                                         <input type="text" name="apartment" id="address_2" class="form-control"
                                             value="{{ old('apartment', isset($address) ? $address->apartment : '') }}">
                                         @error('apartment')
@@ -169,26 +189,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-lg-6 col-12">
-                                <div class="gender-area">
-                                    <h6>Address Type</h6>
-                                    <div class="d-flex">
-                                        <label>
-                                            <input type="radio" class="input-radio" name="address_type" value="1"
-                                                {{ old('address_type', $address->address_type ?? '') == 'Home' ? 'checked' : '' }}>
-                                            Home
-                                        </label>
-                                        <label>
-                                            <input type="radio" class="input-radio" name="address_type" value="2"
-                                                {{ old('address_type', $address->address_type ?? '') == 'Work' ? 'checked' : '' }}>
-                                            Work
-                                        </label>
-                                    </div>
-                                    @error('address_type')
-                                        <div class="text-danger">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
+
 
                         </div>
                         <div class="inline-edit-btn main-btn">

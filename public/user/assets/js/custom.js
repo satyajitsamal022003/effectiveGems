@@ -398,3 +398,10 @@ $(document).ready(function () {
 //         $(".new-address").toggle();
 //     });
 // });
+
+
+$(document).ready(function () {
+    $(".user-menu").click(function () {
+        $(".account-header").toggle();
+    });
+});

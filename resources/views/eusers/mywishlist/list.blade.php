@@ -20,7 +20,7 @@
                                     <a href="#"
                                         onclick="return remove({{ $w->id }})">
                                         <i class="fa-light fa-trash-can"
-                                            style="color: red;cursor: pointer;padding-left: 15px;" title="Delete"></i></a>
+                                            style="color: red;cursor: pointer;" title="Delete"></i></a>
                                 </td>
                                 <td data-th="PRODUCT IMAGE">
                                     <img src="{{ asset($w->productDetails->image1 ?? 'defaultImage.jpeg') }}" alt="image"

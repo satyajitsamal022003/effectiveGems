@@ -26,8 +26,8 @@
     <link rel="stylesheet" type="text/css"
         href="{{ url('/') }}/user/assets/js/plugin/airdatepicker/datepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/all.min.css?=5" />
-    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/mega-menu458e.css?=11.4" />
-    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/style552d.css?=47.4" />
+    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/mega-menu458e.css?=11.5" />
+    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/style552d.css?=50.2" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/aos.css" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/easy-responsive-tabs.css?=7" />
     <!-- Fotorama -->
@@ -49,8 +49,7 @@
             margin: 0;
             padding: 0;
             position: absolute;
-            background-color: #fff;
-            border: 1px solid #ddd;
+            background-color: #003399;
             width: calc(100% - 30px);
             z-index: 1000;
         }
@@ -60,8 +59,13 @@
             cursor: pointer;
         }
 
+        .suggestions-list li a {
+            color: #fff;
+        }
+
         .suggestions-list li:hover {
-            background-color: #f0f0f0;
+            color: #003399;
+            background-color: #ffffff;
         }
     </style>
 </head>
