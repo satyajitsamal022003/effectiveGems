@@ -17,6 +17,9 @@
   <!--account header start-->
   <section class="section-padding pb-0">
       <div class="container">
+
+          <div class="user-menu"><i class="fas fa-bars"></i> Dashboard</div>
+
           <div class="account-header">
               <ul>
                   <li>
@@ -57,7 +60,7 @@
                   <li>
                       <form action="{{ route('euser.logout') }}" method="POST" style="display: inline;">
                           @csrf
-                          <button type="submit" style="background: none; border: none; color: blue; cursor: pointer;">
+                          <button type="submit" class="logout-btn">
                               <i class="fa-solid fa-right-from-bracket"></i> <span>Logout</span>
                           </button>
                       </form>

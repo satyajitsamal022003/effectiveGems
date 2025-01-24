@@ -13,7 +13,7 @@
                         <h6 class="d-block">Phone: {{ $userdata->phone ? $userdata->phone : 'N/A' }}</h6>
                         <h6 class="d-block">Gender: {{ $userdata->gender == 1 ? 'Male' : 'Female' }}</h6>
                     </div>
-                    <a href="{{route('euser.setting')}}" class="edit-btn d-block"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
+                    <a href="{{route('euser.setting')}}" class="edit-btn d-block" style="color: #fff;"><i class="fa-regular fa-pen-to-square"></i> Edit</a>
                 </div>
             </div>
         </div>
