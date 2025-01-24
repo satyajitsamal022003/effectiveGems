@@ -62,6 +62,9 @@
         .suggestions-list li a {
             color: #fff;
         }
+        .suggestions-list li:hover a {
+            color: #003399;
+        }
 
         .suggestions-list li:hover {
             color: #003399;
@@ -143,7 +146,7 @@
                                                                 </button>
                                                             </form></li>
 
-                                                            
+
                                             </ul>
                                         </div>
                                     </div>
