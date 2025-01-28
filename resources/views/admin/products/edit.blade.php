@@ -962,7 +962,7 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    if (response.status) {
+                    if (response.success) {
                         toastr.success('Product description updated successfully');
                         resolve(true);
                     } else {

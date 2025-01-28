@@ -413,9 +413,23 @@ class ProductController extends Controller
 
             $product->update($productData);
 
+            // Determine which tab was updated
+            $updatedTab = null;
+            if ($request->has('productName')) {
+                $updatedTab = 'basic';
+            } elseif ($request->hasFile('icon') || $request->hasFile('image1') || $request->hasFile('image2') || $request->hasFile('image3')) {
+                $updatedTab = 'images';
+            } elseif ($request->has('productDesc1')) {
+                $updatedTab = 'description';
+            }
+
             return response()->json([
                 'success' => true,
-                'message' => 'Product updated successfully'
+                'message' => 'Product updated successfully',
+                'data' => [
+                    'updatedTab' => $updatedTab,
+                    'product' => $product
+                ]
             ]);
 
         } catch (\Exception $e) {
