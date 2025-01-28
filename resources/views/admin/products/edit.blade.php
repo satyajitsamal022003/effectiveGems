@@ -733,183 +733,434 @@
         window.validateProductRange = validateProductRange;
     });
     const updateProductPartly = () => {
-        // Create a FormData object
+        // Show loading indicator
+        $('#loading-indicator').show();
+        
         const formData = new FormData();
+        let hasErrors = false;
 
-        // Append form values
-        const fields = [
-            'productName',
-            'variantName',
-            'categoryId',
-            'subCategoryId',
-            'sortOrder',
-            'sortOrderSubCategory',
-            'sortOrderCategory',
-            'sortOrderPopular',
-            'price_type',
-            'priceMRP',
-            'priceB2C',
-            'min_product_qty',
-            'max_product_qty',
-            'out_of_stock',
-            'certificationId',
-            'activationId',
-            'courierTypeId',
-            'is_variant',
-            'variant',
-            'metaTitle',
-            'metaDescription',
-            'seoUrl',
-            'metaKeyword'
-        ];
+        // Get all form elements in the product tab
+        const $form = $('#product_tab');
+        
+        // Handle regular form fields
+        $form.find('input, select, textarea').each(function() {
+            const $field = $(this);
+            const name = $field.attr('name');
+            
+            if (!name) return;
 
-        fields.forEach(field => {
-            const value = $(`input[name="${field}"]`).val();
-            if (value !== undefined && value !== null) {
-                formData.append(field, value);
+            // Handle different input types
+            if ($field.attr('type') === 'checkbox') {
+                formData.append(name, $field.is(':checked') ? '1' : '0');
+            } else if ($field.attr('type') === 'file') {
+                const files = $field[0].files;
+                if (files.length > 0) {
+                    formData.append(name, files[0]);
+                }
+            } else if ($field.is('select')) {
+                const value = $field.val();
+                if (value !== null && value !== undefined && value !== '') {
+                    formData.append(name, value);
+                }
+            } else {
+                const value = $field.val();
+                if (value !== null && value !== undefined) {
+                    formData.append(name, value);
+                }
+            }
+
+            // Log the field data for debugging
+            console.log(`Field: ${name}, Value: ${$field.val()}, Type: ${$field.attr('type') || $field.prop('tagName')}`);
+
+            // Validate required fields
+            if ($field.hasClass('required')) {
+                const value = $field.val();
+                if (!value || (typeof value === 'string' && value.trim() === '') || value === '--Select--') {
+                    $field.addClass('is-invalid');
+                    hasErrors = true;
+                    console.log(`Validation failed for: ${name}`);
+                } else {
+                    $field.removeClass('is-invalid');
+                }
             }
         });
 
+        // Handle variant data specially
+        const variantSelect = $('#productvariant');
+        if (variantSelect.length) {
+            formData.append('variant', JSON.stringify(variantSelect.val()));
+        }
 
         // Add CSRF token
         formData.append('_token', '{{ csrf_token() }}');
 
+        if (hasErrors) {
+            toastr.error('Please fill all required fields');
+            $('#loading-indicator').hide();
+            return false;
+        }
+
         // Make the AJAX request
-        try {
+        return new Promise((resolve, reject) => {
             $.ajax({
                 type: "POST",
                 url: "{{ route('admin.updateProductPartly', $product->id) }}",
                 data: formData,
-                contentType: false, // Important for file uploads
-                processData: false, // Prevent jQuery from converting the data into a query string
+                contentType: false,
+                processData: false,
                 success: function(response) {
-                    toastr.success('Updated');
-                    return true;
-
+                    if (response.status) {
+                        toastr.success('Product information updated successfully');
+                        resolve(true);
+                    } else {
+                        toastr.error(response.message || 'Failed to update product');
+                        resolve(false);
+                    }
                 },
                 error: function(xhr, status, error) {
                     toastr.error('An error occurred: ' + error);
+                    console.error(xhr.responseText);
+                    resolve(false);
+                },
+                complete: function() {
+                    $('#loading-indicator').hide();
                 }
             });
-        } catch (error) {
-            return false;
-        }
-        return true;
-
+        });
     }
     const updateProductImages = () => {
-        // Create a FormData object
+        $('#loading-indicator').show();
         const formData = new FormData();
+        let hasErrors = false;
 
-        // Append file inputs
-        const fileFields = [
-            'icon',
-            'image1',
-            'image2',
-            'image3'
-        ];
+        // Handle image files and their SEO fields
+        const imageFields = ['icon', 'image1', 'image2', 'image3'];
+        const maxFileSize = 2 * 1024 * 1024; // 2MB
 
-        fileFields.forEach(field => {
-            const fileInput = $(`input[name="${field}"]`)[0]; // Get the file input element
-            if (fileInput.files.length > 0) { // Check if a file is selected
-                formData.append(field, fileInput.files[0]); // Append the first file
+        imageFields.forEach(field => {
+            const fileInput = $(`input[name="${field}"]`)[0];
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                
+                // Validate file size
+                if (file.size > maxFileSize) {
+                    toastr.error(`${field}: File size must be less than 2MB`);
+                    hasErrors = true;
+                    return;
+                }
+
+                // Validate file type
+                if (!file.type.match('image.*')) {
+                    toastr.error(`${field}: Please upload an image file`);
+                    hasErrors = true;
+                    return;
+                }
+
+                formData.append(field, file);
             }
         });
 
-        // Add CSRF token
+        // Add image SEO fields
+        $('#product_image_tab').find('input[type="text"], textarea').each(function() {
+            const field = $(this);
+            const name = field.attr('name');
+            if (name && name.match(/^(imageAlt|imageTitle|imageCaption|imageDesc)/)) {
+                formData.append(name, field.val());
+            }
+        });
+
         formData.append('_token', '{{ csrf_token() }}');
 
-        // Make the AJAX request
-        try {
+        if (hasErrors) {
+            $('#loading-indicator').hide();
+            return false;
+        }
+
+        return new Promise((resolve, reject) => {
             $.ajax({
                 type: "POST",
-                url: "{{ route('admin.updateProductPartly', $product->id) }}", // Adjust the route accordingly
+                url: "{{ route('admin.updateProductPartly', $product->id) }}",
                 data: formData,
-                contentType: false, // Important for file uploads
-                processData: false, // Prevent jQuery from converting the data into a query string
+                contentType: false,
+                processData: false,
+                xhr: function() {
+                    const xhr = new window.XMLHttpRequest();
+                    xhr.upload.addEventListener("progress", function(evt) {
+                        if (evt.lengthComputable) {
+                            const percentComplete = (evt.loaded / evt.total) * 100;
+                            $('#upload-progress').width(percentComplete + '%');
+                        }
+                    }, false);
+                    return xhr;
+                },
                 success: function(response) {
-                    toastr.success('Images updated successfully!');
-                    return true;
+                    if (response.status) {
+                        toastr.success('Product images updated successfully');
+                        resolve(true);
+                    } else {
+                        toastr.error(response.message || 'Failed to update images');
+                        resolve(false);
+                    }
                 },
                 error: function(xhr, status, error) {
                     toastr.error('An error occurred: ' + error);
+                    console.error(xhr.responseText);
+                    resolve(false);
+                },
+                complete: function() {
+                    $('#loading-indicator').hide();
+                    $('#upload-progress').width('0%');
                 }
             });
-        } catch (error) {
-            return false;
-        }
-        return true;
-
+        });
     }
-</script>
+    const updateProductDescription = () => {
+        $('#loading-indicator').show();
+        const formData = new FormData();
+        let hasErrors = false;
 
-<script>
-    document.getElementById('nextButton').addEventListener('click', function() {
-        // Get only the required input and select elements
-        var requiredFields = document.querySelectorAll('#product_tab .required');
-        var allValid = true;
+        // Update CKEditor instances before collecting data
+        for (let i = 1; i <= 5; i++) {
+            const editor = CKEDITOR.instances[`description${i}`];
+            if (editor) {
+                editor.updateElement();
+            }
+        }
 
-        // Loop through only the required fields and check for validation
-        requiredFields.forEach(function(field) {
-            if (field.tagName === 'SELECT') {
-                // Check if the select value is the default option
-                if (field.value === '--Select--') {
-                    field.style.borderColor = 'red'; // Highlight empty required select field
-                    allValid = false;
-                } else {
-                    field.style.borderColor = ''; // Reset field style
-                }
+        // Collect all description fields
+        $('#product_description_tab').find('input, textarea').each(function() {
+            const $field = $(this);
+            const name = $field.attr('name');
+            if (!name) return;
+
+            const value = $field.val();
+            if (value !== null && value !== undefined) {
+                formData.append(name, value);
+            }
+
+            if ($field.hasClass('required') && !value) {
+                $field.addClass('is-invalid');
+                hasErrors = true;
             } else {
-                // Check for input fields
-                if (field.value === '') {
-                    field.style.borderColor = 'red'; // Highlight empty required field
-                    allValid = false;
-                } else {
-                    field.style.borderColor = ''; // Reset field style
-                }
+                $field.removeClass('is-invalid');
             }
         });
 
-        // If all required fields are valid, proceed to the next tab
+        formData.append('_token', '{{ csrf_token() }}');
 
-        if (allValid) {
+        if (hasErrors) {
+            toastr.error('Please fill all required fields');
+            $('#loading-indicator').hide();
+            return false;
+        }
 
-            if (updateProductPartly()) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: "POST",
+                url: "{{ route('admin.updateProductPartly', $product->id) }}",
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    if (response.status) {
+                        toastr.success('Product description updated successfully');
+                        resolve(true);
+                    } else {
+                        toastr.error(response.message || 'Failed to update description');
+                        resolve(false);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('An error occurred: ' + error);
+                    console.error(xhr.responseText);
+                    resolve(false);
+                },
+                complete: function() {
+                    $('#loading-indicator').hide();
+                }
+            });
+        });
+    }
+
+    // Add loading and error indicators
+    $('body').append(`
+        <div id="loading-indicator" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
+            <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                <div class="spinner-border text-light" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <div class="text-light mt-2" id="loading-text">Processing...</div>
+                <div class="text-light mt-2" id="error-text" style="display:none; color: #ff6b6b;"></div>
+            </div>
+        </div>
+    `);
+
+    // Add error display
+    $('.card-body').prepend(`
+        <div id="form-errors" class="alert alert-danger" style="display:none;">
+            <h5>Please correct the following errors:</h5>
+            <ul></ul>
+        </div>
+    `);
+    
+    // Add upload progress bar
+    $('#product_image_tab').prepend(`
+        <div class="mb-3">
+            <div class="progress">
+                <div id="upload-progress" class="progress-bar" role="progressbar" style="width: 0%">
+                    <span class="progress-text">0%</span>
+                </div>
+            </div>
+            <small class="text-muted mt-1" id="upload-status"></small>
+        </div>
+    `);
+
+    // Function to update loading text
+    function updateLoadingText(text) {
+        $('#loading-text').text(text);
+    }
+
+    // Function to update progress
+    function updateProgress(percent) {
+        $('#upload-progress').width(percent + '%');
+        $('.progress-text').text(percent + '%');
+        $('#upload-status').text('Uploading files... ' + percent + '% complete');
+    }
+
+    // Function to show validation errors
+    function showValidationErrors(errors) {
+        const $formErrors = $('#form-errors');
+        const $errorList = $formErrors.find('ul');
+        $errorList.empty();
+        
+        Object.keys(errors).forEach(field => {
+            const $field = $(`[name="${field}"]`);
+            if ($field.length) {
+                $field.addClass('is-invalid');
+                $field.after(`<div class="invalid-feedback">${errors[field][0]}</div>`);
+                $errorList.append(`<li>${errors[field][0]}</li>`);
+            }
+        });
+        
+        $formErrors.show();
+        
+        // Scroll to errors
+        $('html, body').animate({
+            scrollTop: $formErrors.offset().top - 100
+        }, 500);
+    }
+
+    // Function to show error message
+    function showError(message) {
+        $('#error-text').text(message).show();
+        setTimeout(() => {
+            $('#error-text').hide();
+        }, 5000);
+    }
+
+    // Function to clear validation errors
+    function clearValidationErrors() {
+        $('.is-invalid').removeClass('is-invalid');
+        $('.invalid-feedback').remove();
+    }
+
+    // Step 1: Product Info
+    document.getElementById('nextButton').addEventListener('click', async function() {
+        clearValidationErrors();
+        updateLoadingText('Saving product information...');
+        try {
+            const success = await updateProductPartly();
+            if (success) {
                 var nextTabLink = document.querySelector('a[href="#product_image_tab"]');
                 var nextTab = new bootstrap.Tab(nextTabLink);
                 nextTab.show();
             }
-        } else {
-            alert('Please fill all required fields.');
+        } catch (error) {
+            console.error('Error in step 1:', error);
+            if (error.responseJSON && error.responseJSON.errors) {
+                showValidationErrors(error.responseJSON.errors);
+            }
+            toastr.error('Failed to update product information. Please check the form for errors.');
         }
     });
-</script>
-<script>
-    document.getElementById('nextButton2').addEventListener('click', function() {
-        // Get only the required input elements in the product image tab
-        var requiredFields = document.querySelectorAll('#product_image_tab .required');
-        var allValid = true;
 
-        // Loop through the required fields and check for validation
-        requiredFields.forEach(function(field) {
-            if (!field.value) {
-                field.style.borderColor = 'red'; // Highlight empty required field
-                allValid = false;
-            } else {
-                field.style.borderColor = ''; // Reset field style
-            }
-        });
-
-        // If all required fields are valid, proceed to the next tab
-        if (allValid) {
-            if (updateProductImages()) {
+    // Step 2: Images
+    document.getElementById('nextButton2').addEventListener('click', async function() {
+        clearValidationErrors();
+        updateLoadingText('Uploading images...');
+        try {
+            const success = await updateProductImages();
+            if (success) {
                 var nextTabLink = document.querySelector('a[href="#product_description_tab"]');
                 var nextTab = new bootstrap.Tab(nextTabLink);
                 nextTab.show();
             }
-        } else {
-            alert('Please fill all required fields.');
+        } catch (error) {
+            console.error('Error in step 2:', error);
+            if (error.responseJSON && error.responseJSON.errors) {
+                showValidationErrors(error.responseJSON.errors);
+            }
+            toastr.error('Failed to update product images. Please check the files and try again.');
         }
     });
+
+    // Step 3: Description
+    $('form').on('submit', async function(e) {
+        e.preventDefault();
+        clearValidationErrors();
+        updateLoadingText('Saving product description...');
+        try {
+            const success = await updateProductDescription();
+            if (success) {
+                toastr.success('Product updated successfully! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = "{{ route('admin.listproduct') }}";
+                }, 1000);
+            }
+        } catch (error) {
+            console.error('Error in step 3:', error);
+            if (error.responseJSON && error.responseJSON.errors) {
+                showValidationErrors(error.responseJSON.errors);
+            }
+            toastr.error('Failed to update product description. Please check the form for errors.');
+        }
+    });
+
+    // Handle tab navigation
+    $('.nav-tabs a').on('click', function(e) {
+        // Prevent tab change if current step is not complete
+        const currentTab = $('.tab-pane.active').attr('id');
+        const targetTab = $(this).attr('href').substring(1);
+        
+        if (currentTab === 'product_tab' && targetTab !== 'product_tab') {
+            e.preventDefault();
+            $('#nextButton').click();
+        } else if (currentTab === 'product_image_tab' && targetTab === 'product_description_tab') {
+            e.preventDefault();
+            $('#nextButton2').click();
+        }
+    });
+
+    // Prevent accidental form submission
+    $(document).ready(function() {
+        $('form').on('keypress', function(e) {
+            if (e.keyCode === 13) { // Enter key
+                e.preventDefault();
+                return false;
+            }
+        });
+    });
+
+    // Handle tab changes
+    $('a[data-toggle="tab"]').on('show.bs.tab', function (e) {
+        // Save current tab state
+        localStorage.setItem('lastProductTab', $(e.target).attr('href'));
+    });
+
+    // Restore last active tab
+    var lastTab = localStorage.getItem('lastProductTab');
+    if (lastTab) {
+        $('a[href="' + lastTab + '"]').tab('show');
+    }
 </script>
 @endsection
