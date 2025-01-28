@@ -722,54 +722,285 @@
     </script>
 
     <script>
-        document.getElementById('nextButton').addEventListener('click', function() {
-            // Get only the required input and select elements
-            var requiredFields = document.querySelectorAll('#product_tab .required');
-            var allValid = true;
+        // Add loading and error indicators
+        $('body').append(`
+            <div id="loading-indicator" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:9999;">
+                <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); text-align:center;">
+                    <div class="spinner-border text-light" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                    <div class="text-light mt-2" id="loading-text">Processing...</div>
+                    <div class="text-light mt-2" id="error-text" style="display:none; color: #ff6b6b;"></div>
+                </div>
+            </div>
+        `);
 
-            // Loop through only the required fields and check for validation
-            requiredFields.forEach(function(field) {
-                if (field.value === '') {
-                    field.style.borderColor = 'red'; // Highlight empty required field
-                    allValid = false;
-                } else {
-                    field.style.borderColor = ''; // Reset field style
+        // Add error display
+        $('.card-body').prepend(`
+            <div id="form-errors" class="alert alert-danger" style="display:none;">
+                <h5>Please correct the following errors:</h5>
+                <ul></ul>
+            </div>
+        `);
+        
+        // Add upload progress bar
+        $('#product_image_tab').prepend(`
+            <div class="mb-3">
+                <div class="progress">
+                    <div id="upload-progress" class="progress-bar" role="progressbar" style="width: 0%">
+                        <span class="progress-text">0%</span>
+                    </div>
+                </div>
+                <small class="text-muted mt-1" id="upload-status"></small>
+            </div>
+        `);
+
+        // Function to update loading text
+        function updateLoadingText(text) {
+            $('#loading-text').text(text);
+        }
+
+        // Function to update progress
+        function updateProgress(percent) {
+            $('#upload-progress').width(percent + '%');
+            $('.progress-text').text(percent + '%');
+            $('#upload-status').text('Uploading files... ' + percent + '% complete');
+        }
+
+        // Function to show validation errors
+        function showValidationErrors(errors) {
+            const $formErrors = $('#form-errors');
+            const $errorList = $formErrors.find('ul');
+            $errorList.empty();
+            
+            Object.keys(errors).forEach(field => {
+                const $field = $(`[name="${field}"]`);
+                if ($field.length) {
+                    $field.addClass('is-invalid');
+                    $field.after(`<div class="invalid-feedback">${errors[field][0]}</div>`);
+                    $errorList.append(`<li>${errors[field][0]}</li>`);
                 }
             });
+            
+            $formErrors.show();
+            
+            // Scroll to errors
+            $('html, body').animate({
+                scrollTop: $formErrors.offset().top - 100
+            }, 500);
+        }
 
-            // If all required fields are valid, proceed to the next tab
-            if (allValid) {
+        // Function to show error message
+        function showError(message) {
+            $('#error-text').text(message).show();
+            setTimeout(() => {
+                $('#error-text').hide();
+            }, 5000);
+        }
+
+        // Function to clear validation errors
+        function clearValidationErrors() {
+            $('.is-invalid').removeClass('is-invalid');
+            $('.invalid-feedback').remove();
+            $('#form-errors').hide();
+        }
+
+        // Step 1: Product Info
+        document.getElementById('nextButton').addEventListener('click', async function() {
+            clearValidationErrors();
+            updateLoadingText('Validating product information...');
+            $('#loading-indicator').show();
+
+            try {
+                // Get form data
+                const formData = new FormData();
+                const $form = $('#product_tab');
+                let hasErrors = false;
+
+                // Handle regular form fields
+                $form.find('input, select, textarea').each(function() {
+                    const $field = $(this);
+                    const name = $field.attr('name');
+                    
+                    if (!name) return;
+
+                    // Handle different input types
+                    if ($field.attr('type') === 'checkbox') {
+                        formData.append(name, $field.is(':checked') ? '1' : '0');
+                    } else if ($field.is('select')) {
+                        const value = $field.val();
+                        if (value !== null && value !== undefined && value !== '') {
+                            formData.append(name, value);
+                        }
+                    } else {
+                        const value = $field.val();
+                        if (value !== null && value !== undefined) {
+                            formData.append(name, value);
+                        }
+                    }
+
+                    // Validate required fields
+                    if ($field.hasClass('required')) {
+                        const value = $field.val();
+                        if (!value || (typeof value === 'string' && value.trim() === '') || value === '--Select--') {
+                            $field.addClass('is-invalid');
+                            hasErrors = true;
+                        } else {
+                            $field.removeClass('is-invalid');
+                        }
+                    }
+                });
+
+                // Handle variant data
+                const variantSelect = $('#productvariant');
+                if (variantSelect.length) {
+                    formData.append('variant', JSON.stringify(variantSelect.val()));
+                }
+
+                if (hasErrors) {
+                    showError('Please fill all required fields');
+                    return;
+                }
+
+                // Proceed to next tab
                 var nextTabLink = document.querySelector('a[href="#product_image_tab"]');
                 var nextTab = new bootstrap.Tab(nextTabLink);
                 nextTab.show();
-            } else {
-                alert('Please fill all required fields.');
+
+            } catch (error) {
+                console.error('Error in step 1:', error);
+                showError('An error occurred. Please try again.');
+            } finally {
+                $('#loading-indicator').hide();
             }
         });
-    </script>
-    <script>
-        document.getElementById('nextButton2').addEventListener('click', function() {
-            // Get only the required input elements in the product image tab
-            var requiredFields = document.querySelectorAll('#product_image_tab .required');
-            var allValid = true;
 
-            // Loop through the required fields and check for validation
-            requiredFields.forEach(function(field) {
-                if (!field.value) {
-                    field.style.borderColor = 'red'; // Highlight empty required field
-                    allValid = false;
-                } else {
-                    field.style.borderColor = ''; // Reset field style
+        // Step 2: Images
+        document.getElementById('nextButton2').addEventListener('click', async function() {
+            clearValidationErrors();
+            updateLoadingText('Validating images...');
+            $('#loading-indicator').show();
+
+            try {
+                const imageFields = ['icon', 'image1', 'image2', 'image3'];
+                const maxFileSize = 2 * 1024 * 1024; // 2MB
+                let hasErrors = false;
+
+                imageFields.forEach(field => {
+                    const fileInput = $(`input[name="${field}"]`)[0];
+                    if (fileInput.files.length > 0) {
+                        const file = fileInput.files[0];
+                        
+                        // Validate file size
+                        if (file.size > maxFileSize) {
+                            showError(`${field}: File size must be less than 2MB`);
+                            hasErrors = true;
+                            return;
+                        }
+
+                        // Validate file type
+                        if (!file.type.match('image.*')) {
+                            showError(`${field}: Please upload an image file`);
+                            hasErrors = true;
+                            return;
+                        }
+                    }
+                });
+
+                if (hasErrors) {
+                    return;
                 }
-            });
 
-            // If all required fields are valid, proceed to the next tab
-            if (allValid) {
+                // Proceed to next tab
                 var nextTabLink = document.querySelector('a[href="#product_description_tab"]');
                 var nextTab = new bootstrap.Tab(nextTabLink);
                 nextTab.show();
-            } else {
-                alert('Please fill all required fields.');
+
+            } catch (error) {
+                console.error('Error in step 2:', error);
+                showError('An error occurred. Please try again.');
+            } finally {
+                $('#loading-indicator').hide();
+            }
+        });
+
+        // Handle form submission
+        $('form').on('submit', async function(e) {
+            e.preventDefault();
+            clearValidationErrors();
+            updateLoadingText('Saving product...');
+            $('#loading-indicator').show();
+
+            try {
+                // Update CKEditor instances
+                for (let i = 1; i <= 5; i++) {
+                    const editor = CKEDITOR.instances[`description${i}`];
+                    if (editor) {
+                        editor.updateElement();
+                    }
+                }
+
+                const formData = new FormData(this);
+
+                // Make AJAX request
+                const response = await $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    xhr: function() {
+                        const xhr = new window.XMLHttpRequest();
+                        xhr.upload.addEventListener("progress", function(evt) {
+                            if (evt.lengthComputable) {
+                                const percentComplete = Math.round((evt.loaded / evt.total) * 100);
+                                updateProgress(percentComplete);
+                            }
+                        }, false);
+                        return xhr;
+                    }
+                });
+
+                if (response.success) {
+                    toastr.success('Product added successfully!');
+                    setTimeout(() => {
+                        window.location.href = "{{ route('admin.listproduct') }}";
+                    }, 1000);
+                } else {
+                    showError(response.message || 'Failed to add product');
+                }
+
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                if (error.responseJSON && error.responseJSON.errors) {
+                    showValidationErrors(error.responseJSON.errors);
+                } else {
+                    showError('Failed to add product. Please try again.');
+                }
+            } finally {
+                $('#loading-indicator').hide();
+            }
+        });
+
+        // Handle tab navigation
+        $('.nav-tabs a').on('click', function(e) {
+            const currentTab = $('.tab-pane.active').attr('id');
+            const targetTab = $(this).attr('href').substring(1);
+            
+            if (currentTab === 'product_tab' && targetTab !== 'product_tab') {
+                e.preventDefault();
+                $('#nextButton').click();
+            } else if (currentTab === 'product_image_tab' && targetTab === 'product_description_tab') {
+                e.preventDefault();
+                $('#nextButton2').click();
+            }
+        });
+
+        // Prevent accidental form submission
+        $('form').on('keypress', function(e) {
+            if (e.keyCode === 13) { // Enter key
+                e.preventDefault();
+                return false;
             }
         });
     </script>

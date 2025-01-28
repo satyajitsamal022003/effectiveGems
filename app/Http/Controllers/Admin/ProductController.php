@@ -73,36 +73,85 @@ class ProductController extends Controller
 
     public function storeproduct(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'variant' => 'nullable|array',
-            'is_variant' => 'nullable',
-            'productName' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
+            // Basic validation
+            $validator = Validator::make($request->all(), [
+                'productName' => 'required|string|max:255',
+                'categoryId' => 'required|exists:category,id',
+                'price_type' => 'required|string',
+                'priceB2C' => 'required|numeric|min:0',
+                'priceMRP' => 'nullable|numeric|min:0',
+                'priceB2B' => 'nullable|numeric|min:0',
+                'min_product_qty' => 'nullable|numeric|min:0',
+                'max_product_qty' => 'nullable|numeric|min:0',
+                'sortOrder' => 'nullable|integer|min:0',
+                'sortOrderCategory' => 'nullable|integer|min:0',
+                'sortOrderSubCategory' => 'nullable|integer|min:0',
+                'sortOrderPopular' => 'nullable|integer|min:0',
+                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'variant' => 'nullable|array',
+                'is_variant' => 'nullable|boolean',
+                'subCategoryId' => 'nullable|exists:sub_category,id',
+                'certificationId' => 'nullable|exists:certifications,id',
+                'activationId' => 'nullable|exists:activations,id',
+                'courierTypeId' => 'nullable|exists:couriertypes,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Additional validation for product range
+            if ($request->filled('min_product_qty') && $request->filled('max_product_qty')) {
+                if ($request->min_product_qty >= $request->max_product_qty) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Validation failed',
+                        'errors' => ['min_product_qty' => ['Lower product range must be less than higher product range']]
+                    ], 422);
+                }
+            }
+
+            // Prepare product data
             $productData = $request->except(['_token']);
             $productData['status'] = 1;
             $productData['created_at'] = now();
             $productData['updated_at'] = now();
 
-            $productData['icon'] = $this->uploadFile($request, 'icon', 'producticon');
-            $productData['image1'] = $this->uploadFile($request, 'image1', 'product');
-            $productData['image2'] = $this->uploadFile($request, 'image2', 'product');
-            $productData['image3'] = $this->uploadFile($request, 'image3', 'product');
+            // Handle file uploads
+            foreach (['icon' => 'producticon', 'image1' => 'product', 'image2' => 'product', 'image3' => 'product'] as $field => $path) {
+                try {
+                    if ($request->hasFile($field)) {
+                        // Ensure upload directory exists
+                        $uploadPath = public_path($path);
+                        if (!file_exists($uploadPath)) {
+                            mkdir($uploadPath, 0755, true);
+                        }
+                        
+                        $productData[$field] = $this->uploadFile($request, $field, $path);
+                    }
+                } catch (\Exception $e) {
+                    Log::error("File upload failed for {$field}: " . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Failed to upload {$field}",
+                        'errors' => [$field => [$e->getMessage()]]
+                    ], 500);
+                }
+            }
 
-            $productData['is_variant'] = $request->is_variant ? 1 : 0;
+            // Handle variant data
+            $productData['is_variant'] = filter_var($request->is_variant, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
             $productData['variant'] = $request->filled('variant') ? json_encode($request->variant) : null;
 
+            // Generate SEO URL
             $baseSeoUrl = Str::slug($request->productName);
             $seoUrl = $baseSeoUrl;
             $counter = 1;
@@ -111,15 +160,23 @@ class ProductController extends Controller
                 $seoUrl = "{$baseSeoUrl}-{$counter}";
                 $counter++;
             }
-
             $productData['seoUrl'] = $seoUrl;
 
-            Product::create($productData);
+            // Create product
+            $product = Product::create($productData);
 
-            return redirect()->route('admin.listproduct')->with('message', 'Product added successfully!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Product added successfully!',
+                'data' => $product
+            ]);
+
         } catch (\Exception $e) {
             Log::error('Product creation failed: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to create product. Please try again.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create product: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -138,37 +195,77 @@ class ProductController extends Controller
 
     public function updateproduct(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'productName' => 'required|string|max:255',
-        ]);
-
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->withInput();
-        }
-
         try {
+            // Basic validation
+            $validator = Validator::make($request->all(), [
+                'productName' => 'required|string|max:255',
+                'categoryId' => 'required|exists:category,id',
+                'price_type' => 'required|string',
+                'priceB2C' => 'required|numeric|min:0',
+                'priceMRP' => 'nullable|numeric|min:0',
+                'priceB2B' => 'nullable|numeric|min:0',
+                'min_product_qty' => 'nullable|numeric|min:0',
+                'max_product_qty' => 'nullable|numeric|min:0',
+                'sortOrder' => 'nullable|integer|min:0',
+                'sortOrderCategory' => 'nullable|integer|min:0',
+                'sortOrderSubCategory' => 'nullable|integer|min:0',
+                'sortOrderPopular' => 'nullable|integer|min:0',
+                'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+                'variant' => 'nullable|array',
+                'is_variant' => 'nullable|boolean',
+                'subCategoryId' => 'nullable|exists:sub_category,id',
+                'certificationId' => 'nullable|exists:certifications,id',
+                'activationId' => 'nullable|exists:activations,id',
+                'courierTypeId' => 'nullable|exists:couriertypes,id',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            // Additional validation for product range
+            if ($request->filled('min_product_qty') && $request->filled('max_product_qty')) {
+                if ($request->min_product_qty >= $request->max_product_qty) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Validation failed',
+                        'errors' => ['min_product_qty' => ['Lower product range must be less than higher product range']]
+                    ], 422);
+                }
+            }
+
             $product = Product::findOrFail($id);
             $productData = $request->except(['_token']);
             $productData['updated_at'] = now();
 
-            // Handle images
+            // Handle file uploads
             foreach (['icon' => 'producticon', 'image1' => 'product', 'image2' => 'product', 'image3' => 'product'] as $field => $path) {
-                if ($request->hasFile($field)) {
-                    $productData[$field] = $this->uploadFile($request, $field, $path);
-                } else {
-                    $productData[$field] = $product->{$field};
+                try {
+                    if ($request->hasFile($field)) {
+                        $productData[$field] = $this->uploadFile($request, $field, $path, $product->{$field});
+                    }
+                } catch (\Exception $e) {
+                    Log::error("File upload failed for {$field}: " . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Failed to upload {$field}",
+                        'errors' => [$field => [$e->getMessage()]]
+                    ], 500);
                 }
             }
 
-            $productData['is_variant'] = $request->is_variant ? 1 : 0;
+            // Handle variant data
+            $productData['is_variant'] = filter_var($request->is_variant, FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
             $productData['variant'] = $request->filled('variant') ? json_encode($request->variant) : null;
 
+            // Generate SEO URL
             $baseSeoUrl = Str::slug($request->productName);
             $seoUrl = $baseSeoUrl;
             $counter = 1;
@@ -177,14 +274,23 @@ class ProductController extends Controller
                 $seoUrl = "{$baseSeoUrl}-{$counter}";
                 $counter++;
             }
-
             $productData['seoUrl'] = $seoUrl;
+
+            // Update product
             $product->update($productData);
 
-            return redirect()->route('admin.listproduct')->with('message', 'Product updated successfully!');
+            return response()->json([
+                'success' => true,
+                'message' => 'Product updated successfully!',
+                'data' => $product
+            ]);
+
         } catch (\Exception $e) {
             Log::error('Product update failed: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Failed to update product. Please try again.');
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update product: ' . $e->getMessage()
+            ], 500);
         }
     }
 
@@ -209,9 +315,9 @@ class ProductController extends Controller
 
                 if ($validator->fails()) {
                     return response()->json([
-                        'status' => false,
-                        'message' => 'Validation failed',
-                        'errors' => $validator->errors()
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $validator->errors()
                     ], 422);
                 }
 
@@ -223,9 +329,9 @@ class ProductController extends Controller
 
                     if ($subCategoryValidator->fails()) {
                         return response()->json([
-                            'status' => false,
-                            'message' => 'Invalid subcategory selected',
-                            'errors' => $subCategoryValidator->errors()
+                'success' => false,
+                'message' => 'Invalid subcategory selected',
+                'errors' => $subCategoryValidator->errors()
                         ], 422);
                     }
                 }
@@ -241,9 +347,9 @@ class ProductController extends Controller
 
                 if ($validator->fails()) {
                     return response()->json([
-                        'status' => false,
-                        'message' => 'Image validation failed',
-                        'errors' => $validator->errors()
+                'success' => false,
+                'message' => 'Image validation failed',
+                'errors' => $validator->errors()
                     ], 422);
                 }
             }
@@ -259,19 +365,28 @@ class ProductController extends Controller
 
                 if ($validator->fails()) {
                     return response()->json([
-                        'status' => false,
-                        'message' => 'Description validation failed',
-                        'errors' => $validator->errors()
+                'success' => false,
+                'message' => 'Description validation failed',
+                'errors' => $validator->errors()
                     ], 422);
                 }
             }
 
             // Handle file uploads if present
             foreach (['icon' => 'producticon', 'image1' => 'product', 'image2' => 'product', 'image3' => 'product'] as $field => $path) {
-                if ($request->hasFile($field)) {
-                    $productData[$field] = $this->uploadFile($request, $field, $path);
-                } else {
-                    unset($productData[$field]); // Don't update if no new file
+                try {
+                    if ($request->hasFile($field)) {
+                        $productData[$field] = $this->uploadFile($request, $field, $path, $product->{$field});
+                    } else {
+                        unset($productData[$field]); // Don't update if no new file
+                    }
+                } catch (\Exception $e) {
+                    Log::error("File upload failed for {$field}: " . $e->getMessage());
+                    return response()->json([
+                        'success' => false,
+                        'message' => "Failed to upload {$field}",
+                        'errors' => [$field => [$e->getMessage()]]
+                    ], 500);
                 }
             }
 
@@ -299,27 +414,69 @@ class ProductController extends Controller
             $product->update($productData);
 
             return response()->json([
-                'status' => true,
+                'success' => true,
                 'message' => 'Product updated successfully'
             ]);
 
         } catch (\Exception $e) {
             Log::error('Product partial update failed: ' . $e->getMessage());
             return response()->json([
-                'status' => false,
+                'success' => false,
                 'message' => 'Failed to update product: ' . $e->getMessage()
             ], 500);
         }
     }
 
-    private function uploadFile(Request $request, $fieldName, $path)
+    private function uploadFile(Request $request, $fieldName, $path, $oldFile = null)
     {
         try {
             if ($request->hasFile($fieldName)) {
                 $file = $request->file($fieldName);
-                $fileName = time() . '_' . Str::random(10) . '_' . $file->getClientOriginalName();
-                $file->move(public_path($path), $fileName);
-                return $path . '/' . $fileName;
+                
+                // Validate file
+                if (!$file->isValid()) {
+                    throw new \Exception('Invalid file upload');
+                }
+
+                // Validate file size (2MB)
+                $maxSize = 2 * 1024 * 1024;
+                if ($file->getSize() > $maxSize) {
+                    throw new \Exception('File size must be less than 2MB');
+                }
+
+                // Validate mime type
+                $allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/svg+xml'];
+                if (!in_array($file->getMimeType(), $allowedTypes)) {
+                    throw new \Exception('Invalid file type. Only JPG, PNG, GIF and SVG files are allowed');
+                }
+
+                // Create upload directory if it doesn't exist
+                $uploadPath = public_path($path);
+                if (!file_exists($uploadPath)) {
+                    if (!mkdir($uploadPath, 0755, true)) {
+                        throw new \Exception('Failed to create upload directory');
+                    }
+                }
+
+                // Generate unique filename
+                $extension = $file->getClientOriginalExtension();
+                $fileName = time() . '_' . Str::random(10) . '.' . $extension;
+                $fullPath = $path . '/' . $fileName;
+
+                // Move uploaded file
+                if (!$file->move(public_path($path), $fileName)) {
+                    throw new \Exception('Failed to move uploaded file');
+                }
+
+                // Delete old file if it exists
+                if ($oldFile) {
+                    $oldFilePath = public_path($oldFile);
+                    if (file_exists($oldFilePath)) {
+                        unlink($oldFilePath);
+                    }
+                }
+
+                return $fullPath;
             }
         } catch (\Exception $e) {
             Log::error('File upload failed: ' . $e->getMessage());
@@ -331,19 +488,49 @@ class ProductController extends Controller
     public function deleteproduct($id)
     {
         try {
+            $validator = Validator::make(['id' => $id], [
+                'id' => 'required|exists:products,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
             $product = Product::findOrFail($id);
-            $product->status = 2;
+            
+            // Clean up product images
+            $imagePaths = [
+                $product->icon,
+                $product->image1,
+                $product->image2,
+                $product->image3
+            ];
+
+            foreach ($imagePaths as $path) {
+                if ($path) {
+                    $filePath = public_path($path);
+                    if (file_exists($filePath)) {
+                        unlink($filePath);
+                    }
+                }
+            }
+
+            $product->status = 2; // Soft delete
             $product->save();
 
             return response()->json([
-                'status' => 'success',
-                'message' => 'Product deleted successfully.'
+                'success' => true,
+                'message' => 'Product deleted successfully'
             ]);
         } catch (\Exception $e) {
             Log::error('Product deletion failed: ' . $e->getMessage());
             return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to delete product.'
+                'success' => false,
+                'message' => 'Failed to delete product: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -351,19 +538,33 @@ class ProductController extends Controller
     public function productOnTop(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'productId' => 'required|exists:products,id',
+                'ontop' => 'required|boolean'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
             $product = Product::findOrFail($request->productId);
             $product->on_top = $request->ontop;
             $product->save();
 
             return response()->json([
-                'message' => 'Product on top updated successfully!',
-                'success' => true
+                'success' => true,
+                'message' => 'Product on top status updated successfully',
+                'data' => ['on_top' => (bool)$product->on_top]
             ]);
         } catch (\Exception $e) {
             Log::error('Product on top update failed: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Failed to update product on top status.',
-                'success' => false
+                'success' => false,
+                'message' => 'Failed to update product on top status: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -371,19 +572,42 @@ class ProductController extends Controller
     public function productOnStatus(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'productId' => 'required|exists:products,id',
+                'status' => 'required|in:0,1,2'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
             $product = Product::findOrFail($request->productId);
             $product->status = $request->status;
             $product->save();
 
+            $statusMessages = [
+                0 => 'inactive',
+                1 => 'active',
+                2 => 'deleted'
+            ];
+
             return response()->json([
-                'message' => 'Product status updated successfully!',
-                'success' => true
+                'success' => true,
+                'message' => 'Product status updated successfully',
+                'data' => [
+                    'status' => $product->status,
+                    'status_text' => $statusMessages[$product->status] ?? 'unknown'
+                ]
             ]);
         } catch (\Exception $e) {
             Log::error('Product status update failed: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Failed to update product status.',
-                'success' => false
+                'success' => false,
+                'message' => 'Failed to update product status: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -391,21 +615,77 @@ class ProductController extends Controller
     public function getSubCategory(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'categoryId' => 'required|exists:category,id'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
             $subcategories = SubCategory::where('categoryId', $request->categoryId)
                 ->whereNotIn('status', [2])
+                ->select('id', 'subCategoryName', 'categoryId', 'status')
+                ->orderBy('subCategoryName')
                 ->get();
 
+            if ($subcategories->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'No subcategories found for this category',
+                    'data' => []
+                ]);
+            }
+
             return response()->json([
-                'message' => 'Sub Category',
                 'success' => true,
+                'message' => 'Subcategories retrieved successfully',
                 'data' => $subcategories
             ]);
+
         } catch (\Exception $e) {
             Log::error('Sub category fetch failed: ' . $e->getMessage());
             return response()->json([
-                'message' => 'Failed to fetch sub categories.',
-                'success' => false
+                'success' => false,
+                'message' => 'Failed to fetch subcategories: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array
+     */
+    private function getValidationRules()
+    {
+        return [
+            'productName' => 'required|string|max:255',
+            'categoryId' => 'required|exists:category,id',
+            'price_type' => 'required|string',
+            'priceB2C' => 'required|numeric|min:0',
+            'priceMRP' => 'nullable|numeric|min:0',
+            'priceB2B' => 'nullable|numeric|min:0',
+            'min_product_qty' => 'nullable|numeric|min:0',
+            'max_product_qty' => 'nullable|numeric|min:0',
+            'sortOrder' => 'nullable|integer|min:0',
+            'sortOrderCategory' => 'nullable|integer|min:0',
+            'sortOrderSubCategory' => 'nullable|integer|min:0',
+            'sortOrderPopular' => 'nullable|integer|min:0',
+            'icon' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image1' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'variant' => 'nullable|array',
+            'is_variant' => 'nullable|boolean',
+            'subCategoryId' => 'nullable|exists:sub_category,id',
+            'certificationId' => 'nullable|exists:certifications,id',
+            'activationId' => 'nullable|exists:activations,id',
+            'courierTypeId' => 'nullable|exists:couriertypes,id',
+        ];
     }
 }
