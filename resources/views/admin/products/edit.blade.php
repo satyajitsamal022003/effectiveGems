@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', $product->productName ?? '')
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -13,7 +14,7 @@
                                 href="https://effectivegems.com/admin_panel/dashboard">Dashboard</a>
                         </li>
                         <li class="breadcrumb-item"><a href="#">Product</a></li>
-                        <li class="breadcrumb-item active"> Edit Product</li>
+                        <li class="breadcrumb-item active">{{ $product->productName ?? '' }}</li>
                     </ul>
                 </div>
             </div>

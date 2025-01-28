@@ -41,7 +41,7 @@
                       </a>
                   </li>
                   <li>
-                      <a href="{{ route('euser.manageaddress') }}" class="">
+                      <a href="{{ route('euser.manageaddress') }}" class="{{ Request::routeIs('euser.manageaddress') ? 'active' : '' }}">
                           <i class="fa-solid fa-circle-location-arrow"></i> <span>Manage Address</span>
                       </a>
                   </li>

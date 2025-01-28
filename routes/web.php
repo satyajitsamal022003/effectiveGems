@@ -45,10 +45,17 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     // Profile routes
     // Route::middleware('auth')->group(function () {
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    // Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    // Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    // Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
     // });
+
+    Route::get('/profile', [DashboardController::class, 'aprofile'])->name('admin.aprofile');
+    Route::post('/update-profile', [DashboardController::class, 'update'])->name('admin.profile.update');
+
+    Route::get('/change-password', [DashboardController::class, 'showChangePasswordForm'])->name('admin.showChangePasswordForm');
+    Route::post('/update-password', [DashboardController::class, 'updatePassword'])->name('admin.updatePassword');
+
 
     //category
     Route::get('/add-category', [CategoryController::class, 'addcat'])->name('admin.addcat');
@@ -218,6 +225,7 @@ Route::group(['prefix' => 'user'], function () {
         Route::get('/orders-view/{id}', [EuserController::class, 'ordersview'])->name('euser.ordersview');
         Route::get('/my-wishlist', [WishlistController::class, 'index'])->name('euser.wishlist');
         Route::post('/add-to-wishlist', [WishlistController::class, 'store'])->name('euser.wishlist-add');
+        Route::post('/move-to-wishlist', [WishlistController::class, 'moveto'])->name('euser.wishlist-move');
         Route::post('/remove-from-wishlist', [WishlistController::class, 'destroy'])->name('euser.wishlist-destroy');
         Route::get('/my-profile', [ProfileController::class, 'myProfile'])->name('euser.myProfile');
         Route::get('/setting', [ProfileController::class, 'Setting'])->name('euser.setting');

@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
-    <title>Dashboard</title>
+    <title>Admin Login</title>
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{url('/')}}/assets/img/favicon.png?=1">
     <!-- Bootstrap CSS -->
@@ -40,10 +40,19 @@
                                 @csrf
                                 <input type="hidden" name="" value="">
                                 <div class="form-group">
-                                    <input class="form-control" name="email" type="email" value="{{old('email')}}" placeholder="Email" required>
+                                
+                                    <input class="form-control" name="email" type="email" value="{{old('email')}}" placeholder="Email" >
+                                    <span style="color:red">@error('email')
+                                        {{ $message }}
+                                        @enderror
+                                    </span>
                                 </div>
                                 <div class="form-group">
-                                    <input class="form-control" type="password" name="password" placeholder="Password" required>
+                                    <input class="form-control" type="password" name="password" placeholder="Password">
+                                    <span style="color:red">@error('password')
+                                        {{ $message }}
+                                        @enderror
+                                    </span>
                                 </div>
                                 <div class="block mt-4">
                                     <label for="remember_me" class="flex items-center">

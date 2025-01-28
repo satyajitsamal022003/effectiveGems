@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Cart;
+use App\Models\CartItem;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Yajra\DataTables\Facades\DataTables;
 
 class WishlistController extends Controller
 {
@@ -16,7 +19,7 @@ class WishlistController extends Controller
         // Fetch all wishlist items for the authenticated user
         $wishlists = Wishlist::where('user_id', Auth::guard('euser')->user()->id)
             ->with('productDetails') // Eager load the related product details
-            ->get();
+            ->paginate(2);
 
         // Return the wishlist view with the data
         return view('eusers.mywishlist.list', compact('wishlists'));
@@ -68,6 +71,46 @@ class WishlistController extends Controller
             'message' => 'Product added to wishlist successfully.',
         ]);
     }
+
+    public function moveto(Request $request)
+    {
+        $request->validate([
+            'product_id' => 'required|exists:product,id',
+        ]);
+
+        if (Auth::guard('euser')->check()) {
+            $userId = Auth::guard('euser')->id();
+            $productId = $request->product_id;
+
+            $cart = Cart::where('userId', $userId)->first();
+
+            if ($cart) {
+                $cartItem = CartItem::where('cart_id', $cart->id)
+                    ->where('product_id', $productId)
+                    ->first();
+
+                if ($cartItem) {
+                    $cartItem->delete();
+                }
+
+                Wishlist::create([
+                    'user_id' => $userId,
+                    'product_id' => $productId,
+                ]);
+
+                return response()->json(['message' => 'Product moved to wishlist successfully!']);
+            }
+
+            // If no cart is found
+            return response()->json(['message' => 'No active cart found'], 404);
+        }
+
+        // If user is not logged in
+        return response()->json(['message' => 'Please login to add to the wishlist'], 401);
+    }
+
+
+
 
 
     /**

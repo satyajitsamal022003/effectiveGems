@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Admin Panel</title>
+    <title>@yield('page-title', 'Admin Panel')</title>
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="{{url('/')}}/assets/img/favicon.png?=1">
     <!-- Bootstrap CSS -->
@@ -58,9 +58,16 @@
                         </span>
                     </a>
                     <div class="dropdown-menu">
-                        <a href="profile.html" class="dropdown-item"><i class="fa-solid fa-user"></i> Profile</a>
-                        <a href="change-password.html" class="dropdown-item"><i class="fa-solid fa-key"></i> Change Password</a>
-                        <a href="#" class="dropdown-item"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                        <a href="{{route('admin.aprofile')}}" class="dropdown-item"><i class="fa-solid fa-user"></i> Profile</a>
+                        <a href="{{route('admin.showChangePasswordForm')}}" class="dropdown-item"><i class="fa-solid fa-key"></i> Change Password</a>
+                        <a href="#" class="dropdown-item"
+                            onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                            <span>Logout</span>
+                        </a>
+                        <form id="logout-form" action="{{ route('logout') }}" method="POST">
+                            @csrf
+                        </form>
                     </div>
                 </li>
                 <!-- /User Menu -->

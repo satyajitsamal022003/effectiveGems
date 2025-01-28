@@ -27,7 +27,7 @@
                                         class="pro-img">
                                 </td>
                                 <td data-th="PRODUCT NAME">
-                                    <a href="../product-details.html">{{ $w->productDetails->productName }}</a>
+                                <a href="{{ route('user.productdetails', ['prodid' => $w->product_id]) }}">{{ $w->productDetails->productName }}</a>
                                 </td>
                                 <td data-th="Stock Check">
                                     In Stock
@@ -42,9 +42,11 @@
                                 </td>
                             </tr>
                         @endforeach
-
                     </tbody>
                 </table>
+                <div class="pagination-container">
+                    {{ $wishlists->links() }}
+                </div>
             </div>
         </div>
     </section>
@@ -68,8 +70,11 @@
             },
             success: function(response) {
                 // $(".cartCount").text(response.totalCartItems);
-                alert(response.message);
-                // toastr.success(response.message);
+                toastr.success(response.message);
+                setTimeout(function() {
+                        window.location.href =
+                            "/user/my-wishlist";
+                    }, 1000);
             },
             error: function(xhr, status, error) {
                 // toastr.error("An error occurred: " + error);
@@ -92,8 +97,12 @@
             },
             success: function(response) {
                 // $(".cartCount").text(response.totalCartItems);
-                alert(response.message);
-                // toastr.success(response.message);
+                // alert(response.message);
+                toastr.success(response.message);
+                setTimeout(function() {
+                        window.location.href =
+                            "/user/my-wishlist";
+                    }, 1000);
             },
             error: function(xhr, status, error) {
                 // toastr.error("An error occurred: " + error);
