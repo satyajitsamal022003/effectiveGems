@@ -809,7 +809,7 @@
                 contentType: false,
                 processData: false,
                 success: function(response) {
-                    if (response.status) {
+                    if (response.success) {
                         toastr.success('Product information updated successfully');
                         resolve(true);
                     } else {
@@ -894,7 +894,7 @@
                     return xhr;
                 },
                 success: function(response) {
-                    if (response.status) {
+                    if (response.success) {
                         toastr.success('Product images updated successfully');
                         resolve(true);
                     } else {
@@ -1071,9 +1071,9 @@
         try {
             const success = await updateProductPartly();
             if (success) {
-                var nextTabLink = document.querySelector('a[href="#product_image_tab"]');
-                var nextTab = new bootstrap.Tab(nextTabLink);
-                nextTab.show();
+                // var nextTabLink = document.querySelector('a[href="#product_image_tab"]');
+                // var nextTab = new bootstrap.Tab(nextTabLink);
+                // nextTab.show();
             }
         } catch (error) {
             console.error('Error in step 1:', error);
@@ -1091,9 +1091,9 @@
         try {
             const success = await updateProductImages();
             if (success) {
-                var nextTabLink = document.querySelector('a[href="#product_description_tab"]');
-                var nextTab = new bootstrap.Tab(nextTabLink);
-                nextTab.show();
+                // var nextTabLink = document.querySelector('a[href="#product_description_tab"]');
+                // var nextTab = new bootstrap.Tab(nextTabLink);
+                // nextTab.show();
             }
         } catch (error) {
             console.error('Error in step 2:', error);
@@ -1132,13 +1132,13 @@
         const currentTab = $('.tab-pane.active').attr('id');
         const targetTab = $(this).attr('href').substring(1);
         
-        if (currentTab === 'product_tab' && targetTab !== 'product_tab') {
-            e.preventDefault();
-            $('#nextButton').click();
-        } else if (currentTab === 'product_image_tab' && targetTab === 'product_description_tab') {
-            e.preventDefault();
-            $('#nextButton2').click();
-        }
+        // if (currentTab === 'product_tab' && targetTab !== 'product_tab') {
+        //     e.preventDefault();
+        //     $('#nextButton').click();
+        // } else if (currentTab === 'product_image_tab' && targetTab === 'product_description_tab') {
+        //     e.preventDefault();
+        //     $('#nextButton2').click();
+        // }
     });
 
     // Prevent accidental form submission
