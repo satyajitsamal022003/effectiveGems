@@ -1,20 +1,7 @@
 @extends('user.layout')
 @section('content')
-    <!--banner start-->
-    <section class="as_banner_wrapper" style="background-image: url('/user/assets/images/banner.jpg');">
-        <div class="container">
-            <div class="row as_verticle_center">
-                <div class="col-lg-6">
-                    <div class="as_banner_detail">
-                        <h1 data-aos="fade-right">Buy High Quality Natural Gemstones At Wholesale Prices. B2B
-                            Marketplace</h1><a href="#" class="as_btn" data-aos="zoom-in">Shop Now</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    @include('user.partials.banner')
     <div class="clearfix"></div>
-    <!--banner end-->
 
 
     <!--category start-->

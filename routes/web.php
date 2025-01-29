@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\Admin\ActivationController;
+use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CertificationController;
 use App\Http\Controllers\Admin\CouponController;
@@ -26,6 +27,14 @@ use Illuminate\Support\Facades\Route;
 
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
+    Route::get('/banners', [BannerController::class, 'index']);
+    Route::get('/banners/create', [BannerController::class, 'create']);
+    Route::post('/banners', [BannerController::class, 'store']);
+    Route::get('/banners/{banner}/edit', [BannerController::class, 'edit']);
+    Route::put('/banners/{banner}', [BannerController::class, 'update']);
+    Route::delete('/banners/{banner}', [BannerController::class, 'destroy']);
+    Route::post('/banners/{banner}/update-status', [BannerController::class, 'updateStatus']);
+    Route::post('/banners/update-order', [BannerController::class, 'updateOrder']);
     Route::resource('coupons', CouponController::class);
     Route::post('coupons-status-change', [CouponController::class, 'updateStatus'])->name('coupons.couponstatus');
     Route::resource('redirects', RedirectController::class);
@@ -101,6 +110,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/product-edit/{id}', [ProductController::class, 'editproduct'])->name('admin.editproduct');
     Route::post('/update-product/{id}', [ProductController::class, 'updateproduct'])->name('admin.editproductdata');
     Route::post('/update-product-partly/{id}', [ProductController::class, 'updateProductPartly'])->name('admin.updateProductPartly');
+    Route::post('/update-product-images/{id}', [ProductController::class, 'updateProductImages'])->name('admin.updateProductImages');
 
     //activation
     Route::get('/add-activation', [ActivationController::class, 'addactivation'])->name('admin.addactivation');
@@ -215,7 +225,7 @@ Route::group(['prefix' => 'user'], function () {
         return view('eusers.login');
     })->name('eusers.login');
 
-    
+
     Route::post('/post-sign-in', [EuserController::class, 'postsignin'])->name('eusers.postsignin');
     Route::post('/logout', [EuserController::class, 'logout'])->name('euser.logout');
 
