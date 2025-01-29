@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', 'Activation-Add') 
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -12,7 +13,7 @@
                         <li class="breadcrumb-item"><a
                                 href="{{route('admin.dashboard')}}">Dashboard</a>
                         </li>
-                        <li class="breadcrumb-item"><a href="{{route('admin.listcat')}}">Activation</a></li>
+                        <li class="breadcrumb-item"><a href="{{route('admin.listactivation')}}">Activation</a></li>
                         <li class="breadcrumb-item active"> Add Activation</li>
                     </ul>
                 </div>

@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', $activationedit->amount ?? '')
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -13,7 +14,7 @@
                                 href="{{route('admin.dashboard')}}">Dashboard</a>
                         </li>
                         <li class="breadcrumb-item"><a href="{{route('admin.listcertification')}}">Certification</a></li>
-                        <li class="breadcrumb-item active"> Edit Certification</li>
+                        <li class="breadcrumb-item active"> {{$activationedit->amount ?? ''}}</li>
                     </ul>
                 </div>
             </div>

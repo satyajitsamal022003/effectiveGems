@@ -1,5 +1,5 @@
 @extends('admin.layout')
-
+@section('page-title', $category->categoryName ?? '') 
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -12,7 +12,7 @@
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.listcat') }}">Categories</a></li>
-                        <li class="breadcrumb-item active">Edit Category</li>
+                        <li class="breadcrumb-item active">{{$category->categoryName ?? ''}}</li>
                     </ul>
                 </div>
             </div>

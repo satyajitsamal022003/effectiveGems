@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', 'Sub-Category-Add') 
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -10,9 +11,9 @@
                         <h3 class="page-title">Sub Category</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a
-                                    href="https://effectivegems.com/admin_panel/dashboard">Dashboard</a>
+                                    href="{{ route('admin.dashboard') }}">Dashboard</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="#">Sub Category</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.listsubcat') }}">Sub Category</a></li>
                             <li class="breadcrumb-item active"> Add Sub Category</li>
                         </ul>
                     </div>

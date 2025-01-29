@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', 'Category-Add') 
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
