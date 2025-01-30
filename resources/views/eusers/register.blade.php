@@ -55,16 +55,16 @@
                                 <div class="form-group">
                                     <button type="submit" class="main-btn w-100 justify-content-center as_btn">Signup</button>
                                 </div>
-                                <div class="form-group text-center">
-                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#otpModal">
-                                        Login with Mobile OTP
+                                <div class="form-group d-grid gap-2">
+                                    <button type="button" class="btn btn-outline-secondary w-100" data-bs-toggle="modal" data-bs-target="#otpModal">
+                                        <i class="fa fa-mobile-alt"></i> Login with Mobile OTP
                                     </button>
                                 </div>
                             </div>
                         </div>
                         <div class="crs_log__footer d-flex justify-content-center">
                             <div class="fhg_45">
-                                <p class="musrt">Already have an account? <a href="login.html" class="theme-cl">Login</a></p>
+                                <p class="musrt">Already have an account? <a href="/user/sign-in" class="theme-cl">Login</a></p>
                             </div>
                         </div>
                     </div>
@@ -75,14 +75,13 @@
 </section>
 
 <!-- OTP Modal -->
-<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true"
-    data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content modal-content-otp shadow-lg rounded-4">
             <div class="modal-header modal-header-otp bg-primary text-white">
                 <h5 class="modal-title" id="otpModalLabel">🔐 Verify Your Mobile Number</h5>
-                {{-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
-                    aria-label="Close"></button> --}}
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <form id="otpForm">
@@ -116,9 +115,9 @@
                 </form>
             </div>
             <div class="modal-footer d-flex justify-content-between">
-                {{-- <button type="button" class="btn btn-otp btn-secondary rounded-pill px-4 py-2"
+                <button type="button" class="btn btn-otp btn-secondary rounded-pill px-4 py-2"
                     data-bs-dismiss="modal">❌
-                    Close</button> --}}
+                    Close</button>
                 <button type="button" class="btn btn-otp btn-success rounded-pill px-4 py-2 shadow-sm"
                     id="verifyOtp" style="display: none;">
                     ✅ Verify OTP
