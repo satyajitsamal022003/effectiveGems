@@ -66,14 +66,14 @@
                          </li>
                      </ul>
                  </li>
-              
+
 
                  <li class="submenu">
                      <a href="#"><i class="fa-solid fa-gear"></i> <span>System</span> <span
                              class="menu-arrow"></span></a>
                      <ul>
                          <li>
-                             <a href="#">Banner</a>
+                             <a href="{{route('admin.banners.index')}}">Banner</a>
                          </li>
                          <li>
                              <a class="" href="#">Pages</a>

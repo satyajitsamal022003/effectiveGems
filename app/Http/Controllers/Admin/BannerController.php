@@ -50,7 +50,7 @@ class BannerController extends Controller
 
         $banner->save();
 
-        return redirect()->route('admin.banners')
+        return redirect()->route('admin.banners.index')
             ->with('success', 'Banner created successfully');
     }
 
@@ -93,7 +93,7 @@ class BannerController extends Controller
 
         $banner->save();
 
-        return redirect()->route('admin.banners')
+        return redirect()->route('admin.banners.index')
             ->with('success', 'Banner updated successfully');
     }
 
@@ -106,7 +106,7 @@ class BannerController extends Controller
 
         $banner->delete();
 
-        return redirect()->route('admin.banners')
+        return redirect()->route('admin.banners.index')
             ->with('success', 'Banner deleted successfully');
     }
 

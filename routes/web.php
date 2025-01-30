@@ -27,14 +27,14 @@ use Illuminate\Support\Facades\Route;
 
 // Group routes under 'admin' prefix and 'auth' middleware
 Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
-    Route::get('/banners', [BannerController::class, 'index']);
-    Route::get('/banners/create', [BannerController::class, 'create']);
-    Route::post('/banners', [BannerController::class, 'store']);
-    Route::get('/banners/{banner}/edit', [BannerController::class, 'edit']);
-    Route::put('/banners/{banner}', [BannerController::class, 'update']);
-    Route::delete('/banners/{banner}', [BannerController::class, 'destroy']);
-    Route::post('/banners/{banner}/update-status', [BannerController::class, 'updateStatus']);
-    Route::post('/banners/update-order', [BannerController::class, 'updateOrder']);
+    Route::get('/banners', [BannerController::class, 'index'])->name('admin.banners.index');
+    Route::get('/banners/create', [BannerController::class, 'create'])->name('admin.banners.create');
+    Route::post('/banners', [BannerController::class, 'store'])->name('admin.banners.store');
+    Route::get('/banners/{banner}/edit', [BannerController::class, 'edit'])->name('admin.banners.edit');
+    Route::put('/banners/{banner}', [BannerController::class, 'update'])->name('admin.banners.update');
+    Route::delete('/banners/{banner}', [BannerController::class, 'destroy'])->name('admin.banners.destroy');
+    Route::post('/banners/{banner}/update-status', [BannerController::class, 'updateStatus'])->name('admin.banners.updateStatus');
+    Route::post('/banners/update-order', [BannerController::class, 'updateOrder'])->name('admin.banners.updateOrder');
     Route::resource('coupons', CouponController::class);
     Route::post('coupons-status-change', [CouponController::class, 'updateStatus'])->name('coupons.couponstatus');
     Route::resource('redirects', RedirectController::class);
