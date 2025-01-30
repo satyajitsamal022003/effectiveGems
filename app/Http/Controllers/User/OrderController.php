@@ -117,13 +117,9 @@ class OrderController extends Controller
             $order->ip = $ip;
         }
 
-        $usermobile= Euser::where('mobile', $request->phoneNumber)->first();
+        $usermobile = Euser::where('mobile', $request->phoneNumber)->first();
 
-        if(!$userId && !$usermobile){
-            return back()->with('error', 'Please Verify Your Mobile Number.');
-        }else if(!$userId && $usermobile && $usermobile->is_mobile_verified ==0){
-            return back()->with('error', 'Please Verify Your Mobile Number.');
-        }else{
+
         $order->email = $request->email;
         $order->firstName = $request->firstName;
         $order->middleName = $request->middleName;
@@ -222,17 +218,33 @@ class OrderController extends Controller
             try {
                 $razorpayOrder = $api->order->create($razorpayOrderData);
 
+                session()->put([
+                    'razorpay_order_id' => $razorpayOrder['id'],
+                    'subtotal' => $subtotal,
+                    'order_id' => $orderId,
+                ]);
+
+                if (!$userId && !$usermobile) {
+                    return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
+                } else if (!$userId && $usermobile || $usermobile->is_mobile_verified == 0) {
+                    return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
+                } else {
+                    return response()->json([
+                        'success' => true,
+                        'redirect_url' => route('razorpay.order', ['razorpayOrderId' => $razorpayOrder['id'], 'subtotal' => $subtotal, 'orderId' => $orderId])
+                    ]);
+                }
+
                 // Get the Razorpay Order ID (this is what needs to be passed to the frontend)
-                $razorpayOrderId = $razorpayOrder['id'];
+                // $razorpayOrderId = $razorpayOrder['id'];
 
                 // Pass $razorpayOrderId to the frontend
-                return view('user.checkout.razorpay', compact('razorpayOrderId', 'subtotal', 'orderId'));
+                // return view('user.checkout.razorpay', compact('razorpayOrderId', 'subtotal', 'orderId'));
             } catch (\Throwable $th) {
                 dd($th);
             }
         }
-      }
-
+        return response()->json(['success' => false, 'message' => 'Order creation failed.'], 500);
     }
 
     /**
@@ -314,6 +326,7 @@ class OrderController extends Controller
             $user = Euser::where('mobile', $request->mobile)->first();
 
             if ($user) {
+                $user->update(['is_mobile_verified' => 1]);
                 Auth::guard('euser')->login($user);
                 return response()->json(['success' => true, 'message' => 'Mobile Number Verified.']);
             }
@@ -330,7 +343,7 @@ class OrderController extends Controller
             $ip = $request->getClientIp();
 
             Cart::where('ip', $ip)
-            ->update(['userId' => $newUser->id, 'ip' => null]);
+                ->update(['userId' => $newUser->id, 'ip' => null]);
 
 
             $apikey = '5xP9YXeSUnRUqqEw';
@@ -352,8 +365,26 @@ class OrderController extends Controller
                 \Log::error("Error sending SMS to {$request->mobile}: " . $e->getMessage());
             }
 
+
+            // Retrieve Razorpay order details from the session
+            if (session()->has('razorpay_order_id') && session()->has('subtotal') && session()->has('order_id')) {
+                // return response()->json([
+                //     'success' => true,
+                //     'redirect_url' => route('razorpay.order', [
+                //         'razorpayOrderId' => session('razorpay_order_id'),
+                //         'subtotal' => session('subtotal'),
+                //         'orderId' => session('order_id')
+                //     ])
+                // ]);
+
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => route('razorpay.order', ['razorpayOrderId' => session('razorpay_order_id'), 'subtotal' => session('subtotal'), 'orderId' => session('order_id')])
+                ]);
+            }
+
             Auth::guard('euser')->login($newUser);
-            return response()->json(['success' => true, 'message' => 'Mobile Number Verified successfully.']);
+            return response()->json(['success' => false, 'message' => 'Order details missing.'], 500);
         }
 
         return response()->json(['success' => false, 'message' => 'Invalid OTP.']);
