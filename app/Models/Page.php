@@ -9,4 +9,16 @@ class Page extends Model
 {
     use HasFactory;
     protected $table = 'pages';
+
+    protected $fillable = [
+        'pageName',
+        'heading',
+        'description',
+        'sortOrder',
+        'status',
+        'seoUrl',
+        'metaTitle',
+        'metaDescription',
+        'metaKeyword',
+    ];
 }
