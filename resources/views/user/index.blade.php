@@ -1,9 +1,44 @@
 @extends('user.layout')
 @section('content')
-    @include('user.partials.banner')
+    {{-- @include('user.partials.banner') --}}
+    @if ($banners->count() > 0)
+        @foreach ($banners as $banner)
+            <section class="as_banner_wrapper"
+                style="background-image: url('{{ asset($banner->image ? $banner->image : '/user/assets/images/banner.jpg') }}');">
+                <div class="container">
+                    <div class="row as_verticle_center">
+                        <div class="col-lg-6">
+                            <div class="as_banner_detail">
+                                <h1 data-aos="fade-right">{{ $banner->title }}</h1>
+                                <p>{{ $banner->description }}</p>
+                                @if ($banner->button_text && $banner->button_link)
+                                    <a href="{{ $banner->button_link }}" class="as_btn"
+                                        data-aos="zoom-in">{{ $banner->button_text }}</a>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        @endforeach
+    @else
+        <section class="as_banner_wrapper" style="background-image: url('/user/assets/images/banner.jpg');">
+            <div class="container">
+                <div class="row as_verticle_center">
+                    <div class="col-lg-6">
+                        <div class="as_banner_detail">
+                            <h1 data-aos="fade-right">Buy High Quality Natural Gemstones At Wholesale Prices. B2B
+                                Marketplace</h1>
+                            <a href="#" class="as_btn" data-aos="zoom-in">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
+
+
     <div class="clearfix"></div>
-
-
     <!--category start-->
     <section class="as_padderTop40 as_padderBottom40 category-section">
         <div class="container">
@@ -49,7 +84,8 @@
                                             <h4 class="as_subheading">{{ $popular->productName }}</h4>
                                             <span class="as_price">
                                                 <i class="fa-solid fa-indian-rupee-sign"></i>
-                                                <span style="text-decoration: line-through;">{{ $popular->priceMRP }}</span>
+                                                <span
+                                                    style="text-decoration: line-through;">{{ $popular->priceMRP }}</span>
                                                 <span>{{ $popular->priceB2C }} / {{ $popular->price_type }}</span>
                                             </span>
 

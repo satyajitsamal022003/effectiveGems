@@ -76,10 +76,7 @@
                              <a href="{{route('admin.banners.index')}}">Banner</a>
                          </li>
                          <li>
-                             <a class="" href="#">Pages</a>
-                         </li>
-                         <li>
-                             <a class="" href="#">Order status</a>
+                             <a class="" href="{{route('admin.pages.index')}}">Pages</a>
                          </li>
                          <li>
                              <a href="{{ route('admin.settings') }}">Setting</a>

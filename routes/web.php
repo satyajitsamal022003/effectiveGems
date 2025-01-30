@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CourierController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
+use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TestimonialController;
 use App\Http\Controllers\eusers\EuserController;
@@ -39,6 +40,12 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('coupons-status-change', [CouponController::class, 'updateStatus'])->name('coupons.couponstatus');
     Route::resource('redirects', RedirectController::class);
     Route::post('redirects/status/update', [RedirectController::class, 'updateStatus'])->name('redirects.updateStatus');
+
+
+    Route::get('/pages', [PagesController::class, 'index'])->name('admin.pages.index');
+    Route::get('/pages/{pages}/edit', [PagesController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/pages/{pages}', [PagesController::class, 'update'])->name('admin.pages.update');
+    Route::post('admin/pageStatus', [PagesController::class, 'updateStatus'])->name('admin.pages.updateStatus');
 
 
 
