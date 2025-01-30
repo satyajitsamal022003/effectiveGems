@@ -22,7 +22,6 @@ class RazorpayController extends Controller
      */
     public function createOrder(Request $request)
     {
-        dd($request->all());
         return view('user.checkout.razorpay', [
             'razorpayOrderId' => $request->razorpayOrderId,
             'subtotal' => $request->subtotal,
