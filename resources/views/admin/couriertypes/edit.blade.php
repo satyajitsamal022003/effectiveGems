@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', $couriertype->courier_name ?? '')
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -11,7 +12,7 @@
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                         <li class="breadcrumb-item"><a href="{{ route('admin.listcouriertype') }}">Courier Types</a></li>
-                        <li class="breadcrumb-item active">Edit Courier Type</li>
+                        <li class="breadcrumb-item active">{{$couriertype->courier_name ?? ''}}</li>
                     </ul>
                 </div>
             </div>

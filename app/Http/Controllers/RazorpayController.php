@@ -20,10 +20,15 @@ class RazorpayController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function createOrder()
+    public function createOrder(Request $request)
     {
-        return view('user.checkout.razorpay');
+        return view('user.checkout.razorpay', [
+            'razorpayOrderId' => $request->razorpayOrderId,
+            'subtotal' => $request->subtotal,
+            'orderId' => $request->orderId
+        ]);
     }
+
     public function testRazorpayCredentials()
     {
         $api = new Api(env('RAZORPAY_KEY'), env('RAZORPAY_SECRET'));
@@ -85,20 +90,18 @@ class RazorpayController extends Controller
         $order->save();
 
         // Send confirmation email
-        try{
+        try {
             Mail::to($order->email)->send(new OrderConfirmation($order));
+        } catch (\Exception $e) {
         }
-        catch (\Exception $e){
-
-        }
-        $userId='';
+        $userId = '';
         if (Auth::guard('euser')->check()) {
             $euser = Auth::guard('euser')->user();
             $userId = $euser->id;
         }
 
         if ($userId) {
-            $cart = Cart::where("userId", $userId)->first(); 
+            $cart = Cart::where("userId", $userId)->first();
             $cartId = $cart->id;
         } else {
             $cart = Cart::where("ip", $ip)->first();

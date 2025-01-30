@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', $subcategory->subCategoryName ?? '') 
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -8,10 +9,10 @@
                     <div class="col">
                         <h3 class="page-title">Edit Sub Category</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('admin.listsubcat') }}">Manage Sub Category</a>
                             </li>
-                            <li class="breadcrumb-item active">Edit Sub Category</li>
+                            <li class="breadcrumb-item active">{{$subcategory->subCategoryName ?? ''}}</li>
                         </ul>
                     </div>
                 </div>

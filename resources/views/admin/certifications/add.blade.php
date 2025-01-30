@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', 'Certification-Add')
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
