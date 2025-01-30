@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', 'Coupon-Add')
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -10,9 +11,9 @@
                         <h3 class="page-title">Coupons</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a
-                                    href="https://effectivegems.com/admin_panel/dashboard">Dashboard</a>
+                                    href="{{route('admin.dashboard')}}">Dashboard</a>
                             </li>
-                            <li class="breadcrumb-item"><a href="#">Coupons</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/coupons">Coupons</a></li>
                             <li class="breadcrumb-item active"> Add Coupon</li>
                         </ul>
                     </div>

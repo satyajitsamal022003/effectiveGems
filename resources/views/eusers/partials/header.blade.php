@@ -1,17 +1,32 @@
   <!-- Start breadcrumb section -->
+  @php
+  $breadcrumbs = [
+  'euser.dashboard' => 'Dashboard',
+  'euser.myorderlist' => 'My Orders',
+  'euser.wishlist' => 'My Wishlist',
+  'euser.manageaddress' => 'Manage Address',
+  'euser.myProfile' => 'My Profile',
+  'euser.setting' => 'Settings',
+  ];
+
+  $currentRoute = Route::currentRouteName();
+  $pageTitle = $breadcrumbs[$currentRoute] ?? 'My Account';
+  @endphp
+
   <section class="container">
       <div class="as_breadcrum_wrapper" style="background-image: url('assets/images/breadcrum-img-1.jpg');">
           <div class="row">
               <div class="col-lg-12 text-center">
-                  <h1>My Account</h1>
+                  <h1>{{ $pageTitle }}</h1>
                   <ul class="breadcrumb">
                       <li><a href="{{ route('euser.dashboard') }}">Home</a></li>
-                      <li>My Account</li>
+                      <li>{{ $pageTitle }}</li>
                   </ul>
               </div>
           </div>
       </div>
   </section>
+
   <!-- End breadcrumb section -->
 
   <!--account header start-->

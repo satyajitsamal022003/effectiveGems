@@ -11,9 +11,9 @@
                     <h3 class="page-title">Product</h3>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a
-                                href="https://effectivegems.com/admin_panel/dashboard">Dashboard</a>
+                                href="{{route('admin.dashboard')}}">Dashboard</a>
                         </li>
-                        <li class="breadcrumb-item"><a href="#">Product</a></li>
+                        <li class="breadcrumb-item"><a href="{{route('admin.listproduct')}}">Product</a></li>
                         <li class="breadcrumb-item active">{{ $product->productName ?? '' }}</li>
                     </ul>
                 </div>

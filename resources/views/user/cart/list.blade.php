@@ -143,10 +143,10 @@
                 <div class="cart-bg-right">
                     <div class="cart-total">
                         <h3>Sub Total : Rs. <span class="subTotal"> {{ $subtotal }}</span></h3>
-                        <p>Tax included. <a href="#"><u>Shipping</u></a> calculated at checkout.</p>
+                        <p>Tax included. <a href="/pages/shipping-and-delivery"><u>Shipping</u></a> calculated at checkout.</p>
                         <div class="extra-feature-list">
                             <input required type="checkbox" id="agree-cart" name="agree-cart" value="1">
-                            <label for="agree-cart"> I agree with the <a href="#" class="text-black"><u>terms
+                            <label for="agree-cart"> I agree with the <a href="/pages/terms-and-conditions" class="text-black"><u>terms
                                         and
                                         conditions</u></a></label>
                         </div>

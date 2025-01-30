@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', $testimonial->designation ?? '')
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -11,7 +12,7 @@
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('admin.listtestimonial') }}">Testimonials</a></li>
-                            <li class="breadcrumb-item active">Edit Testimonial</li>
+                            <li class="breadcrumb-item active">{{$testimonial->designation ?? ''}}</li>
                         </ul>
                     </div>
                 </div>

@@ -32,19 +32,28 @@ class EuserController extends Controller
     public function dashboard()
     {
         $user = Auth::guard('euser')->user();
-        $orderCount = Order::where('userId', $user->id)->count();
+        $orderCount = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed'])->count();
         return view('eusers.dashboard', compact('user', 'orderCount'));
     }
 
-    public function myorderlist()
+    public function myorderlist(Request $request)
     {
         $user = Auth::guard('euser')->user();
-        // $orders = Order::where('userId', $user->id)->get();
-        $orders = Order::where('userId', $user->id)->get();
-        // dd($orders);
+        $query = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed']);
+
+        if ($request->has('orderStatus') && !empty($request->orderStatus)) {
+            $query->where('orderStatus', $request->orderStatus); 
+        }
+
+        $orders = $query->paginate(10);
+
+        if ($request->ajax()) {
+            return view('eusers.myorders.order_table', compact('orders'))->render();
+        }
 
         return view('eusers.myorders.list', compact('orders'));
     }
+
 
     public function ordersview($id)
     {

@@ -1,4 +1,5 @@
 @extends('user.layout')
+@section('title', 'My Wishlist') 
 @section('content')
     @include('eusers.partials.header')
     <section class="container mb-5">

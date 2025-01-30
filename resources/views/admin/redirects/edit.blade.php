@@ -1,5 +1,5 @@
 @extends('admin.layout')
-
+@section('page-title', $redirect->new_url ?? '')
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -10,9 +10,9 @@
                     <div class="col">
                         <h3 class="page-title">Redirects</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="https://effectivegems.com/admin_panel/dashboard">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a href="#">Redirects</a></li>
-                            <li class="breadcrumb-item active">Edit Redirect</li>
+                            <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="/admin/redirects">Redirects</a></li>
+                            <li class="breadcrumb-item active">{{$redirect->new_url ?? ''}}</li>
                         </ul>
                     </div>
                 </div>

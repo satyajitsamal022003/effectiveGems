@@ -1,4 +1,5 @@
 @extends('user.layout')
+@section('title', 'Manage Address') 
 @section('content')
     @include('eusers.partials.header')
     <section class="container mb-5">
@@ -29,7 +30,11 @@
                     @endforeach
                 </div>
                 <div class="profile-edit-section">
+                    @if(isset($address))
+                    <h4 class="">Edit ADDRESS</h4>
+                    @else
                     <h4 class="">ADD A NEW ADDRESS</h4>
+                    @endif
                     <form id="addAddressForm"
                         action="{{ isset($address) ? route('euser.address.update', $address->id) : route('euser.address.store') }}"
                         method="POST">

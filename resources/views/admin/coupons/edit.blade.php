@@ -1,4 +1,5 @@
 @extends('admin.layout')
+@section('page-title', $coupon->name ?? '')
 @section('content')
     <div class="page-wrapper">
         <div class="content container-fluid">
@@ -11,7 +12,7 @@
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item"><a href="{{ route('coupons.index') }}">Coupons</a></li>
-                            <li class="breadcrumb-item active">Edit Coupon</li>
+                            <li class="breadcrumb-item active">{{ $coupon->name ?? ''}}</li>
                         </ul>
                     </div>
                 </div>

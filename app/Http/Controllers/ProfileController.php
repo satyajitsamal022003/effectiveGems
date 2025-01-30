@@ -19,6 +19,7 @@ class ProfileController extends Controller
     {
         $userdata = Euser::where('id', Auth::guard('euser')->user()->id)->first();
 
+
         return view('eusers.profile.my-profile', compact('userdata'));
     }
 
@@ -38,9 +39,9 @@ class ProfileController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
-            'phone' => 'nullable|digits:10',
+            'mobile' => 'nullable|digits:10',
             'gender' => 'required|in:1,2',
-            'profile_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'profile_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $user = Auth::guard('euser')->user();
@@ -54,7 +55,7 @@ class ProfileController extends Controller
         $user->first_name = $request->first_name;
         $user->last_name = $request->last_name;
         $user->email = $request->email;
-        $user->phone = $request->phone;
+        $user->mobile = $request->mobile;
         $user->gender = $request->gender;
 
         $user->save();
@@ -65,16 +66,16 @@ class ProfileController extends Controller
     public function changePassword(Request $request)
     {
         $request->validate([
-            'old_password' => 'required',
+            // 'old_password' => 'required',
             'new_password' => 'required|min:6',
             'confirm_password' => 'required|same:new_password',
         ]);
 
         $user = Auth::guard('euser')->user();
 
-        if (!Hash::check($request->old_password, $user->password)) {
-            return response()->json(['error' => 'Old password is incorrect'], 400);
-        }
+        // if (!Hash::check($request->old_password, $user->password)) {
+        //     return response()->json(['error' => 'Old password is incorrect'], 400);
+        // }
 
         $user->password = Hash::make($request->new_password);
         $user->save();

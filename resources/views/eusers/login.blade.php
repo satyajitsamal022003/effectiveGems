@@ -68,88 +68,140 @@
 </section>
 
 <!-- OTP Modal -->
-<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="otpModalLabel">Verify Your Mobile Number</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true"
+    data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content modal-content-otp shadow-lg rounded-4">
+            <div class="modal-header modal-header-otp bg-primary text-white">
+                <h5 class="modal-title" id="otpModalLabel">🔐 Verify Your Mobile Number</h5>
+                {{-- <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Close"></button> --}}
             </div>
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form id="otpForm">
                     @csrf
                     <div class="form-group">
-                        <label for="mobile">Enter Mobile Number</label>
-                        <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number" required style="background: #c6b5b5;color: black;">
-                        <span id="mobileError" class="text-danger"></span>
+                        <label for="mobile" class="fw-bold">📱 Mobile Number</label>
+                        <input type="text"
+                            class="form-control form-control-otp rounded-pill bg-light text-dark fw-semibold"
+                            id="mobile" name="mobile" placeholder="Enter your mobile number" required>
+                        <span id="mobileError" class="text-danger small"></span>
                     </div>
-                    <div class="form-group mt-3">
-                        <button type="button" class="btn btn-primary" id="sendOtp">Send OTP</button>
+                    <div class="form-group mt-3 text-center">
+                        <button type="button" class="btn btn-otp btn-primary px-4 py-2 rounded-pill shadow-sm"
+                            id="sendOtp">
+                            📩 Send OTP
+                        </button>
+                        <span id="timer" class="text-danger fw-bold" style="display: none;"></span>
+                        <button type="button" class="btn btn-otp btn-secondary px-4 py-2 rounded-pill shadow-sm"
+                            id="resendOtp" style="display: none;">
+                            🔄 Resend OTP
+                        </button>
                     </div>
-                    <div class="form-group mt-3" id="otpField" style="display: none;">
-                        <label for="otp">Enter OTP</label>
-                        <input type="text" class="form-control" id="otp" name="otp" placeholder="Enter OTP" required style="background: #c6b5b5;color: black;">
-                        <span id="otpError" class="text-danger"></span>
+
+                    <div class="form-group mt-4" id="otpField" style="display: none;">
+                        <label for="otp" class="fw-bold">🔑 Enter OTP</label>
+                        <input type="text"
+                            class="form-control form-control-otp rounded-pill bg-light text-dark fw-semibold"
+                            id="otp" name="otp" placeholder="Enter OTP" required>
+                        <span id="otpError" class="text-danger small"></span>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="verifyOtp" style="display: none;">Verify OTP</button>
+            <div class="modal-footer d-flex justify-content-between">
+                {{-- <button type="button" class="btn btn-otp btn-secondary rounded-pill px-4 py-2"
+                    data-bs-dismiss="modal">❌
+                    Close</button> --}}
+                <button type="button" class="btn btn-otp btn-success rounded-pill px-4 py-2 shadow-sm"
+                    id="verifyOtp" style="display: none;">
+                    ✅ Verify OTP
+                </button>
             </div>
         </div>
     </div>
 </div>
-
+<script src="{{ url('/') }}/user/assets/js/jquery.js"></script>
 <script>
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    $(document).ready(function() {
 
-    document.getElementById('sendOtp').addEventListener('click', function() {
-        const mobile = document.getElementById('mobile').value;
+        function startTimer(duration) {
+            let timer = duration,
+                seconds;
+            let countdown = setInterval(function() {
+                seconds = timer;
+                $('#timer').text(`Resend OTP in ${seconds}s`).show();
 
-        if (!mobile) {
-            document.getElementById('mobileError').textContent = 'Mobile number is required.';
-            return;
+                if (--timer < 0) {
+                    clearInterval(countdown);
+                    $('#timer').hide();
+                    $('#resendOtp').show(); // Show Resend OTP button after timer ends
+                }
+            }, 1000);
         }
 
-        fetch('/user/send-otp', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': csrfToken,
-                },
-                body: JSON.stringify({
-                    mobile
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('otpField').style.display = 'block';
-                    document.getElementById('verifyOtp').style.display = 'block';
-                    document.getElementById('mobileError').textContent = '';
-                } else {
-                    document.getElementById('mobileError').textContent = data.message;
-                }
-            })
-            .catch(error => console.error('Error:', error));
+        $("#sendOtp, #resendOtp").click(function() {
+            const mobile = $('#mobile').val();
+            if (!mobile) {
+                $('#mobileError').text('Mobile number is required.');
+                return;
+            }
+
+            let buttonId = $(this).attr('id');
+            $('#' + buttonId).prop('disabled', true).text('Processing...');
+
+            const csrfToken = $('meta[name="csrf-token"]').attr('content');
+            fetch('/user/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                    },
+                    body: JSON.stringify({
+                        mobile
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    $('#' + buttonId).prop('disabled', false).text(buttonId === "sendOtp" ?
+                        'Send OTP' : 'Resend OTP');
+                    if (data.success) {
+                        $('#otpField').show();
+                        $('#verifyOtp').show();
+                        $('#mobileError').text('');
+
+                        // Hide both buttons, show timer, start countdown
+                        $('#sendOtp, #resendOtp').hide();
+                        startTimer(30);
+                    } else {
+                        $('#mobileError').text(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    $('#' + buttonId).prop('disabled', false).text(buttonId === "sendOtp" ?
+                        'Send OTP' : 'Resend OTP');
+                });
+        });
     });
 
-    document.getElementById('verifyOtp').addEventListener('click', function() {
-        const mobile = document.getElementById('mobile').value;
-        const otp = document.getElementById('otp').value;
-
+    $("#verifyOtp").click(function() {
+        const mobile = $('#mobile').val();
+        const otp = $('#otp').val();
         if (!otp) {
-            document.getElementById('otpError').textContent = 'OTP is required.';
+            $('#otpError').text('OTP is required.');
             return;
         }
+
+        $('#verifyOtp').prop('disabled', true).text('Verifying...');
+
+        const csrfToken = $('meta[name="csrf-token"]').attr('content');
         toastr.options = {
-            "closeButton": true, // Optional: adds a close button
-            "progressBar": true, // Optional: adds a progress bar
-            "timeOut": 1000, // Toastr will display for 5 seconds before disappearing
-            "extendedTimeOut": 1000, // Time for Toastr to remain open after mouse hover (optional)
-            "hideDuration": 1000, // Duration of the Toastr hide animation
-            "showDuration": 1000 // Duration of the Toastr show animation
+            "closeButton": true,
+            "progressBar": true,
+            "timeOut": 1000,
+            "extendedTimeOut": 1000,
+            "hideDuration": 1000,
+            "showDuration": 1000
         };
 
         fetch('/user/verify-otp', {
@@ -165,16 +217,53 @@
             })
             .then(response => response.json())
             .then(data => {
+                $('#verifyOtp').prop('disabled', false).text('Verify OTP');
                 if (data.success) {
                     toastr.success(data.message);
                     setTimeout(function() {
                         window.location.href = '/user/dashboard';
                     }, 1000);
                 } else {
-                    document.getElementById('otpError').textContent = data.message;
+                    $('#otpError').text(data.message);
                 }
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                $('#verifyOtp').prop('disabled', false).text('Verify OTP');
+            });
     });
 </script>
+<style>
+    .modal-body .form-control {
+        background-color: #ff8484 !important;
+        color: #040404 !important;
+    }
+
+    .modal-content .modal-content-otp {
+        border: none;
+    }
+
+    .modal-header .modal-header-otp {
+        border-bottom: none;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .form-control .form-control-otp {
+        border: 2px solid #ccc;
+        padding: 10px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: none;
+    }
+
+    .btn .btn-otp {
+        transition: all 0.3s ease-in-out;
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+    }
+</style>
 @endsection
