@@ -13,4 +13,9 @@ class Wishlist extends Model
     {
         return $this->hasOne(Product::class, 'id', 'product_id');
     }
+
+    public function userDetails()
+    {
+        return $this->hasOne(Euser::class, 'id', 'user_id');
+    }
 }

@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner;
 use App\Models\Category;
 use App\Models\Couriertype;
+use App\Models\Faq;
 use App\Models\Product;
 use App\Models\SubCategory;
 use App\Models\Page;
@@ -32,37 +33,37 @@ class IndexController extends Controller
         return response()->json(['message' => 'Application optimized successfully!']);
     }
 
-    
+
 
     public function getSuggestions(Request $request)
     {
         $query = $request->input('query');
-        
+
         if ($query) {
             // Split the search term into individual words
             $words = explode(' ', $query);
-    
+
             // Generate substrings of 3 consecutive characters
             $substrings = [];
             for ($i = 0; $i <= strlen($query) - 3; $i++) {
                 $substrings[] = substr($query, $i, 3);
             }
-    
+
             // Create the REGEXP pattern for substrings
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
-    
+
             // Query to search products
             $suggestions = Product::where(function ($q) use ($query, $words, $pattern) {
                 // Priority 1: Exact full-term match
                 $q->orWhere('productName', '=', $query);
-    
+
                 // Priority 2: Individual word match
                 foreach ($words as $word) {
                     $q->orWhere('productName', 'LIKE', "%{$word}%");
                 }
-    
+
                 // Priority 3: Substring match
                 $q->orWhere('productName', 'REGEXP', $pattern);
             })
@@ -79,13 +80,13 @@ class IndexController extends Controller
                 END", [$query, "%{$query}%"])
             ->limit(10)
             ->get(['productName', 'id']);  // Adjust the fields as needed
-    
+
             return response()->json($suggestions);
         }
-    
+
         return response()->json([]);
     }
-    
+
     public function searchProducts(Request $request)
     {
         // Retrieve the query parameters directly from the request
@@ -110,8 +111,10 @@ class IndexController extends Controller
             ->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
         $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->orderBy('sortOrderPopular', 'asc')->orderBy('created_at', 'asc')->paginate(16);
         $banners = Banner::where('status', 1)->orderBy('sort_order')->get();
-        
-        return view('user.index', compact('categories', 'popularproducts', 'testimonials', 'banners'));
+
+        $faqs = Faq::where('is_active', 1)->get();
+
+        return view('user.index', compact('categories', 'popularproducts', 'testimonials', 'banners', 'faqs'));
     }
 
     public function categorywiseproduct($id, $search = null)
@@ -125,7 +128,7 @@ class IndexController extends Controller
         $subcat = SubCategory::where('categoryId', $id)->where('status', 1)->get();
         $subcategoryIds = $subcat->pluck('id');
 
-        // Fetch subcategories 
+        // Fetch subcategories
         $subcategories = SubCategory::where('categoryId', $id)
             ->where('status', 1)
             ->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
@@ -147,18 +150,18 @@ class IndexController extends Controller
         if ($search) {
             $subcategoryproducts = null;
             $searchWords = explode(' ', strtolower($search));
-        
+
             // Generate substrings of length 3 from the search term
             $substrings = [];
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
                 $substrings[] = substr($search, $i, 3);
             }
-        
+
             // Create a regex pattern from the substrings
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
-        
+
             // Condition 1: Exact match
             $subcategoryproducts = Product::where('status', 1)
                 ->where('productName', 'LIKE', '%' . $search . '%')
@@ -166,7 +169,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
-        
+
             // Condition 2: 3-character substring matches
             $subcategoryproducts = Product::where('status', 1)
                 ->selectRaw("
@@ -200,7 +203,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
-        
+
             // Condition 3: Any word matches in any order
             $subcategoryproducts = Product::where('status', 1)
                 ->where(function ($query) use ($substrings) {
@@ -212,7 +215,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
-        
+
             // Condition 4: Combination of words in any order
             $subcategoryproducts = Product::where('status', 1)
                 ->where(function ($query) use ($searchWords) {
@@ -229,7 +232,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
-        
+
             // Condition 5: Regex for 3-character substring match
             $subcategoryproducts = Product::where('status', 1)
                 ->whereRaw("productName REGEXP '{$pattern}'")
@@ -237,13 +240,13 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
-        
+
             // If no matches found, return empty results
             $subcategoryproducts = collect([]);
             return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
         }
-        
-        
+
+
 
 
 
@@ -272,7 +275,7 @@ class IndexController extends Controller
         $subcat = SubCategory::where('categoryId', $category->id)->where('status', 1)->get();
         $subcategoryIds = $subcat->pluck('id');
 
-        // Fetch subcategories 
+        // Fetch subcategories
         $subcategories = SubCategory::where('categoryId', $category->id)
             ->where('status', 1)
             ->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
@@ -332,18 +335,18 @@ class IndexController extends Controller
             if ($search) {
                 $subcategoryproducts = null;
                 $searchWords = explode(' ', strtolower($search));
-            
+
                 // Generate substrings of length 3 from the search term
                 $substrings = [];
                 for ($i = 0; $i <= strlen($search) - 3; $i++) {
                     $substrings[] = substr($search, $i, 3);
                 }
-            
+
                 // Create a regex pattern from the substrings
                 $pattern = implode('|', array_map(function ($substr) {
                     return preg_quote($substr, '/');
                 }, $substrings));
-            
+
                 // Condition 1: Exact match
                 $subcategoryproducts = Product::where('status', 1)
                     ->where('productName', 'LIKE', '%' . $search . '%')
@@ -351,7 +354,7 @@ class IndexController extends Controller
                 if ($subcategoryproducts->isNotEmpty()) {
                     return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
                 }
-            
+
                 // Condition 2: 3-character substring matches
                 $subcategoryproducts = Product::where('status', 1)
                     ->selectRaw("
@@ -385,7 +388,7 @@ class IndexController extends Controller
                 if ($subcategoryproducts->isNotEmpty()) {
                     return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
                 }
-            
+
                 // Condition 3: Any word matches in any order
                 $subcategoryproducts = Product::where('status', 1)
                     ->where(function ($query) use ($substrings) {
@@ -397,7 +400,7 @@ class IndexController extends Controller
                 if ($subcategoryproducts->isNotEmpty()) {
                     return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
                 }
-            
+
                 // Condition 4: Combination of words in any order
                 $subcategoryproducts = Product::where('status', 1)
                     ->where(function ($query) use ($searchWords) {
@@ -414,7 +417,7 @@ class IndexController extends Controller
                 if ($subcategoryproducts->isNotEmpty()) {
                     return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
                 }
-            
+
                 // Condition 5: Regex for 3-character substring match
                 $subcategoryproducts = Product::where('status', 1)
                     ->whereRaw("productName REGEXP '{$pattern}'")
@@ -422,13 +425,13 @@ class IndexController extends Controller
                 if ($subcategoryproducts->isNotEmpty()) {
                     return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
                 }
-            
+
                 // If no matches found, return empty results
                 $subcategoryproducts = collect([]);
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search'));
             }
-            
-            
+
+
 
 
         $category = SubCategory::find($id);
@@ -494,18 +497,18 @@ class IndexController extends Controller
         if ($search) {
             $subcategoryproducts = null;
             $searchWords = explode(' ', strtolower($search));
-        
+
             // Generate substrings of length 3 from the search term
             $substrings = [];
             for ($i = 0; $i <= strlen($search) - 3; $i++) {
                 $substrings[] = substr($search, $i, 3);
             }
-        
+
             // Create a regex pattern from the substrings
             $pattern = implode('|', array_map(function ($substr) {
                 return preg_quote($substr, '/');
             }, $substrings));
-        
+
             // Condition 1: Exact match
             $subcategoryproducts = Product::where('status', 1)
                 ->where('productName', 'LIKE', '%' . $search . '%')
@@ -513,7 +516,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category'));
             }
-        
+
             // Condition 2: 3-character substring matches
             $subcategoryproducts = Product::where('status', 1)
             ->selectRaw("
@@ -547,7 +550,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
             }
-        
+
             // Condition 3: Any word matches in any order
             $subcategoryproducts = Product::where('status', 1)
                 ->where(function ($query) use ($substrings) {
@@ -559,7 +562,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
             }
-        
+
             // Condition 4: Combination of words in any order
             $subcategoryproducts = Product::where('status', 1)
                 ->where(function ($query) use ($searchWords) {
@@ -576,7 +579,7 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
             }
-        
+
             // Condition 5: Regex for 3-character substring match
             $subcategoryproducts = Product::where('status', 1)
                 ->whereRaw("productName REGEXP '{$pattern}'")
@@ -584,13 +587,13 @@ class IndexController extends Controller
             if ($subcategoryproducts->isNotEmpty()) {
                 return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
             }
-        
+
             // If no matches found, return empty results
             $subcategoryproducts = collect([]);
             return view('user.category.searchProducts', compact('subcategoryproducts', 'search', 'category',));
         }
-        
-        
+
+
 
         return view('user.category.searchProducts', compact(
             'category',
