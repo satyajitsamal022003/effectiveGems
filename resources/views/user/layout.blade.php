@@ -7,6 +7,7 @@
     <meta name="description" content="">
     <meta name="metakeyword" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-logged-in" content="{{ Auth::guard('euser')->check() ? '1' : '' }}">
     <meta property="og:title" content="@yield('title', 'Home | Effective Gems')" />
     <meta property="og:description" content="@yield('description', '')" />
     <meta property="og:image" content="@yield('image', 'thumb/image.html')" />

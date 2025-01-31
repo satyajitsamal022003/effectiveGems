@@ -19,7 +19,7 @@ class WishlistController extends Controller
         // Fetch all wishlist items for the authenticated user
         $wishlists = Wishlist::where('user_id', Auth::guard('euser')->user()->id)
             ->with('productDetails') // Eager load the related product details
-            ->paginate(2);
+            ->paginate(10);
 
         // Return the wishlist view with the data
         return view('eusers.mywishlist.list', compact('wishlists'));
@@ -52,11 +52,12 @@ class WishlistController extends Controller
             ->first();
 
         if ($existingWishlistItem) {
+            $existingWishlistItem->delete();
             // Return JSON response with error
             return response()->json([
-                'status' => 'error',
-                'message' => 'Product is already in your wishlist.',
-            ], 409); // HTTP 409 Conflict
+                'status' => 'removed',
+                'message' => 'Product removed from wishlist.',
+            ]);
         }
 
         // Add the product to the wishlist

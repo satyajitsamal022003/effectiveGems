@@ -10,9 +10,11 @@ use App\Models\Product;
 use App\Models\SubCategory;
 use App\Models\Page;
 use App\Models\Testimonial;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class IndexController extends Controller
@@ -601,7 +603,6 @@ class IndexController extends Controller
 
     public function productdetails($prodid)
     {
-
         $productdetails = Product::with('category')->where('id', $prodid)->first();
         // dd($productdetails );
         $productSlug = $productdetails->seoUrl;
@@ -622,7 +623,13 @@ class IndexController extends Controller
     public function productdetailsSlug($slug)
     {
 
+        $userId = Auth::guard('euser')->id();
+
         $productdetails = Product::with('category')->where('seoUrl', $slug)->first();
+
+        $isInWishlist = Wishlist::where('user_id', $userId)
+        ->where('product_id', $productdetails->id)
+        ->exists();
         $productSlug = $productdetails->seoUrl;
 
 
@@ -633,7 +640,7 @@ class IndexController extends Controller
         if ($productdetails->variant)
             $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();        // dd(count($variants));
 
-        return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype"));
+        return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype",'isInWishlist'));
     }
 
     public function getProductsForCategory($categoryId)
