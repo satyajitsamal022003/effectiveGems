@@ -7,8 +7,10 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CertificationController;
 use App\Http\Controllers\Admin\CouponController;
 use App\Http\Controllers\Admin\CourierController;
+use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ManageWishlistController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\ProductController;
@@ -118,6 +120,19 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('/update-product/{id}', [ProductController::class, 'updateproduct'])->name('admin.editproductdata');
     Route::post('/update-product-partly/{id}', [ProductController::class, 'updateProductPartly'])->name('admin.updateProductPartly');
     Route::post('/update-product-images/{id}', [ProductController::class, 'updateProductImages'])->name('admin.updateProductImages');
+
+    //Faqs
+    Route::get('/faqs-list', [FaqController::class, 'listfaq'])->name('admin.listfaq');
+    Route::get('/add-faq', [FaqController::class, 'addfaq'])->name('admin.addfaq');
+    Route::post('/store-faq', [FaqController::class, 'storefaq'])->name('admin.storefaq');
+    Route::delete('/delete-faq/{id}', [FaqController::class, 'deletefaq'])->name('admin.deletefaq');
+    Route::post('admin/faqOnStatus', [FaqController::class, 'faqOnStatus'])->name('admin.faqOnStatus');
+    Route::get('/faq-edit/{id}', [FaqController::class, 'editfaq'])->name('admin.editfaq');
+    Route::post('/update-faq/{id}', [FaqController::class, 'updatefaq'])->name('admin.editfaqdata');
+
+    //Wishlists
+    Route::get('/wishlist-list', [ManageWishlistController::class, 'WishlistData'])->name('admin.wishlist');
+    Route::post('/wishlistOnStatus', [ManageWishlistController::class, 'wishlistOnStatus'])->name('admin.wishlistOnStatus');
 
     //activation
     Route::get('/add-activation', [ActivationController::class, 'addactivation'])->name('admin.addactivation');

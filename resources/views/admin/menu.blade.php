@@ -23,7 +23,7 @@
                      </ul>
                  </li>
                  <li class="">
-                     <a href="#"><i class="fa-solid fa-question-circle"></i>
+                     <a href="{{ route('admin.listfaq') }}"><i class="fa-solid fa-question-circle"></i>
                          <span>FAQ</span></a>
                  </li>
                  <li class="submenu">
@@ -43,14 +43,15 @@
                  </li>
 
                  <li class="">
-                     <a href="{{route('admin.listtestimonial')}}"><i class="fa-solid fa-users-line"></i><span>Testimonial</span></a>
+                     <a href="{{ route('admin.listtestimonial') }}"><i
+                             class="fa-solid fa-users-line"></i><span>Testimonial</span></a>
                  </li>
                  <li class="">
                      <a href="/admin/redirects"><i class="fa-solid fa-users-line"></i><span>Redirects</span></a>
                  </li>
                  <li class="">
-                    <a href="/admin/coupons"><i class="fa-solid fa-cart-shopping"></i><span>Coupons</span></a>
-                </li>
+                     <a href="/admin/coupons"><i class="fa-solid fa-cart-shopping"></i><span>Coupons</span></a>
+                 </li>
                  <li class="submenu">
                      <a href="product.html"><i class="fa-solid fa-passport"></i> <span>Orders</span>
                          <span class="menu-arrow"></span></a>
@@ -66,6 +67,9 @@
                          </li>
                      </ul>
                  </li>
+                 <li class="">
+                    <a href="{{route('admin.wishlist')}}"><i class="fa-solid fa-heart"></i><span>Wishlists</span></a>
+                </li>
 
 
                  <li class="submenu">
@@ -73,10 +77,10 @@
                              class="menu-arrow"></span></a>
                      <ul>
                          <li>
-                             <a href="{{route('admin.banners.index')}}">Banner</a>
+                             <a href="{{ route('admin.banners.index') }}">Banner</a>
                          </li>
                          <li>
-                             <a class="" href="{{route('admin.pages.index')}}">Pages</a>
+                             <a class="" href="{{ route('admin.pages.index') }}">Pages</a>
                          </li>
                          <li>
                              <a href="{{ route('admin.settings') }}">Setting</a>
