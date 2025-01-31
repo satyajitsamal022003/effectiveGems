@@ -4,6 +4,7 @@ namespace App\Http\Controllers\eusers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Order;
+use App\Models\Wishlist;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -33,7 +34,8 @@ class EuserController extends Controller
     {
         $user = Auth::guard('euser')->user();
         $orderCount = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed'])->count();
-        return view('eusers.dashboard', compact('user', 'orderCount'));
+        $wishlistcount = Wishlist::where('user_id', $user->id)->count();
+        return view('eusers.dashboard', compact('user', 'orderCount' ,'wishlistcount'));
     }
 
     public function myorderlist(Request $request)

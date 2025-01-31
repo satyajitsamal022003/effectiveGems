@@ -35,16 +35,17 @@ class ProfileController extends Controller
      */
     public function updateProfile(Request $request)
     {
+        $user = Auth::guard('euser')->user();
+
         $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'mobile' => 'nullable|digits:10',
-            'gender' => 'required|in:1,2',
+            'email' => 'required|email|max:255|unique:eusers,email,' . $user->id,
+            'mobile' => 'nullable|digits:10|unique:eusers,mobile,' . $user->id,
+            // 'gender' => 'required|in:1,2',
             // 'profile_img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        $user = Auth::guard('euser')->user();
 
         if ($request->hasFile('profile_img')) {
             $fileName = time() . '.' . $request->profile_img->extension();

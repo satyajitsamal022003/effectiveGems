@@ -16,12 +16,12 @@
                     <a href="{{route('euser.wishlist')}}" class="card_box">
                         <img src="assets/images/wishlist.png" alt="image">
                         <h4>My Wishlist</h4>
-                        <span>05</span>
+                        <span>{{ $wishlistcount }}</span>
                     </a>
                 </div>
                 <div class="col-lg-4 col-md-4 col-12">
                     <a href="{{route('euser.myProfile')}}" class="card_box">
-                        <img src="{{ $user->profile_img ? asset('user/assets/images/profile/' . $user->profile_img) : asset('assets/images/profile-img.jpg') }}" alt="image">
+                        <img src="{{ $user->profile_img ? asset('user/assets/images/profile/' . $user->profile_img) : asset('user/assets/images/profile-img.jpg') }}" alt="image">
                         <h4>{{ $user->first_name ." ". $user->last_name }}</h4>
                         <span>View Profile</span>
                     </a>
@@ -29,4 +29,4 @@
             </div>
         </div>
     </section>
-@endsection
+@endsection 

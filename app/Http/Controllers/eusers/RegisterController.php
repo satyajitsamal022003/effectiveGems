@@ -83,6 +83,7 @@ class RegisterController extends Controller
             $user = Euser::where('mobile', $request->mobile)->first();
 
             if ($user) {
+                $user->update(['is_mobile_verified' => 1]);
                 Auth::guard('euser')->login($user);
                 return response()->json(['success' => true, 'message' => 'Logged in successfully.']);
             }
@@ -92,7 +93,8 @@ class RegisterController extends Controller
 
             $newUser = Euser::create([
                 'mobile' => $request->mobile,
-                'password' => Hash::make($randomPassword),
+                'password' => Hash::make($randomPassword), 
+                'is_mobile_verified' => 1
             ]);
 
             $apikey = '5xP9YXeSUnRUqqEw';

@@ -25,7 +25,7 @@
                     </div>
                     <div class="inline-edit-btn main-btn">
                         <button type="submit" class="as_btn">Save</button>
-                        <button type="reset" class="as_btn cancel-btn">Cancel</button>
+                        <a href="/user/setting" class="as_btn cancel-btn">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -43,12 +43,12 @@
 
                             <!-- Image Preview Section -->
                             <div id="image-preview-container" style="margin-top: 10px;">
-                                @if($userdata->profile_img)
-                                <img id="image-preview" src="{{ asset('user/assets/images/profile/'.$userdata->profile_img) }}" alt="Profile Image" style="max-width: 100px; max-height: 100px; border-radius: 8px;">
-                                @else
-                                <p>No profile image available.</p>
-                                @endif
+                                <img id="image-preview" 
+                                    src="{{ $userdata->profile_img ? asset('user/assets/images/profile/'.$userdata->profile_img) : asset('user/assets/images/profile-img.jpg') }}" 
+                                    alt="Profile Image" 
+                                    style="max-width: 100px; max-height: 100px; border-radius: 8px;">
                             </div>
+
                         </div>
                         <div class="form-group col-lg-6 col-12">
                             <label for="first_name">First Name</label>
@@ -92,15 +92,12 @@
                                             {{ $userdata->gender == 2 ? 'checked' : '' }}> Female</label>
                                 </div>
                             </div>
-                            @error('gender')
-                            <div class="text-danger">{{ $message }}</div>
-                            @enderror
                         </div>
                     </div>
 
                     <div class="inline-edit-btn main-btn">
                         <button type="submit" class="as_btn">Save Changes</button>
-                        <button type="reset" class="as_btn cancel-btn">Cancel</button>
+                        <a href="/user/setting" class="as_btn cancel-btn">Cancel</a>
                     </div>
                 </form>
             </div>
@@ -190,13 +187,13 @@
     });
 </script>
 <script>
-    // JavaScript to update the preview image when a new file is selected
+document.addEventListener("DOMContentLoaded", function() {
     document.getElementById('file').addEventListener('change', function(event) {
         var file = event.target.files[0];
         var preview = document.getElementById('image-preview');
         var fileName = document.getElementById('file-name');
 
-        if (file) {
+        if (file && preview) {
             var reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
@@ -206,5 +203,7 @@
             fileName.textContent = file.name;
         }
     });
+});
 </script>
+
 @endsection
