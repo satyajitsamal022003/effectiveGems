@@ -10,7 +10,7 @@
                     <div class="col">
                         <h3 class="page-title">Order Placed</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{route('admin.dashbaord')}}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
                             <li class="breadcrumb-item active">Order Placed</li>
                         </ul>
                     </div>
