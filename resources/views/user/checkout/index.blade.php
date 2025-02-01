@@ -1,4 +1,5 @@
 @extends('user.layout')
+<meta name="csrf-token" content="{{ csrf_token() }}">
 @section('content')
 <div class="container checkout_style as_padderBottom40">
     <div class="cart-body section-padding">
@@ -143,7 +144,7 @@
                                                     <div class="col-lg-12 col-md-12 col-12">
                                                         <label for="address_1">Address:</label>
                                                         <input name="address" required type="text"
-                                                            name="" id="address_2" class="form-control"
+                                                            id="address_2" class="form-control"
                                                             value="">
                                                     </div>
                                                 </div>
@@ -163,13 +164,13 @@
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="landmark">Landmark:</label>
                                                         <input name="landmark" required type="text"
-                                                            name="" id="landmark" class="form-control"
+                                                            id="landmark" class="form-control"
                                                             value="" />
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="city-name">City:</label>
                                                         <input name="city" required type="text"
-                                                            name="" id="city-name" class="form-control"
+                                                            id="city-name" class="form-control"
                                                             value="" />
                                                     </div>
                                                     <div class="col-lg-8 col-md-6 col-12">
@@ -190,7 +191,7 @@
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="postal-code">Zip / Postal Code:</label>
                                                         <input name="zipcode" required type="number"
-                                                            name="" id="postal-code" class="form-control"
+                                                            id="postal-code" class="form-control"
                                                             value="" />
                                                     </div>
 
@@ -200,7 +201,7 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-6 col-12">
                                                         <label for="p-no">Phone Number:</label>
-                                                        <input type="number" required type="tel"
+                                                        <input required type="tel"
                                                             maxlength="10" name="phoneNumber" id="phoneNumber"
                                                             class="form-control" value="" />
                                                         <span id="mobileError" class="text-danger"></span>
@@ -280,7 +281,7 @@
                                                     <div class="col-lg-12 col-md-12 col-12">
                                                         <label for="address_1">Address:</label>
                                                         <input name="address" required type="text"
-                                                            name="" id="address_2" class="form-control"
+                                                            id="address_2" class="form-control"
                                                             value="">
                                                     </div>
                                                 </div>
@@ -300,13 +301,13 @@
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="landmark">Landmark:</label>
                                                         <input name="landmark" required type="text"
-                                                            name="" id="landmark" class="form-control"
+                                                            id="landmark" class="form-control"
                                                             value="" />
                                                     </div>
                                                     <div class="col-lg-6 col-md-6 col-12">
                                                         <label for="city-name">City:</label>
                                                         <input name="city" required type="text"
-                                                            name="" id="city-name" class="form-control"
+                                                            id="city-name" class="form-control"
                                                             value="" />
                                                     </div>
                                                     <div class="col-lg-8 col-md-6 col-12">
@@ -327,7 +328,7 @@
                                                     <div class="col-lg-4 col-md-6 col-12">
                                                         <label for="postal-code">Zip / Postal Code:</label>
                                                         <input name="zipcode" required type="number"
-                                                            name="" id="postal-code" class="form-control"
+                                                            id="postal-code" class="form-control"
                                                             value="" />
                                                     </div>
 
@@ -343,7 +344,7 @@
                                                 <div class="row">
                                                     <div class="col-lg-12 col-md-6 col-12">
                                                         <label for="p-no">Phone Number:</label>
-                                                        <input type="number" required type="tel"
+                                                        <input required type="tel"
                                                             maxlength="10" name="phoneNumber" id="p-no"
                                                             class="form-control" value="" />
                                                     </div>
@@ -819,6 +820,10 @@
 <script src="{{ url('/') }}/user/assets/js/jquery.js"></script>
 <link rel="stylesheet" href="{{ url('/') }}/user/assets/css/bootstrap.css">
 <script src="{{ url('/') }}/user/assets/js/bootstrap.js"></script>
+<script src="{{ url('/') }}/assets/js/checkout-validation.js"></script>
+@if (Auth::guard('euser')->check())
+<meta name="auth-check" content="true">
+@endif
 <!-- OTP Modal -->
 <div class="modal fade" id="otpModal" tabindex="-1" aria-labelledby="otpModalLabel" aria-hidden="true"
     data-bs-backdrop="static" data-bs-keyboard="false">
@@ -874,44 +879,6 @@
 </div>
 
 
-<script>
-    $(document).ready(function() {
-        $('#orderForm').on('submit', function(e) {
-            e.preventDefault(); // Prevent default form submission
-
-            $.ajax({
-                url: "{{ url('/checkout') }}",
-                type: "POST",
-                data: $(this).serialize(), // Serialize form data
-                dataType: "json",
-                beforeSend: function() {
-                    $('#submitOrder').prop('disabled', true).text('Processing...');
-                },
-                success: function(response) {
-                    if (response.otp_required) {
-                        console.log("OTP required response:", response); // Debugging
-                        $("#otpModal").modal("show"); // Open the modal
-                    } else if (response.success && response.redirect_url) {
-                        console.log("Redirecting to:", response.redirect_url); // Debugging
-                        window.location.href = response
-                            .redirect_url; // Redirect to Razorpay
-                    } else {
-                        alert("Something went wrong. Please try again.");
-                    }
-                },
-                error: function(xhr) {
-                    let errors = xhr.responseJSON?.errors;
-                    let errorMessage = "An error occurred.";
-                    if (errors) {
-                        errorMessage = Object.values(errors).join("\n");
-                    }
-                    alert(errorMessage);
-                    $('#submitOrder').prop('disabled', false).text('Place Order');
-                }
-            });
-        });
-    });
-</script>
 <script>
     const removeFromCart = (cartItemId) => {
 

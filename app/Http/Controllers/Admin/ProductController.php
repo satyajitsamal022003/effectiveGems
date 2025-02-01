@@ -311,6 +311,7 @@ class ProductController extends Controller
                     'categoryId' => 'required|exists:category,id',
                     'price_type' => 'required',
                     'priceB2C' => 'required|numeric',
+                    'seoUrl' => 'nullable|string|max:255',
                 ]);
 
                 if ($validator->fails()) {
@@ -398,15 +399,19 @@ class ProductController extends Controller
                 $productData['variant'] = is_array($productData['variant']) ? json_encode($productData['variant']) : $productData['variant'];
             }
 
-            // Handle SEO URL if product name is being updated
-            if (isset($productData['productName'])) {
-                $baseSeoUrl = Str::slug($productData['productName']);
-                $seoUrl = $baseSeoUrl;
-                $counter = 1;
+            // Handle SEO URL if product name is being updated or seoUrl is provided
+            if (isset($productData['productName']) || isset($productData['seoUrl'])) {
+                if (isset($productData['seoUrl'])) {
+                    $seoUrl = $productData['seoUrl'];
+                } else {
+                    $baseSeoUrl = Str::slug($productData['productName']);
+                    $seoUrl = $baseSeoUrl;
+                    $counter = 1;
 
-                while (Product::where('seoUrl', $seoUrl)->where('id', '!=', $id)->exists()) {
-                    $seoUrl = "{$baseSeoUrl}-{$counter}";
-                    $counter++;
+                    while (Product::where('seoUrl', $seoUrl)->where('id', '!=', $id)->exists()) {
+                        $seoUrl = "{$baseSeoUrl}-{$counter}";
+                        $counter++;
+                    }
                 }
                 $productData['seoUrl'] = $seoUrl;
             }
