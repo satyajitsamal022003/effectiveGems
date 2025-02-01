@@ -234,18 +234,16 @@
                                                         <div class="row">
                                                             <div class="col-xl-12">
                                                                 <div class="row">
-                                                                    <div class="col-xl-4">
-                                                                        <label for="add_variant"
-                                                                            class="flex items-center">
-                                                                            <input id="add_variant" type="checkbox"
-                                                                                class="form-checkbox"
-                                                                                name="is_variant" checked
-                                                                                value="{{ $product->is_variant }}">
-                                                                            <span
-                                                                                class="ml-2 text-sm text-gray-600">have
-                                                                                Variant?</span>
-                                                                        </label>
-                                                                    </div>
+                                                                <div class="col-xl-4">
+                                                                    <label for="add_variant" class="flex items-center">
+                                                                        <!-- Hidden input to send 'is_variant' as 0 when unchecked -->
+                                                                        <input type="hidden" name="is_variant" value="0">
+                                                                        <!-- Set the checkbox checked state based on the current value of is_variant -->
+                                                                        <input id="add_variant" type="checkbox" class="form-checkbox" name="is_variant" value="1" {{ old('is_variant', $product->is_variant) == 1 ? 'checked' : '' }}>
+                                                                        <span class="ml-2 text-sm text-gray-600">Have Variant?</span>
+                                                                    </label>
+                                                                </div>
+
                                                                     {{-- <div class="col-xl-4">
                                                                             <button type="button" class="bg-info btn text-white" id="add-variant-btn"><i class="fa-regular fa-plus"></i> Add Variant</button>
                                                                         </div> --}}

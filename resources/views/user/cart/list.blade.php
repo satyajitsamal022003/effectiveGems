@@ -195,6 +195,10 @@
 
         var quantity = parseFloat($(`input[id="quantity-${id}"], select[id="quantityDd-${id}"]`).val());
         var newQuantity = operation == 2 ? quantity + 1 : quantity - 1;
+        if (newQuantity < 1) {
+            newQuantity = 1;
+            return false;
+        }
         if (selectedQuantity && selectedQuantity != 0)
             newQuantity = $(`select[id="quantityDd-${id}"]`).val();
 

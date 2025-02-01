@@ -37,7 +37,7 @@
                             </div>
                         </div>
                     </div>
-                    @endif 
+                    @endif
                     <!--customer area end-->
 
                     <!--shipping area start-->
@@ -337,7 +337,7 @@
                                             <input type="hidden" required type="tel"
                                                 maxlength="10" name="phoneNumber" id="p-no"
                                                 class="form-control" value="" />
-                                                @endif
+                                            @endif
                                             @if (!Auth::guard('euser')->check())
                                             <div class="form-group">
                                                 <div class="row">
@@ -945,6 +945,12 @@
     const changeQuantity = (id, operation, selectedQuantity) => {
         var quantity = parseFloat($(`input[id="quantity-${id}"], select[id="quantity-${id}"]`).val());
         var newQuantity = operation == 2 ? quantity + 1 : quantity - 1;
+
+        if (newQuantity < 1) {
+            newQuantity = 1;
+            return false;
+        }
+
         if (selectedQuantity)
             newQuantity = $(`select[id="quantity-${id}"]`).val();
         $.ajax({
