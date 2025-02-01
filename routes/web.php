@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PagesController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\TestimonialController;
+use App\Http\Controllers\EuserForgotPasswordController;
 use App\Http\Controllers\eusers\EuserController;
 use App\Http\Controllers\eusers\RegisterController;
 use App\Http\Controllers\ProfileController;
@@ -271,6 +272,11 @@ Route::group(['prefix' => 'user'], function () {
         Route::delete('/delete-address/{id}', [AddressController::class, 'destroy'])->name('euser.address.destroy');
     });
 });
+
+Route::get('user/forgot-password', [EuserForgotPasswordController::class, 'showForgotPasswordForm'])->name('user.password.request');
+Route::post('user/forgot-password', [EuserForgotPasswordController::class, 'sendResetLink'])->name('user.password.email');
+Route::get('user/reset-password/{token}', [EuserForgotPasswordController::class, 'showResetPasswordForm'])->name('user.password.reset');
+Route::post('user/reset-password', [EuserForgotPasswordController::class, 'resetPassword'])->name('user.password.update');
 
 
 

@@ -56,7 +56,7 @@
                                         class="theme-cl">SignUp</a></p>
                             </div>
                             <div class="fhg_45">
-                                <p class="musrt"><a href="#" class="text-danger">Forgot
+                                <p class="musrt"><a href="{{route('user.password.request')}}" class="text-danger">Forgot
                                         Password?</a></p>
                             </div>
                         </div>

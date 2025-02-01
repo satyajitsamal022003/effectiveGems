@@ -226,7 +226,7 @@ class OrderController extends Controller
 
                 if (!$userId && !$usermobile) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
-                } else if (!$userId && $usermobile || $usermobile->is_mobile_verified == 0) {
+                } else if (!$userId && $usermobile && $usermobile->is_mobile_verified == 0) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
                 } else {
                     return response()->json([
