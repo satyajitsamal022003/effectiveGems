@@ -93,7 +93,7 @@ class ProductController extends Controller
                 'image2' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'image3' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
                 'variant' => 'nullable|array',
-                'is_variant' => 'nullable|boolean',
+                'is_variant' => 'nullable|integer',
                 'subCategoryId' => 'nullable|exists:sub_category,id',
                 'certificationId' => 'nullable|exists:certifications,id',
                 'activationId' => 'nullable|exists:activations,id',

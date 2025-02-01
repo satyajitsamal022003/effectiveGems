@@ -237,7 +237,7 @@
                                                                                 class="flex items-center">
                                                                                 <input id="add_variant" type="checkbox"
                                                                                     class="form-checkbox"
-                                                                                    name="is_variant" checked>
+                                                                                    name="is_variant" value="1" checked>
                                                                                 <span
                                                                                     class="ml-2 text-sm text-gray-600">have
                                                                                     Variant?</span>
