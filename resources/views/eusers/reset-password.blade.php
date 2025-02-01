@@ -9,7 +9,7 @@
         <input type="hidden" name="token" value="{{ $token }}">
         <div class="form-group">
             <label>Email Address</label>
-            <input type="email" name="email" class="form-control" required>
+            <input type="email" name="email" value="{{ request()->email }}" class="form-control" readonly required>
             @error('email') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
         <div class="form-group">
