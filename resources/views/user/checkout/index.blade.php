@@ -412,10 +412,7 @@
                                                             <select class="form-select form-control"
                                                                 name="billingcountry" id="f-name"
                                                                 aria-label="Default select example">
-                                                                <option selected disabled>Choose Country</option>
-                                                                <option value="1">India</option>
-                                                                <option value="2">United States</option>
-                                                                <option value="3">Netherlands</option>
+                                                                <option value="1" selected>India</option>
                                                             </select>
                                                         </div>
 
