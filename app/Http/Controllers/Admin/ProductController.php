@@ -392,7 +392,8 @@ class ProductController extends Controller
 
             // Handle variant data
             if (isset($productData['is_variant'])) {
-                $productData['is_variant'] = filter_var($productData['is_variant'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                // $productData['is_variant'] = filter_var($productData['is_variant'], FILTER_VALIDATE_BOOLEAN) ? 1 : 0;
+                $productData['is_variant'] = $request->is_variant === 1 ? $request->is_variant: 0;
             }
             if (isset($productData['variant'])) {
                 $productData['variant'] = is_array($productData['variant']) ? json_encode($productData['variant']) : $productData['variant'];

@@ -324,7 +324,7 @@
                                                                 $(".seo-edit-box").toggle('slow');
                                                             }
                                                         </script>
-                                                        <button type="button" class="btn btn-success mt-3">Generate
+                                                        <button type="button" onclick="showseoedit()" class="btn btn-success mt-3">Generate
                                                             SEO
                                                         </button>
                                                     </div>
