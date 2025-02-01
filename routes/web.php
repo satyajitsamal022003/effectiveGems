@@ -163,7 +163,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::post('/update-certifications/{id}', [CertificationController::class, 'updatecertification'])->name('admin.updatecertification');
 
     //settings
-    Route::get('/add-setting', [AdminOrderController::class, 'addsetting'])->name('admin.settings');
+    Route::get('/edit-setting', [AdminOrderController::class, 'addsetting'])->name('admin.settings');
     Route::post('/store-setting', [AdminOrderController::class, 'storesetting'])->name('admin.storesettings');
 });
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('coupon.applyCoupon');

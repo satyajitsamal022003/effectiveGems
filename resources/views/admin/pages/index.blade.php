@@ -9,7 +9,7 @@
                     <div class="col">
                         <h3 class="page-title">Pages</h3>
                         <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="/admin/dashboard">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             <li class="breadcrumb-item active">Pages</li>
                         </ul>
                     </div>
@@ -37,10 +37,10 @@
                                         </tr>
                                     </thead>
                                     <tbody id="sortable-pages">
-                                        @forelse($pages as $page)
+                                        @forelse($pages as $index => $page)
                                             <tr data-page-id="{{ $page->id }}">
                                                 <td class="text-center">
-                                                    <i class="fas fa-grip-vertical handle" style="cursor: move;"></i>
+                                                    {{$index + 1}}
                                                 </td>
                                                 <td>{{ $page->pageName }}</td>
                                                 <td>{{ $page->heading }}</td>

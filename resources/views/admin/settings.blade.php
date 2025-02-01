@@ -9,8 +9,8 @@
                 <div class="col">
                     <h3 class="page-title">Setting</h3>
                     <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="#">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="#">Setting</a></li>
+                        <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
+                        <!-- <li class="breadcrumb-item"><a href="#">Setting</a></li> -->
                         <li class="breadcrumb-item active"> Update Setting</li>
                     </ul>
                 </div>
