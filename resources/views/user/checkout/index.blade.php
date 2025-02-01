@@ -215,13 +215,13 @@
                                                     <label for="billing_information">Save this information for next
                                                         time</label>
                                                 </div> --}}
-                                        <div class="mt-0 flex_box">
+                                        <!-- <div class="mt-0 flex_box">
                                             <input type="checkbox" id="billing_same_address" name="billing_1"
                                                 value="">
                                             <label for="billing_same_address">My billing address is the same as my
                                                 shipping
                                                 address.</label>
-                                        </div>
+                                        </div> -->
 
                                     </div>
 
@@ -358,13 +358,13 @@
                                             <label for="billing_information">Save this information for next
                                                 time</label>
                                         </div>
-                                        <div class="mt-0 flex_box">
+                                        <!-- <div class="mt-0 flex_box">
                                             <input type="checkbox" id="billing_same_address" name="billing_1"
                                                 value="">
                                             <label for="billing_same_address">My billing address is the same as my
                                                 shipping
                                                 address.</label>
-                                        </div>
+                                        </div> -->
 
                                     </div>
 

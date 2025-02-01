@@ -37,11 +37,16 @@ class OrderController extends Controller
 
         // Fetch the cart based on IP or userId
         $ip = $req->getClientIp();
-        $cart = Cart::where('ip', $ip)->first();
 
-        if (!$cart && $userId) {
+        if($userId){
             $cart = Cart::where('userId', $userId)->first();
+        }else{
+            $cart = Cart::where('ip', $ip)->first();
         }
+
+        // if (!$cart && $userId) {
+        //     $cart = Cart::where('userId', $userId)->first();
+        // }
 
         // If no cart found, redirect to user index
         if (!$cart) {
@@ -226,7 +231,7 @@ class OrderController extends Controller
 
                 if (!$userId && !$usermobile) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
-                } else if (!$userId && $usermobile || $usermobile->is_mobile_verified == 0) {
+                } else if (!$userId && $usermobile && $usermobile->is_mobile_verified == 0) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
                 } else {
                     return response()->json([
