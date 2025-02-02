@@ -38,9 +38,9 @@ class OrderController extends Controller
         // Fetch the cart based on IP or userId
         $ip = $req->getClientIp();
 
-        if($userId){
+        if ($userId) {
             $cart = Cart::where('userId', $userId)->first();
-        }else{
+        } else {
             $cart = Cart::where('ip', $ip)->first();
         }
 
@@ -316,6 +316,12 @@ class OrderController extends Controller
             'otp' => 'required|digits:6',
         ]);
 
+        if(session()->has('order_id')){
+            $order_id = session('order_id');
+            $orderdata = Order::where('id',$order_id)->update(['phoneNumber'=>$request->mobile]);
+        }
+
+
         $otpCreatedAt = session('otp_created_at');
         if (session('otp') == $request->otp && session('mobile') == $request->mobile) {
             if (now()->diffInMinutes($otpCreatedAt) > 5) {
@@ -338,6 +344,7 @@ class OrderController extends Controller
                     ]);
                 }
             }
+
 
             $randomPassword = Str::random(8);
             $mobile = $request->mobile;
@@ -372,7 +379,6 @@ class OrderController extends Controller
             } catch (\Exception $e) {
                 \Log::error("Error sending SMS to {$request->mobile}: " . $e->getMessage());
             }
-
 
             if (session()->has('razorpay_order_id') && session()->has('subtotal') && session()->has('order_id')) {
                 return response()->json([

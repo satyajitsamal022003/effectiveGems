@@ -900,7 +900,7 @@
                     // toastr.success(response.message);
                 },
                 error: function(xhr, status, error) {
-                    // toastr.error("An error occurred: " + error);
+                    // toastr.error("An error occurred: " + error); 
                 },
             });
         }
