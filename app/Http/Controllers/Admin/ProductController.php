@@ -407,7 +407,10 @@ class ProductController extends Controller
                     $seoUrl = "{$baseSeoUrl}-{$counter}";
                     $counter++;
                 }
-                $productData['seoUrl'] = $seoUrl;
+                if ($product->seoUrl !== $seoUrl) {
+                    $productData['old_seo_url'] = $product->seoUrl;
+                    $productData['seoUrl'] = $seoUrl;
+                }
             }
 
             $product->update($productData);

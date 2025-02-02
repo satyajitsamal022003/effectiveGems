@@ -628,7 +628,15 @@ class IndexController extends Controller
 
         $userId = Auth::guard('euser')->id();
 
-        $productdetails = Product::with('category')->where('seoUrl', $slug)->first();
+        $productdetails = Product::with('category')->where('seoUrl', $slug)->orWhere('old_seo_url', $slug)->first();
+
+        if (!$productdetails) {
+            abort(404);
+        }
+
+        if ($productdetails->seoUrl !== $slug) {
+            return redirect()->route('user.productdetailsslug', ['slug' => $productdetails->seoUrl], 301);
+        }
 
         $isInWishlist = Wishlist::where('user_id', $userId)
         ->where('product_id', $productdetails->id)
