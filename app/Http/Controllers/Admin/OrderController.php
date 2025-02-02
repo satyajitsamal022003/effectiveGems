@@ -33,7 +33,7 @@ class OrderController extends Controller
         $order->orderStatus = 'Placed';
         $order->transactionId = $transactionId;
         $order->save();
-        return response()->json(['status'=>true,'message'=>"Payment details added"]);
+        return response()->json(['status' => true, 'message' => "Payment details added"]);
     }
     public function index()
     {
@@ -458,16 +458,45 @@ class OrderController extends Controller
 
     public function storesetting(Request $request)
     {
-        // Use updateOrCreate to insert or update the record
-        Setting::updateOrCreate(
-            ['id' => 1], // Replace with the condition for finding an existing record
-            [
-                'header_script' => $request->get('header_script'),
-                'footer_script' => $request->get('footer_script'),
-            ]
-        );
+        // Validate the request
+        $request->validate([
+            'phone1' => 'nullable|string|max:255',
+            'phone2' => 'nullable|string|max:255',
+            'email1' => 'nullable|email|max:255',
+            'email2' => 'nullable|email|max:255',
+            'address' => 'nullable|string|max:255',
+            'workingHour' => 'nullable|string|max:255',
+            'fbLink' => 'nullable|url|max:255',
+            'twitterLink' => 'nullable|url|max:255',
+            'linkedinLink' => 'nullable|url|max:255',
+            'instaLink' => 'nullable|url|max:255',
+            'youtubeLink' => 'nullable|url|max:255',
+            'header_script' => 'nullable|string',
+            'footer_script' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',
+        ]);
 
-        // Redirect to a specified route with a success message
-        return back()->with('message', 'Setting saved successfully');
+        // Fetch existing setting record
+        $setting = Setting::firstOrNew(['id' => 1]);
+
+        // Handle file upload
+        if ($request->hasFile('image')) {
+            // Delete old image if exists
+            if (!empty($setting->image) && file_exists(public_path('uploads/settings/' . $setting->image))) {
+                unlink(public_path('uploads/settings/' . $setting->image));
+            }
+
+            // Upload new image
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/settings/'), $imageName);
+            $setting->image = $imageName;
+        }
+
+        // Update other settings
+        $setting->fill($request->except(['_token', 'image']));
+        $setting->save();
+
+        return back()->with('message', 'Settings updated successfully');
     }
 }

@@ -97,9 +97,9 @@
                                         <i class="fa-solid fa-phone"></i>
                                     </span>
                                     <div class="flex-one">
-                                        <a href="tel:+91 7328835585">
-                                            <span>+91 7328835585</span>
-                                        </a>
+                                    <a href="tel:{{ $setting->phone1 ?? '+91 7328835585' }}">
+                                        <span>{{ $setting->phone1 ?? '+91 7328835585' }}</span>
+                                    </a>
                                     </div>
                                 </div>
                             </li>
@@ -109,9 +109,9 @@
                                         <i class="fa-solid fa-envelope"></i>
                                     </span>
                                     <div class="flex-one">
-                                        <a href="mailto:gemseffective@gmail.com">
-                                            <span>gemseffective@gmail.com</span>
-                                        </a>
+                                    <a href="mailto:{{ $setting->email1 ?? 'gemseffective@gmail.com' }}">
+                                        <span>{{ $setting->email1 ?? 'gemseffective@gmail.com' }}</span>
+                                    </a>
                                     </div>
                                 </div>
                             </li>
@@ -291,39 +291,47 @@
                 <div class="col-lg-12">
                     <div class="as_footer_inner as_padderTop20 as_padderBottom20">
                         <div class="row">
-                            <div class="col-lg-3 col-md-3 col-sm-12 col-12">
+                        <div class="col-lg-3 col-md-3 col-sm-12 col-12">
                                 <div class="as_footer_widget">
+                                    <!-- Footer Logo -->
+                                    <img src="{{ url('/') }}/user/assets/images/logo-light.png" alt="image" class="footer-logo">
+                                    
+                                    <!-- Footer Description -->
+                                    <p>
+                                        @php
+                                            $setting = \App\Models\Setting::first();
+                                        @endphp
+                                        {{ $setting->description ?? 'Effective gems is an online store targeting B2B Marketplace and the end customer...' }}
+                                    </p>
 
-                                    <img src="{{ url('/') }}/user/assets/images/logo-light.png" alt="image"
-                                        class="footer-logo">
-                                    <p>Effective gems is an online store targeting B2B Marketplace and the end
-                                        customer...</p>
                                     <ul class="as_contact_list">
+                                        <!-- Phone -->
                                         <li>
-                                            <img src="{{ url('/') }}/user/assets/images/svg/phone.svg"
-                                                alt="">
+                                            <img src="{{ url('/') }}/user/assets/images/svg/phone.svg" alt="">
                                             <p>
-                                                <a href="tel:+91 7328835585">+91 7328835585</a>
+                                                <a href="tel:{{ $setting->phone1 ?? '+91 7328835585' }}">{{ $setting->phone1 ?? '+91 7328835585' }}</a>
                                             </p>
                                         </li>
+
+                                        <!-- Email -->
                                         <li>
-                                            <img src="{{ url('/') }}/user/assets/images/svg/mail.svg"
-                                                alt="">
+                                            <img src="{{ url('/') }}/user/assets/images/svg/mail.svg" alt="">
                                             <p>
-                                                <a href="mailto:gemseffective@gmail.com">gemseffective@gmail.com</a>
+                                                <a href="mailto:{{ $setting->email1 ?? 'gemseffective@gmail.com' }}">{{ $setting->email1 ?? 'gemseffective@gmail.com' }}</a>
                                             </p>
                                         </li>
+
+                                        <!-- Address -->
                                         <li>
-                                            <img src="{{ url('/') }}/user/assets/images/svg/map.svg"
-                                                alt="">
-                                            <a href="https://goo.gl/maps/sPAPcT8hU8fhtetH7" target="_blank">
-                                                <p>Plot No - A/88, Saheed Nagar<br />
-                                                    Bhubaneswar, Odisha - 751007</p>
+                                            <img src="{{ url('/') }}/user/assets/images/svg/map.svg" alt="">
+                                            <a href="{{ $setting->address_link ?? 'https://goo.gl/maps/sPAPcT8hU8fhtetH7' }}" target="_blank">
+                                                <p>{{ $setting->address ?? 'Plot No - A/88, Saheed Nagar<br />Bhubaneswar, Odisha - 751007' }}</p>
                                             </a>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
+
                             <!-- <div class="col-lg-2 col-md-2 col-sm-12 col-12">
                                 <div class="as_footer_widget">
                                     <h3 class="as_footer_heading">Quick Links</h3>
