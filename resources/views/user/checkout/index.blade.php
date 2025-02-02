@@ -838,7 +838,7 @@
                         <label for="mobile" class="fw-bold">📱 Mobile Number</label>
                         <input type="text"
                             class="form-control form-control-otp rounded-pill bg-light text-dark fw-semibold"
-                            id="mobile" name="mobile" placeholder="Enter your mobile number" required readonly>
+                            id="mobile" name="mobile" placeholder="Enter your mobile number" required>
                         <span id="mobileError" class="text-danger small"></span>
                     </div>
                     <div class="form-group mt-3 text-center">

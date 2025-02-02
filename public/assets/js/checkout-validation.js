@@ -1,8 +1,10 @@
-$(document).ready(function() {
+$(document).ready(function () {
     // Form validation function
     function validateForm() {
         let isValid = true;
         let errorMessages = [];
+
+        const isUserLoggedIn = $('meta[name="auth-check"]').length > 0;
 
         // Validate shipping form
         const shippingFields = {
@@ -12,8 +14,7 @@ $(document).ready(function() {
             'landmark': 'Landmark',
             'city': 'City',
             'state': 'State',
-            'zipcode': 'Zip Code',
-            'phoneNumber': 'Phone Number'
+            'zipcode': 'Zip Code'
         };
 
         // Validate shipping fields
@@ -46,10 +47,12 @@ $(document).ready(function() {
 
         // Phone number validation
         const phone = $('input[name="phoneNumber"]').val();
-        if (phone && !/^\d{10}$/.test(phone)) {
+        if (!isUserLoggedIn && phone && !/^\d{10}$/.test(phone)) {
             isValid = false;
             errorMessages.push('Please enter a valid 10-digit phone number');
             $('input[name="phoneNumber"]').addClass('is-invalid');
+        } else {
+            $('input[name="phoneNumber"]').removeClass('is-invalid');
         }
 
         // Validate billing form if different billing address is selected
@@ -119,9 +122,9 @@ $(document).ready(function() {
     }
 
     // Override the existing AJAX form submission
-    $('#orderForm').off('submit').on('submit', function(e) {
+    $('#orderForm').off('submit').on('submit', function (e) {
         e.preventDefault(); // Always prevent default submission first
-        
+
         if (!validateForm()) {
             return false; // Stop here if validation fails
         }
@@ -135,10 +138,10 @@ $(document).ready(function() {
             },
             data: $(this).serialize(),
             dataType: "json",
-            beforeSend: function() {
+            beforeSend: function () {
                 $('#submitOrder').prop('disabled', true).text('Processing...');
             },
-            success: function(response) {
+            success: function (response) {
                 if (response.otp_required) {
                     $("#otpModal").modal("show");
                 } else if (response.success && response.redirect_url) {
@@ -147,7 +150,7 @@ $(document).ready(function() {
                     alert("Something went wrong. Please try again.");
                 }
             },
-            error: function(xhr) {
+            error: function (xhr) {
                 let errors = xhr.responseJSON?.errors;
                 let errorMessage = "An error occurred.";
                 if (errors) {
@@ -162,14 +165,14 @@ $(document).ready(function() {
     });
 
     // Real-time validation on input change
-    $('input, select').on('change', function() {
+    $('input, select').on('change', function () {
         if ($(this).hasClass('is-invalid')) {
             $(this).removeClass('is-invalid');
         }
     });
 
     // Toggle billing address form visibility
-    $('input[name="sameAddress"]').on('change', function() {
+    $('input[name="sameAddress"]').on('change', function () {
         if ($(this).val() === '0') {
             $('.billingAddress').show();
             // Add required attribute to billing fields
@@ -182,7 +185,7 @@ $(document).ready(function() {
     });
 
     // Phone number input validation
-    $('input[type="tel"]').on('input', function() {
+    $('input[type="tel"]').on('input', function () {
         this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
     });
 
