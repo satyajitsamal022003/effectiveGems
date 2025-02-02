@@ -797,7 +797,6 @@
             $('#loading-indicator').hide();
             return false;
         }
-
         // Make the AJAX request
         return new Promise((resolve, reject) => {
             $.ajax({
