@@ -560,7 +560,7 @@ class ProductController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'productId' => 'required|exists:products,id',
+                'productId' => 'required|exists:product,id',
                 'ontop' => 'required|boolean'
             ]);
 
@@ -594,7 +594,7 @@ class ProductController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'productId' => 'required|exists:products,id',
+                'productId' => 'required|exists:product,id',
                 'status' => 'required|in:0,1,2'
             ]);
 
