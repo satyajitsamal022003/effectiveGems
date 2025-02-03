@@ -510,7 +510,7 @@ class ProductController extends Controller
     {
         try {
             $validator = Validator::make(['id' => $id], [
-                'id' => 'required|exists:products,id'
+                'id' => 'required|exists:product,id'
             ]);
 
             if ($validator->fails()) {
@@ -618,7 +618,7 @@ class ProductController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product status updated successfully',
+                'message' => 'Product status updated Successfully',
                 'data' => [
                     'status' => $product->status,
                     'status_text' => $statusMessages[$product->status] ?? 'unknown'
