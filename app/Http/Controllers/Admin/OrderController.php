@@ -395,15 +395,10 @@ class OrderController extends Controller
         return response()->json(['message' => 'Order Details and Invoice Added Successfully!']);
     }
 
-
-
-
-
-
-
     public function acceptOrder($id)
     {
         $order = Order::find($id);
+        // dd($order);
 
         if (!$order) {
             return redirect()->back()->with('message', 'Order not found');
@@ -411,7 +406,7 @@ class OrderController extends Controller
 
         // Approve the order
         $order->orderApproved = 1; // Assuming 1 means approved
-        $order->orderStatus = 'Accepted ';
+        $order->orderStatus = 'Approved';
         $order->save();
 
         // Optionally, send an email to confirm acceptance

@@ -58,6 +58,17 @@ class CategoryController extends Controller
             'sortOrder' => $request->input('sortOrder'),
             'description' => $request->input('description'),
             'status' => $request->has('onoffswitch928') ? 0 : 1,
+            'metaTitle' => $request->input('metaTitle'),
+            'metaDescription' => $request->input('metaDescription'),
+            'seoUrl' => $request->input('seoUrl'),
+            'metaKeyword' => $request->input('metaKeyword'),
+            'metaImage' => $request->input('metaImage'),
+            'imageAlt' => $request->input('imageAlt'),
+            'imageTitle' => $request->input('imageTitle'),
+            'imageCaption' => $request->input('imageCaption'),
+            'imageDesc' => $request->input('imageDesc'),
+
+            
         ]);
 
       // Redirect with success message
@@ -105,6 +116,18 @@ class CategoryController extends Controller
         $category->sortOrder = $request->input('sortOrder');
         $category->description = $request->input('description');
         $category->status = $request->has('status') ? 1 : 0;
+        // for seo 
+        $category->metaTitle = $request->input('metaTitle');
+        $category->metaDescription = $request->input('metaDescription');
+        $category->seoUrl = $request->input('seoUrl');
+        $category->metaKeyword = $request->input('metaKeyword');
+        $category->metaImage = $request->input('metaImage');
+        // for alternative 
+        $category->imageAlt = $request->input('imageAlt');
+        $category->imageTitle = $request->input('imageTitle');
+        $category->imageCaption = $request->input('imageCaption');
+        $category->imageDesc = $request->input('imageDesc');
+
     
         // Save the updated data
         $category->save();

@@ -306,7 +306,7 @@
                         <input type="hidden" id="orderId" name="orderId" value="">
                         <div class="form-group">
                             <label for="invoiceupload">Upload</label>
-                            <input type="file" id="invoiceupload" name="invoiceupload" class="form-control" required>
+                            <input type="file" id="invoiceupload" name="invoiceupload" class="form-control" accept=".pdf" required>
                         </div>
                         <input type="hidden" id="orderId" name="orderId" value="">
 
@@ -688,8 +688,9 @@
                             'content') // Ensure CSRF token is included
                     },
                     success: function(response) {
-                        alert(response.message);
+                        toastr.success(response.message);
                         $('#requestModal').modal('hide');
+                        table.ajax.reload();
                     },
                     error: function(xhr) {
                         alert(xhr.responseJSON.message);
@@ -716,8 +717,9 @@
                             'content') // Ensure CSRF token is included
                     },
                     success: function(response) {
-                        alert(response.message);
+                        toastr.success(response.message);
                         $('#cancelModal').modal('hide');
+                        table.ajax.reload();
                     },
                     error: function(xhr) {
                         alert(xhr.responseJSON.message);
@@ -748,8 +750,9 @@
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert(response.message);
+                        toastr.success(response.message);
                         $('#couriermodal').modal('hide');
+                        table.ajax.reload();
                     },
                     error: function(xhr) {
                         alert(xhr.responseJSON.message);
@@ -776,8 +779,9 @@
                         _token: $('meta[name="csrf-token"]').attr('content')
                     },
                     success: function(response) {
-                        alert(response.message);
+                        toastr.success(response.message);
                         $('#deliverymodal').modal('hide');
+                        table.ajax.reload();
                     },
                     error: function(xhr) {
                         alert(xhr.responseJSON.message);
@@ -801,8 +805,9 @@
                     processData: false, // Prevent jQuery from processing the data
                     contentType: false, // Prevent jQuery from setting the content-type header
                     success: function(response) {
-                        alert(response.message);
+                        toastr.success(response.message);
                         $('#invoicemodal').modal('hide'); // Close the modal on success
+                        table.ajax.reload();
                     },
                     error: function(xhr) {
                         alert(xhr.responseJSON.message);

@@ -9,10 +9,11 @@ class Category extends Model
 {
     use HasFactory;
 	protected $table = 'category';
-	protected $fillable = ['categoryName','image','banner','description','class','seoUrl','sortOrder','metaTitle','metaKeyword','metaDescription','metaImage','onTop','onFooter','status'];
+	protected $fillable = ['categoryName','image','banner','description','class','seoUrl','sortOrder','metaTitle','metaKeyword','metaDescription','metaImage','onTop','onFooter','status','imageAlt','imageTitle','imageCaption','imageDesc'];
 	
 	 public function products()
     {
         return $this->hasMany(Product::class, 'categoryId', 'id'); // 'categoryId' is the foreign key in the products table
     }
+
 }

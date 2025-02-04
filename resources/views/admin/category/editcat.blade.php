@@ -91,7 +91,7 @@
                                             <label>Meta Title </label>
                                             <input class="form-control" id="metaTitle"
                                                 placeholder="Meta Title" name="metaTitle"
-                                                value="">
+                                                value="{{ $category->metaTitle ?? '' }}">
                                         </div>
 
                                         <div class="form-group">
@@ -99,7 +99,7 @@
                                             </label>
 
                                             <textarea id="metaDescription" class="form-control " placeholder="First Description" name="metaDescription"
-                                                cols="50" rows="4"></textarea>
+                                                cols="50" rows="4">{{ $category->metaDescription ?? '' }}</textarea>
 
                                         </div>
 
@@ -107,21 +107,21 @@
                                             <label>Seo Url </label>
                                             <input class="form-control" id="seoUrl"
                                                 placeholder="Seo Url" name="seoUrl"
-                                                value="">
+                                                value="{{ $category->seoUrl ?? '' }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Meta Keyword </label>
                                             <input class="form-control" id="metaKeyword"
                                                 placeholder="Meta Keyword" name="metaKeyword"
-                                                value="">
+                                                value="{{ $category->metaKeyword ?? '' }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Meta image </label>
                                             <input class="form-control" id="metaImage"
                                                 placeholder="Meta image" name="metaImage"
-                                                value="">
+                                                value="{{ $category->metaImage ?? '' }}">
                                         </div>
 
                                     </div>
@@ -131,7 +131,7 @@
                                         $(".seo-edit-box").toggle('slow');
                                     }
                                 </script>
-                                <button type="button" class="btn btn-success mt-3">Generate
+                                <button type="button" onclick="showseoedit()" class="btn btn-success mt-3">Generate
                                     SEO
                                 </button>
 
@@ -148,28 +148,28 @@
                                             <label>Alternative Text</label>
                                             <input class="form-control" id="imageAlt"
                                                 placeholder="Alternative Text" name="imageAlt"
-                                                value="">
+                                                value="{{ $category->imageAlt ?? '' }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Image Title</label>
                                             <input class="form-control" id="imageTitle"
                                                 placeholder="Image Title" name="imageTitle"
-                                                value="">
+                                                value="{{ $category->imageTitle ?? '' }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label>Image Caption</label>
                                             <input class="form-control" id="imageCaption"
                                                 placeholder="Image Caption" name="imageCaption"
-                                                value="">
+                                                value="{{ $category->imageCaption ?? '' }}">
                                         </div>
 
                                         <div class="form-group">
                                             <label class="col-form-label">Image Description
                                             </label>
                                             <textarea id="imageDesc" class="form-control" placeholder="Description" name="imageDesc" cols="50"
-                                                rows="4"></textarea>
+                                                rows="4">{{ $category->imageDesc ?? '' }}</textarea>
 
                                         </div>
 
@@ -180,7 +180,7 @@
                                         $(".seo-img-edit-box").toggle('slow');
                                     }
                                 </script>
-                                <button type="button" class="btn btn-success mt-3">Generate
+                                <button type="button" onclick="showseoimgedit()" class="btn btn-success mt-3">Generate
                                     SEO </button>
                                 <!--image seo en-->
                             </div>
