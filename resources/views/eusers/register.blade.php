@@ -46,13 +46,6 @@
                                     </div>
                                     <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
                                         <div class="form-group">
-                                            <label for="mobile">Mobile No.</label>
-                                            <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your Mobile Number" value="{{old('mobile')}}" required>
-                                            @error('email') <span class="text-danger">{{ $message }}</span> @enderror
-                                        </div>
-                                    </div>
-                                    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12">
-                                        <div class="form-group">
                                             <label for="password">Password</label>
                                             <input type="password" class="form-control" id="password" name="password" placeholder="*******" required>
                                             @error('password') <span class="text-danger">{{ $message }}</span> @enderror

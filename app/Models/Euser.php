@@ -16,7 +16,6 @@ class Euser extends Authenticatable
         'last_name',
         'email',
         'password',
-        'mobile',
         'is_mobile_verified'
     ];
 

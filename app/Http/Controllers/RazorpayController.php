@@ -102,7 +102,7 @@ class RazorpayController extends Controller
 
         if ($userId) {
             $cart = Cart::where("userId", $userId)->first();
-            $cartId = $cart->id;
+            $cartId = $cart->id; 
         } else {
             $cart = Cart::where("ip", $ip)->first();
             $cartId = $cart->id;

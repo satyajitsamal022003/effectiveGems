@@ -22,7 +22,7 @@ class RegisterController extends Controller
             'l_name' => 'required|string|max:255',
             'email' => 'required|email|unique:eusers,email',
             'password' => 'required|string|min:8',
-            'mobile' => 'required|digits:10|unique:eusers,mobile',
+            // 'mobile' => 'required|digits:10|unique:eusers,mobile',
         ]);
 
         if ($validator->fails()) {
@@ -35,7 +35,7 @@ class RegisterController extends Controller
             'last_name' => $request->l_name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'mobile' => $request->mobile,
+            // 'mobile' => $request->mobile,
         ]);
 
         // Redirect to a success page or login
