@@ -209,6 +209,7 @@ class CouponController extends Controller
         // Retrieve the coupon by name
         $coupon = Coupon::where("code", $couponName)->first();
 
+
         // If the coupon does not exist, return an error response
         if (!$coupon) {
             return response()->json(['message' => 'Coupon not found'], 422);
@@ -218,7 +219,7 @@ class CouponController extends Controller
         $startDate = Carbon::parse($coupon->startDate)->timezone('Asia/Kolkata');  // Parse start date in 'Asia/Kolkata' timezone
         $endDate = Carbon::parse($coupon->endDate)->timezone('Asia/Kolkata');  // Parse end date in 'Asia/Kolkata' timezone
 
-        if ($startDate->lessThan($currentDate) || $endDate->greaterThan($currentDate)) {
+        if ($endDate->lessThan($currentDate)) {
             return response()->json(['message' => 'Coupon expired or not yet valid'], 422);
         }
 
