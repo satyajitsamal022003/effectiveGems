@@ -992,8 +992,11 @@
                 cartId: cartId, // Send the cart ID
             },
             success: function(response) {
+                if (response.discount === 0) {
+                toastr.error('Coupon not found'); // Show error message if discount is 0
+                 } else {
                 // Assuming response contains subtotal, discount, and finalAmount
-                alert(`Discount of rs ${response.discount} applied!`); // Show a success message
+                toastr.success(`Discount of Rs ${response.discount} applied!`); // Show a success message
                 $('.amount').val(response.finalAmount);
                 $('.subTotal').text(response.finalAmount);
                 $('#discountedtotal').text(response.finalSubtotal);
@@ -1007,6 +1010,7 @@
                 $('.couponApplyBtn').prop('disabled', true);
                 // $('.subTotal').text(`${response.subtotal}`); // Update the subtotal on the page
                 // $('#total').text(`${response.finalAmount}`); // Update the total amount on the page
+                }
             },
             error: function(xhr, status, error) {
                 alert(JSON.parse(xhr.responseText)

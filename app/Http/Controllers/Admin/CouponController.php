@@ -72,8 +72,7 @@ class CouponController extends Controller
             'type' => $request->type,
         ]);
 
-        return redirect()->route('coupons.index');
-
+        return redirect()->route('coupons.index')->with('message', 'Coupon created successfully!');
     }
 
 
@@ -171,8 +170,7 @@ class CouponController extends Controller
         ]);
 
         // Return a success message
-        return redirect()->route('coupons.index');
-
+        return redirect()->route('coupons.index')->with('message', 'Coupon updated successfully!');
     }
 
 
@@ -188,7 +186,7 @@ class CouponController extends Controller
         }
 
         $coupon->delete();
-        return redirect()->route('coupons.index');
+        return redirect()->route('coupons.index')->with('message', 'Coupon Deleted!');
     }
     public function updateStatus(Request $request)
     {
@@ -204,111 +202,98 @@ class CouponController extends Controller
     {
         // Find the cart using cartId
         $cart = Cart::find($req->cartId);
+        if (!$cart) {
+            return response()->json(['message' => 'Cart not found'], 404);
+        }
+
         $couponName = $req->couponName;
 
         // Retrieve the coupon by name
         $coupon = Coupon::where("code", $couponName)->first();
-
-
-        // If the coupon does not exist, return an error response
         if (!$coupon) {
             return response()->json(['message' => 'Coupon not found'], 422);
         }
-        $currentDate = Carbon::now('Asia/Kolkata');  // Get current date and time in 'Asia/Kolkata' timezone
 
-        $startDate = Carbon::parse($coupon->startDate)->timezone('Asia/Kolkata');  // Parse start date in 'Asia/Kolkata' timezone
-        $endDate = Carbon::parse($coupon->endDate)->timezone('Asia/Kolkata');  // Parse end date in 'Asia/Kolkata' timezone
+        $currentDate = Carbon::now('Asia/Kolkata');
 
-        if ($endDate->lessThan($currentDate)) {
+        $startDate = Carbon::parse($coupon->startDate)->timezone('Asia/Kolkata');
+        $endDate = Carbon::parse($coupon->endDate)->timezone('Asia/Kolkata');
+
+        if ($currentDate->lt($startDate) || $currentDate->gt($endDate)) {
             return response()->json(['message' => 'Coupon expired or not yet valid'], 422);
         }
 
+        // Fetch cart items with product details
+        $cartItems = $cart->items()->with('productDetails')->get();
 
-        // Calculate subtotal from the cart items
-        $cartItems = $cart ? $cart->items()->with(['productDetails'])->get() : collect();
-        $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
+        if ($cartItems->isEmpty()) {
+            return response()->json(['message' => 'Cart is empty'], 422);
+        }
+
+        $totalDelPrice = 0;
+        $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
             $product = Product::find($item->product_id);
 
-            if ($courierType) {
-                $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
-                    $deliveryPrice = $deliveryPrice * $item->quantity;
-                }
+            $deliveryPrice = $courierType ? $courierType->courier_price : 0;
+            if ($courierType && ($courierType->id == 3 || $courierType->id == 4) && $product->categoryId != 1) {
+                $deliveryPrice *= $item->quantity;
             }
+
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
-            if ($product->categoryId != 1) {
-                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-            } else {
-                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
-                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
-            }
+
+            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
         });
+
         $total = $subtotal - $totalDelPrice;
-
-        // Initialize discount variable
         $discount = 0;
+        $totalApplicableAmount = 0;
 
-        // Check if coupon applies to the whole site
+        // Whole site discount
         if ($coupon->wholeSite) {
             if ($coupon->type == 2) {
-                // Percentage discount
                 $discount = ($total * $coupon->value) / 100;
             } else {
-                // Flat discount
-                $discount = $coupon->value;
+                $discount = min($coupon->value, $total);
             }
         } else {
-            // Initialize total applicable amount for products
-            $totalApplicableAmount = 0;
+            // Initialize product/category/subcategory discount calculation
+            $productIds = !empty($coupon->products) ? explode(',', $coupon->products) : [];
+            $categoryIds = !empty($coupon->categories) ? explode(',', $coupon->categories) : [];
+            $subCategoryIds = !empty($coupon->subCategories) ? explode(',', $coupon->subCategories) : [];
 
-            // Check if coupon applies to specific products
-            if ($coupon->products) {
-                $productIds = explode(',', $coupon->products);
-                foreach ($cartItems as $item) {
-                    if (in_array($item->product_id, $productIds)) {
-                        $totalApplicableAmount += $item->productDetails->priceB2C * $item->quantity;
-                    }
+            foreach ($cartItems as $item) {
+                $product = Product::find($item->product_id);
+                $itemTotal = $item->productDetails->priceB2C * $item->quantity; // Ensure quantity is included
+            
+                // Check if coupon applies to products
+                if (in_array($item->product_id, $productIds)) {
+                    $totalApplicableAmount += $itemTotal;
+                }
+            
+                // Check if coupon applies to categories
+                if (in_array($product->categoryId, $categoryIds)) {
+                    $totalApplicableAmount += $itemTotal;
+                }
+            
+                // Check if coupon applies to subcategories
+                if (in_array($product->subCategoryId, $subCategoryIds)) {
+                    $totalApplicableAmount += $itemTotal;
                 }
             }
 
-            // Check if coupon applies to specific categories
-            if ($coupon->categories) {
-                $categoryIds = explode(',', $coupon->categories);
-                foreach ($cartItems as $item) {
-                    $product = Product::find($item->product_id);
-                    if (in_array($product->categoryId, $categoryIds)) {
-                        $totalApplicableAmount += $item->productDetails->priceB2C * $item->quantity;
-                    }
-                }
-            }
-
-            // Check if coupon applies to specific subcategories
-            if ($coupon->subCategories) {
-                $subCategoryIds = explode(',', $coupon->subCategories);
-                foreach ($cartItems as $item) {
-                    $product = Product::find($item->product_id);
-                    if (in_array($product->subCategoryId, $subCategoryIds)) {
-                        $totalApplicableAmount += $item->productDetails->priceB2C * $item->quantity;
-                    }
-                }
-            }
-
-            // Calculate discount based on applicable total amount
+            // Apply discount on total applicable amount
             if ($coupon->type == 2) {
-                // Percentage discount on total applicable amount
                 $discount = ($totalApplicableAmount * $coupon->value) / 100;
             } else {
-                // Flat discount on total applicable amount
-                $discount = $coupon->value; // or limit it based on the total applicable amount
+                $discount = min($coupon->value * $cartItems->sum('quantity'), $totalApplicableAmount);
             }
         }
 
-        // Calculate final amount after discount
-        $finalSubtotal = max(0, $total - $discount); // Ensure final amount does not go below zero
-        $finalAmount = max(0, $total - $discount) + $totalDelPrice; // Ensure final amount does not go below zero
+        // Calculate final total
+        $finalSubtotal = max(0, $total - $discount);
+        $finalAmount = $finalSubtotal + $totalDelPrice;
 
         return response()->json([
             'total' => $total,
