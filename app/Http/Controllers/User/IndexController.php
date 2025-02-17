@@ -616,7 +616,7 @@ class IndexController extends Controller
         $variants = [];
         $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
         if ($productdetails->variant)
-            $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();
+            $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C", "productName")->get();
         // dd(count($variants));
         if ($productSlug) {
             return redirect()->route('user.productdetailsslug', ['slug' => $productSlug], 301);
@@ -649,7 +649,7 @@ class IndexController extends Controller
         $variants = [];
         $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
         if ($productdetails->variant)
-            $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C")->get();        // dd(count($variants));
+            $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C", "productName")->get();        // dd(count($variants));
 
         return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype",'isInWishlist'));
     }
