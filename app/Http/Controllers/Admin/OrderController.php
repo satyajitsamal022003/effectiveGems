@@ -58,7 +58,9 @@ class OrderController extends Controller
         $orderStatus = $request->input('orderStatus');
         // $category = $request->input('category');
         // Base query to fetch orders and eager load order items and their related products
-        $query = Order::with(['items.productDetails']); // Eager load order items and product details
+        $query = Order::with(['items.productDetails'])
+            ->leftJoin('eusers', 'eusers.id', '=', 'orders.userid')
+            ->select('orders.*', 'eusers.userid as user_id'); 
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {
@@ -66,7 +68,7 @@ class OrderController extends Controller
                 $query->where('firstName', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('middleName', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('lastName', 'LIKE', '%' . $searchValue . '%')
-                    ->orWhere('userId', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('eusers.userid', 'LIKE', '%' . $searchValue . '%') 
                     ->orWhere('amount', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('ip', 'LIKE', '%' . $searchValue . '%');
             });
@@ -126,7 +128,9 @@ class OrderController extends Controller
         $orderStatus = $request->input('orderStatus');
         // $category = $request->input('category');
         // Base query to fetch orders and eager load order items and their related products
-        $query = Order::where('orderType','2')->with(['items.productDetails']); // Eager load order items and product details
+        $query = Order::where('orderType','2')->with(['items.productDetails'])
+            ->leftJoin('eusers', 'eusers.id', '=', 'orders.userid')
+            ->select('orders.*', 'eusers.userid as user_id'); 
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {
@@ -134,7 +138,7 @@ class OrderController extends Controller
                 $query->where('firstName', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('middleName', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('lastName', 'LIKE', '%' . $searchValue . '%')
-                    ->orWhere('userId', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('eusers.userid', 'LIKE', '%' . $searchValue . '%') 
                     ->orWhere('amount', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('ip', 'LIKE', '%' . $searchValue . '%');
             });
@@ -194,7 +198,10 @@ class OrderController extends Controller
         $orderStatus = $request->input('orderStatus');
         // $category = $request->input('category');
         // Base query to fetch orders and eager load order items and their related products
-        $query = Order::with(['items.productDetails']); // Eager load order items and product details
+        $query = Order::with(['items.productDetails'])
+            ->leftJoin('eusers', 'eusers.id', '=', 'orders.userid')
+            ->select('orders.*', 'eusers.userid as user_id'); 
+
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {
@@ -202,7 +209,7 @@ class OrderController extends Controller
                 $query->where('firstName', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('middleName', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('lastName', 'LIKE', '%' . $searchValue . '%')
-                    ->orWhere('userId', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('eusers.userid', 'LIKE', '%' . $searchValue . '%') 
                     ->orWhere('amount', 'LIKE', '%' . $searchValue . '%')
                     ->orWhere('ip', 'LIKE', '%' . $searchValue . '%');
             });

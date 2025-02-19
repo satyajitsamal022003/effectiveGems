@@ -309,7 +309,7 @@
                                                                         placeholder="Meta Keyword" name="metaKeyword"
                                                                         value="{{ $product->metaKeyword }}">
                                                                 </div>
-                                                                <div class="form-group">
+                                                                <div class="form-group"> 
                                                                     <label>Meta image </label>
                                                                     <input class="form-control" id="metaImage"
                                                                         placeholder="Meta image" name="metaImage"
@@ -330,8 +330,11 @@
                                             </fieldset>
                                         </div> <!-- end col -->
                                     </div>
+                                    
                                     <div class="form-group row">
                                         <label class="col-form-label col-md-4">
+                                        <a href="#product_image_tab" data-toggle="tab"><button
+                                        class="btn btn-info">Next</button></a>
                                             <button class="btn btn-primary" type="button"
                                                 id="nextButton">Update</button>
                                         </label>
@@ -527,6 +530,8 @@
                                         <label class="col-form-label col-md-4">
                                             <a href="#product_tab" data-toggle="tab"><button
                                                     class="btn btn-info">Previous</button></a>
+                                                    <a href="#product_description_tab" data-toggle="tab"><button
+                                        class="btn btn-secondary">Next</button></a>
                                             <button class="btn btn-primary" type="button"
                                                 id="nextButton2">Update</button>
                                         </label>

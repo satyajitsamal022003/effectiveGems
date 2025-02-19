@@ -383,7 +383,7 @@
                         name: 'orderDate'
                     },
                     {
-                        data: 'middleName', // Customer ID
+                        data: 'user_id', // Customer ID
                         name: 'customerID'
                     },
                     {
