@@ -526,10 +526,15 @@
                             <div class="radio-check-box">
 
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="flexRadioDefault"
-                                        id="razorpay_secure" checked>
+                                    <input class="form-check-input" type="radio" name="orderType" id="razorpay_secure" value="1" checked>
                                     <label class="form-check-label" for="razorpay_secure">
                                         Razorpay Secure (UPI, Cards, Wallets, NetBanking)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="orderType" id="cash_on_delivery" value="2">
+                                    <label class="form-check-label" for="cash_on_delivery">
+                                        Cash on Delivery
                                     </label>
                                 </div>
                                 <p>After clicking “Pay now”, you will be redirected to Razorpay Secure (UPI, Cards,
@@ -1272,7 +1277,8 @@
                     }),
                 })
                 .then(response => response.json())
-                .then(data => {
+                .then(data => { 
+                    debugger
                     $('#verifyOtp').prop('disabled', false).text('Verify OTP');
                     if (data.success) {
                         toastr.success(data.message);

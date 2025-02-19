@@ -138,6 +138,8 @@ class OrderController extends Controller
         $order->landmark = $request->landmark;
         $order->appartment = $request->appartment;
         $order->address = $request->address;
+        //order Type storing here COD or Razorpay
+        $order->orderType = $request->orderType;
         if ($request->sameAddress) {
             $order->billingfirstName = $request->billingfirstName;
             $order->billingmiddleName = $request->billingmiddleName;
@@ -328,7 +330,18 @@ class OrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'OTP has expired.']);
             }
             $user = Euser::where('mobile', $request->mobile)->first();
-
+            
+            $orderdata = Order::where('id',session('order_id'))->first();
+           //    return $orderdata->orderType;
+            if($orderdata && $orderdata->orderType == '2'){ //COD
+                $order = Order::find(session('order_id'));
+                $order->paymentMode = 'COD';
+                $order->orderStatus = 'Placed';
+                $order->transactionId = '';
+                $order->save();
+                return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
+                // return redirect()->route('order.placed');
+            }
             if ($user) {
                 $user->update(['is_mobile_verified' => 1]);
                 Auth::guard('euser')->login($user);
@@ -344,7 +357,6 @@ class OrderController extends Controller
                     ]);
                 }
             }
-
 
             $randomPassword = Str::random(8);
             $mobile = $request->mobile;

@@ -78,6 +78,9 @@
                         <li class="{{ request()->is('admin/order') ? 'active' : '' }}">
                             <a href="/admin/order"><i class="fa-solid fa-cart-shopping"></i> <span>Order</span></a>
                         </li>
+                        <li class="{{ request()->is('admin/cash-on-delivery-list') ? 'active' : '' }}">
+                            <a href="/admin/cash-on-delivery-list"><i class="fa-solid fa-cart-shopping"></i> <span>COD Order list</span></a>
+                        </li>
                         <li class="{{ request()->routeIs('admin.order.pendingOrdersList') ? 'active' : '' }}">
                             <a href="{{ route('admin.order.pendingOrdersList') }}">
                                 <i class="fa-solid fa-cart-shopping"></i> Payment failed

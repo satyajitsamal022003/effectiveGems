@@ -39,6 +39,10 @@ class OrderController extends Controller
     {
         return view('admin.orders.list');
     }
+    public function cashOnDeliveryList()
+    {
+        return view('admin.orders.cashOnDeliverylist');
+    }
     public function pendingOrdersList()
     {
         return view('admin.orders.pendingOrders');
@@ -55,6 +59,74 @@ class OrderController extends Controller
         // $category = $request->input('category');
         // Base query to fetch orders and eager load order items and their related products
         $query = Order::with(['items.productDetails']); // Eager load order items and product details
+
+        // Apply search filtering if needed
+        if (!empty($searchValue)) {
+            $query->where(function ($query) use ($searchValue) {
+                $query->where('firstName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('middleName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('lastName', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('userId', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('amount', 'LIKE', '%' . $searchValue . '%')
+                    ->orWhere('ip', 'LIKE', '%' . $searchValue . '%');
+            });
+        }
+
+
+        // Apply filtering by category if applicable
+        $query->where('orderStatus', '!=', 'Failed');
+        if (!empty($orderStatus)) {
+            $query->where('orderStatus', $orderStatus);
+        }
+
+        // Get the total filtered records count
+        $totalFilteredRecords = $query->count();
+
+        // Apply pagination
+        $orders = $query // Filter by payment completed
+            ->orderBy('created_at', 'desc')
+            ->skip($skip)
+            ->take($length)
+            ->get();
+
+        // Get the total record count without filtering
+        $totalRecords = Order::count();
+
+        // Map the orders to include a custom index and return the data
+
+        $data = $orders->map(function ($order, $key) use ($pageNo) {
+            $order->DT_RowIndex = $pageNo + $key + 1;
+            $specificDate = new DateTime($order->created_at);
+            $order->orderDate = $specificDate->format('d-m-Y h:iA');
+            $order->state = State::find($order->state)->stateName;
+            $order->country = "India";
+            $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
+            // You can add extra details here if needed
+            foreach ($order->items as $key => $item) {
+                $item->productDetails->image = asset($item->productDetails->image1);
+            }
+            return $order;
+        });
+
+        return response()->json([
+            'draw' => $draw,
+            'recordsTotal' => $totalRecords,
+            'recordsFiltered' => $totalFilteredRecords,
+            'data' => $data
+        ]);
+    }
+    public function getCODOrdersData(Request $request)
+    {
+
+        $draw = intval($request->input('draw'));
+        $length = intval($request->input('length'));
+        $pageNo = intval($request->input('start'));
+        $skip = $pageNo;
+        $searchValue = $request->input('search.value');
+        $orderStatus = $request->input('orderStatus');
+        // $category = $request->input('category');
+        // Base query to fetch orders and eager load order items and their related products
+        $query = Order::where('orderType','2')->with(['items.productDetails']); // Eager load order items and product details
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {

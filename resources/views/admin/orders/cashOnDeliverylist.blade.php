@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('page-title', 'Orders')
+@section('page-title', 'COD Order')
 @section('content')
     <!-- Page Wrapper -->
     <div class="page-wrapper">
@@ -8,10 +8,10 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col">
-                        <h3 class="page-title">Order Placed</h3>
+                        <h3 class="page-title">COD Order</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Order Placed</li>
+                            <li class="breadcrumb-item active">COD Order</li>
                         </ul>
                     </div>
                 </div>
@@ -367,7 +367,7 @@
                 processing: true,
                 serverSide: true,
                 ajax: {
-                    url: "{{ route('admin.order.data') }}", // Update the route for orders
+                    url: "{{ route('admin.cod.order.data') }}", // Update the route for orders
                     data: function(d) {
                         d.orderStatus = $('#orderStatusFilter').val(); // Pass orderstatus parameter
                     }

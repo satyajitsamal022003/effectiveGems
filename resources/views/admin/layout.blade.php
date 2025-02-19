@@ -22,7 +22,11 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
     <script src="{{url('/')}}/assets/js/jquery-3.2.1.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css" rel="stylesheet">
-
+    <style>
+    .text-nowrap {
+        white-space: nowrap;
+    }
+    </style>
 </head>
 
 <body>

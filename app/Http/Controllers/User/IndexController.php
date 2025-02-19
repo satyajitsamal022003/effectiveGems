@@ -687,6 +687,11 @@ class IndexController extends Controller
         return view('user.payment_success');
     }
 
+    public function orderPlaced()
+    {
+        return view('user.payment_order_placed');
+    }
+
     public function paymentfailed()
     {
         return view('user.payment_failed');

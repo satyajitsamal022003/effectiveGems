@@ -53,9 +53,11 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
 
     Route::resource('order', AdminOrderController::class);
+    Route::get('/cash-on-delivery-list', [AdminOrderController::class, 'cashOnDeliveryList'])->name('admin.order.cashOnDeliveryList');
     Route::get('/pending-orders-list', [AdminOrderController::class, 'pendingOrdersList'])->name('admin.order.pendingOrdersList');
     Route::get('/pending-orders-data', [AdminOrderController::class, 'getPendingOrdersData'])->name('admin.order.getPendingOrdersData');
     Route::get('/orders/data', [AdminOrderController::class, 'getOrdersData'])->name('admin.order.data');
+    Route::get('/orders/cod/data', [AdminOrderController::class, 'getCODOrdersData'])->name('admin.cod.order.data');
     Route::post('/orders/changeStatus', [AdminOrderController::class, 'changeStatus'])->name('admin.order.changeStatus');
     Route::post('/orders/add-payment-details', [AdminOrderController::class, 'addPaymentDetails'])->name('admin.order.addPaymentDetails');
     // Admin dashboard route
@@ -200,6 +202,7 @@ Route::get('/pages/{url}', [IndexController::class, 'pages'])->name('pages');
 
 //success and failed
 Route::get('/payment-success', [IndexController::class, 'paymentsuccess'])->name('payment.success');
+Route::get('/order-placed', [IndexController::class, 'orderPlaced'])->name('order.placed');
 Route::get('/payment-failed', [IndexController::class, 'paymentfailed'])->name('payment.failed');
 
 Route::resource('checkout', OrderController::class);
