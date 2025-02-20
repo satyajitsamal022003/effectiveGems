@@ -250,4 +250,38 @@
             }
         });
     </script>
+    <script>
+            document.addEventListener("DOMContentLoaded", function () {
+        const checkboxes = document.querySelectorAll('input[name="wholeSite"], input[name="products"], input[name="categories"], input[name="subCategories"]');
+
+        checkboxes.forEach((checkbox) => {
+            checkbox.addEventListener("change", function () {
+                if (this.checked) {
+                    checkboxes.forEach((cb) => {
+                        if (cb !== this) {
+                            cb.checked = false;
+                        }
+                    });
+
+                    // Hide all containers
+                    document.getElementById('variant-container').style.display = 'none';
+                    document.getElementById('categories-container').style.display = 'none';
+                    document.getElementById('subCategories-container').style.display = 'none';
+
+                    // Show the selected container
+                    if (this.id === 'products') {
+                        document.getElementById('variant-container').style.display = 'block';
+                        intialiseSelect2('productList');
+                    } else if (this.id === 'categories') {
+                        document.getElementById('categories-container').style.display = 'block';
+                        intialiseSelect2('categoriesList');
+                    } else if (this.id === 'subCategories') {
+                        document.getElementById('subCategories-container').style.display = 'block';
+                        intialiseSelect2('subCategoriesList');
+                    }
+                }
+            });
+        });
+    });
+    </script>
 @endsection
