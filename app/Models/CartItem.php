@@ -14,6 +14,6 @@ class CartItem extends Model
     }
     public function productDetails()
     {
-        return $this->hasOne(Product::class, 'id', 'product_id');
+        return $this->hasOne(Product::class, 'id', 'product_id'); 
     }
 }

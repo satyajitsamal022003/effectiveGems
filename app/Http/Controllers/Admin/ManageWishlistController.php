@@ -14,11 +14,30 @@ use Illuminate\Support\Facades\Validator;
 
 class ManageWishlistController extends Controller
 {
-    public function WishlistData()
+    public function aWishlistData()
     {
         $Wishlist = Wishlist::with(['userDetails', 'productDetails'])->orderBy('id', 'desc')->get();
-        return view('admin.wishlist.list', compact('Wishlist'));
+        return view('admin.wishlist.frontlist', compact('Wishlist'));
     }
+
+    public function WishlistData($product_id = null)
+    {
+        $query = Wishlist::with(['userDetails', 'productDetails'])->orderBy('id', 'desc');
+
+        if ($product_id) {
+            $query->where('product_id', $product_id);
+        }
+
+        // Fetch data
+        $Wishlist = $query->get();
+
+        // Get product name from the first wishlist entry
+        $productName = $Wishlist->first()->productDetails->productName ?? 'N/A';
+
+        return view('admin.wishlist.list', compact('Wishlist', 'productName'));
+    }
+
+
 
     public function wishlistOnStatus(Request $request)
     {
@@ -59,5 +78,19 @@ class ManageWishlistController extends Controller
                 'message' => 'Failed to update Is followed: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function deleteWishlist(Request $request)
+    {
+        $wishlistId = $request->wishlistId;
+        Wishlist::where('id', $wishlistId)->delete();
+        return response()->json(['message' => 'Wishlist item deleted successfully.']);
+    }
+
+    public function massDeleteWishlist(Request $request)
+    {
+        $wishlistIds = $request->wishlistIds;
+        Wishlist::whereIn('id', $wishlistIds)->delete();
+        return response()->json(['message' => 'Selected wishlist items deleted successfully.']);
     }
 }

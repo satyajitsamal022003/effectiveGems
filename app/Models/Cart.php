@@ -18,4 +18,10 @@ class Cart extends Model
     {
         return $this->hasMany(CartItem::class);
     }
+
+    public function productDetails()
+    {
+        return $this->hasManyThrough(Product::class, CartItem::class, 'cart_id', 'id', 'id', 'product_id');
+    }
+    
 }

@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\CourierController;
 use App\Http\Controllers\Admin\FaqController;
 use App\Http\Controllers\Admin\SubCategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ManageCartController;
 use App\Http\Controllers\Admin\ManageWishlistController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PagesController;
@@ -133,9 +134,22 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/faq-edit/{id}', [FaqController::class, 'editfaq'])->name('admin.editfaq');
     Route::post('/update-faq/{id}', [FaqController::class, 'updatefaq'])->name('admin.editfaqdata');
 
-    //Wishlists
-    Route::get('/wishlist-list', [ManageWishlistController::class, 'WishlistData'])->name('admin.wishlist');
+    // Follow wishlist routes
+    Route::get('/wishlist', [ManageWishlistController::class, 'aWishlistData'])->name('admin.aWishlistData');
+    Route::get('/wishlist-list/{product_id}', [ManageWishlistController::class, 'WishlistData'])->name('admin.wishlist.details');
     Route::post('/wishlistOnStatus', [ManageWishlistController::class, 'wishlistOnStatus'])->name('admin.wishlistOnStatus');
+
+    Route::post('/admin/wishlist/delete', [ManageWishlistController::class, 'deleteWishlist'])->name('admin.wishlist.delete');
+    Route::post('/admin/wishlist/massDelete', [ManageWishlistController::class, 'massDeleteWishlist'])->name('admin.wishlist.massDelete');
+
+    // Follow Cart routes
+    Route::get('/cart', [ManageCartController::class, 'aCartData'])->name('admin.aCartData');
+    Route::get('/cart-list/{product_id}', [ManageCartController::class, 'CartData'])->name('admin.cart.details');
+    Route::post('/cartOnStatus', [ManageCartController::class, 'cartOnStatus'])->name('admin.cartOnStatus');
+
+    Route::post('/admin/cart/delete', [ManageCartController::class, 'deleteCart'])->name('admin.cart.delete');
+    Route::post('/admin/cart/massDelete', [ManageCartController::class, 'massDeleteCart'])->name('admin.cart.massDelete');
+
 
     //activation
     Route::get('/add-activation', [ActivationController::class, 'addactivation'])->name('admin.addactivation');

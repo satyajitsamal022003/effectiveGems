@@ -1,5 +1,5 @@
 @extends('admin.layout')
-@section('page-title', 'Wishlist Details - ' . $productName)
+@section('page-title', 'Cart Details - ' . $productName)
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
@@ -7,10 +7,10 @@
         <div class="page-header">
             <div class="row">
                 <div class="col">
-                    <h3 class="page-title">Wishlist Details - {{ $productName }}</h3>
+                    <h3 class="page-title">Cart Details - {{ $productName }}</h3>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="{{ route('admin.aWishlistData') }}">Wishlist</a></li>
+                        <li class="breadcrumb-item"><a href="{{ route('admin.aCartData') }}">Cart</a></li>
                         <li class="breadcrumb-item active">{{ $productName }}</li>
                     </ul>
                 </div>
@@ -23,7 +23,7 @@
                     <div class="card-body">
                         <button class="btn btn-danger mb-3" id="deleteSelected">Delete Selected</button>
                         <div class="table-responsive">
-                            <table id="WishlistTable" class="datatable table table-striped">
+                            <table id="CartTable" class="datatable table table-striped">
                                 <thead>
                                     <tr>
                                         <th><input type="checkbox" id="selectAll"></th>
@@ -31,33 +31,33 @@
                                         <th>User ID</th>
                                         <th>Email</th>
                                         <th>Mobile</th>
-                                        <th>Date/Time</th>
+                                        <th>Created At</th>
                                         <th>Followup</th>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($Wishlist as $index => $Wishlistdata)
+                                    @foreach ($Cart as $index => $Cartdata)
                                     <tr>
-                                        <td><input type="checkbox" class="wishlist-checkbox" value="{{ $Wishlistdata->id }}"></td>
+                                        <td><input type="checkbox" class="cart-checkbox" value="{{ $Cartdata->id }}"></td>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ optional($Wishlistdata->userDetails)->user_id ?? 'N/A' }}</td>
-                                        <td>{{ optional($Wishlistdata->userDetails)->email ?? 'N/A' }}</td>
-                                        <td>{{ optional($Wishlistdata->userDetails)->mobile ?? 'N/A' }}</td>
-                                        <td>{{ optional($Wishlistdata->created_at)->format('d-m-Y / h:i a') }}</td>
+                                        <td>{{ optional($Cartdata->userDetails)->user_id ?? 'N/A' }}</td>
+                                        <td>{{ optional($Cartdata->userDetails)->email ?? 'N/A' }}</td>
+                                        <td>{{ optional($Cartdata->userDetails)->mobile ?? 'N/A' }}</td>
+                                        <td>{{ optional($Cartdata->created_at)->format('d-m-Y H:i') }}</td>
                                         <td>
                                             <div class="onoffswitch">
                                                 <input type="checkbox" name="onoffswitch928"
                                                     class="onoffswitch-checkbox"
-                                                    id="wishlistOnStatus{{ $Wishlistdata->id }}" tabindex="0"
-                                                    {{ $Wishlistdata->follow_off ? 'checked' : '' }}
-                                                    onchange="toggleOnStatus({{ $Wishlistdata->id }})">
+                                                    id="cartOnStatus{{ $Cartdata->id }}" tabindex="0"
+                                                    {{ $Cartdata->follow_off ? 'checked' : '' }}
+                                                    onchange="toggleOnStatus({{ $Cartdata->id }})">
                                                 <label class="onoffswitch-label"
-                                                    for="wishlistOnStatus{{ $Wishlistdata->id }}"></label>
+                                                    for="cartOnStatus{{ $Cartdata->id }}"></label>
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteWishlist({{ $Wishlistdata->id }})">Cancel</button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteCart({{ $Cartdata->id }})">Remove</button>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -78,11 +78,11 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        if ($.fn.DataTable.isDataTable('#WishlistTable')) {
-            $('#WishlistTable').DataTable().destroy();
+        if ($.fn.DataTable.isDataTable('#CartTable')) {
+            $('#CartTable').DataTable().destroy();
         }
 
-        $('#WishlistTable').DataTable({
+        $('#CartTable').DataTable({
             "paging": true,
             "ordering": true,
             "info": true,
@@ -94,27 +94,27 @@
 
         // Select all checkboxes
         $('#selectAll').on('click', function() {
-            $('.wishlist-checkbox').prop('checked', this.checked);
+            $('.cart-checkbox').prop('checked', this.checked);
         });
 
-        // Delete selected wishlists
+        // Delete selected carts
         $('#deleteSelected').on('click', function() {
-            var selectedIds = $('.wishlist-checkbox:checked').map(function() {
+            var selectedIds = $('.cart-checkbox:checked').map(function() {
                 return $(this).val();
             }).get();
 
             if (selectedIds.length === 0) {
-                toastr.warning('Please select at least one wishlist to delete.');
+                toastr.warning('Please select at least one cart item to delete.');
                 return;
             }
 
-            if (confirm('Are you sure you want to delete the selected wishlists?')) {
+            if (confirm('Are you sure you want to delete the selected cart items?')) {
                 $.ajax({
                     type: "POST",
-                    url: "{{ route('admin.wishlist.massDelete') }}",
+                    url: "{{ route('admin.cart.massDelete') }}",
                     data: {
                         '_token': '{{ csrf_token() }}',
-                        'wishlistIds': selectedIds
+                        'cartIds': selectedIds
                     },
                     success: function(response) {
                         toastr.success(response.message);
@@ -128,16 +128,16 @@
         });
     });
 
-    function toggleOnStatus(wishlistId) {
-        var isChecked = $('#wishlistOnStatus' + wishlistId).is(':checked');
+    function toggleOnStatus(cartId) {
+        var isChecked = $('#cartOnStatus' + cartId).is(':checked');
         var status = isChecked ? 1 : 0;
 
         $.ajax({
             type: "POST",
-            url: "{{ route('admin.wishlistOnStatus') }}",
+            url: "{{ route('admin.cartOnStatus') }}",
             data: {
                 '_token': '{{ csrf_token() }}',
-                'wishlistId': wishlistId,
+                'cartId': cartId,
                 'status': status
             },
             success: function(response) {
@@ -149,14 +149,14 @@
         });
     }
 
-    function deleteWishlist(wishlistId) {
-        if (confirm('Are you sure you want to remove this wishlist item?')) {
+    function deleteCart(cartId) {
+        if (confirm('Are you sure you want to remove this cart item?')) {
             $.ajax({
                 type: "POST",
-                url: "{{ route('admin.wishlist.delete') }}",
+                url: "{{ route('admin.cart.delete') }}",
                 data: {
                     '_token': '{{ csrf_token() }}',
-                    'wishlistId': wishlistId
+                    'cartId': cartId
                 },
                 success: function(response) {
                     toastr.success(response.message);
