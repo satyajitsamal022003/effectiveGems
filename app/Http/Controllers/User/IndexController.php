@@ -10,6 +10,7 @@ use App\Models\Faq;
 use App\Models\Product;
 use App\Models\SubCategory;
 use App\Models\Page;
+use App\Models\Setting;
 use App\Models\Testimonial;
 use App\Models\Wishlist;
 use Illuminate\Http\Request;

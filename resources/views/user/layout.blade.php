@@ -73,6 +73,35 @@
             background-color: #ffffff;
         }
     </style>
+    <style>
+        .slider-container {
+            overflow: hidden;
+            white-space: nowrap;
+            position: relative;
+            background-color: #e6b317;
+        }
+
+        .slider-content {
+            display: inline-block;
+            animation: slide 20s linear infinite;
+        }
+
+        .slider-item {
+            display: inline-block;
+            padding: 0 40px; /* Increased padding for spacing */
+            font-size: 18px;
+            color: #000;
+        }
+
+        @keyframes slide {
+            0% {
+                transform: translateX(100%);
+            }
+            100% {
+                transform: translateX(-100%);
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -88,6 +117,16 @@
     <!--header start-->
     <div class="as_main_wrapper">
         <section class="as_header_wrapper">
+            @if ($annoument_text && $annoument_text->announcement_text)
+            <div class="col-md-10 mx-auto slider-container" id="announcement-slider">
+                <div class="slider-content">
+                    <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
+                    <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
+                    <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
+                </div>
+            </div>
+            @endif
+            
             <div class="top-header">
                 <div class="container">
                     <div class="top-left">
@@ -682,7 +721,12 @@
         });
     </script>
 
-
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const content = document.querySelector('.slider-content');
+        content.innerHTML = content.innerHTML.repeat(-1); 
+    });
+</script>
 </body>
 
 </html>
