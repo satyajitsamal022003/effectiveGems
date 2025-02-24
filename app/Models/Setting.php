@@ -21,6 +21,7 @@ class Setting extends Model
         'instaLink',
         'youtubeLink',
         'heading1',
+        'announcement_text',
         'description1',
         'image',
         'button',

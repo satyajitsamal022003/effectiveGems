@@ -89,6 +89,10 @@
                                     <div class="row">
                                         <div class="col-xl-6">
                                             <div class="form-group">
+                                                <label>Announcement Text <span class="text-danger">*</span></label>
+                                                <input class="form-control" name="announcement_text" placeholder="Announcement Text" value="{{ $setting->announcement_text ?? '' }}">
+                                            </div>
+                                            <div class="form-group">
                                                 <label>Heading 1 <span class="text-danger">*</span></label>
                                                 <input class="form-control" name="heading1" placeholder="Heading 1" value="{{ $setting->heading1 ?? '' }}">
                                             </div>
