@@ -136,6 +136,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     // Follow wishlist routes
     Route::get('/wishlist', [ManageWishlistController::class, 'aWishlistData'])->name('admin.aWishlistData');
+    Route::get('/admin/wishlist/data', [ManageWishlistController::class, 'getWishlistData'])->name('admin.wishlist.data');
     Route::get('/wishlist-list/{product_id}', [ManageWishlistController::class, 'WishlistData'])->name('admin.wishlist.details');
     Route::post('/wishlistOnStatus', [ManageWishlistController::class, 'wishlistOnStatus'])->name('admin.wishlistOnStatus');
 
@@ -144,6 +145,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     // Follow Cart routes
     Route::get('/cart', [ManageCartController::class, 'aCartData'])->name('admin.aCartData');
+    Route::get('/admin/cart/data', [ManageCartController::class, 'getCartData'])->name('admin.cart.data');
     Route::get('/cart-list/{product_id}', [ManageCartController::class, 'CartData'])->name('admin.cart.details');
     Route::post('/cartOnStatus', [ManageCartController::class, 'cartOnStatus'])->name('admin.cartOnStatus');
 

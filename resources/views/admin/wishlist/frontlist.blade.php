@@ -1,9 +1,9 @@
 @extends('admin.layout')
 @section('page-title', 'Manage Wishlist')
 @section('content')
+
 <div class="page-wrapper">
     <div class="content container-fluid">
-        <!-- Page Header -->
         <div class="page-header">
             <div class="row">
                 <div class="col">
@@ -24,33 +24,14 @@
                             <table id="WishlistTable" class="datatable table table-striped">
                                 <thead>
                                     <tr>
-                                        <th class="no-sort">Sl No.</th>
+                                        <th>Sl No.</th>
                                         <th>Product Name</th>
                                         <th>No. Of People</th>
                                         <th>Estimated Amount</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach ($Wishlist as $index => $Wishlistdata)
-                                    @php
-                                    $userCount = $Wishlist->where('product_id', $Wishlistdata->product_id)->count();
-
-                                    $estimatedAmount = $userCount * (optional($Wishlistdata->productDetails)->priceB2C ?? 0);
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.wishlist.details', ['product_id' => $Wishlistdata->product_id]) }}">
-                                                {{ optional($Wishlistdata->productDetails)->productName ?? 'N/A' }}
-                                            </a>
-                                        </td>
-                                        <td>{{ $userCount }}</td>
-                                        <td>{{ (int) $estimatedAmount }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
+                                <tbody></tbody> <!-- Empty body, filled via AJAX -->
                             </table>
-
                         </div>
                     </div>
                 </div>
@@ -60,6 +41,8 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap4.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script type="text/javascript">
@@ -68,14 +51,30 @@
             $('#WishlistTable').DataTable().destroy();
         }
 
-        $('#WishlistTable').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "columnDefs": [{
-                "orderable": false,
-                "targets": 'no-sort'
-            }]
+        // Initialize DataTable
+        var table = $('#WishlistTable').DataTable({
+            "processing": true,
+            "serverSide": false,
+            "ajax": {
+                "url": "{{ route('admin.wishlist.data') }}",
+                "type": "GET",
+                "dataSrc": function(json) {
+                    if (!json.data) {
+                        return [];
+                    }
+                    return json.data;
+                }
+            },
+            "columns": [
+                { "data": null, "render": function(data, type, row, meta) { return meta.row + 1; }},
+                { "data": "product_name", "render": function(data, type, row) {
+                    var url = `{{ route('admin.wishlist.details', ':product_id') }}`.replace(':product_id', row.product_id);
+                    return `<a href="${url}" class="text-primary">${data}</a>`;
+                }},
+                { "data": "user_count" },
+                { "data": "estimated_amount" },
+                
+            ]
         });
     });
 </script>

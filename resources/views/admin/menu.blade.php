@@ -94,11 +94,11 @@
                         <i class="fa-solid fa-heart"></i> <span>Wishlists</span>
                     </a>
                 </li>
-                <!-- <li class="{{ request()->routeIs('admin.aCartData') ? 'active' : '' }}">
+                <li class="{{ request()->routeIs('admin.aCartData') ? 'active' : '' }}">
                     <a href="{{ route('admin.aCartData') }}">
                         <i class="fa-solid fa-cart-shopping"></i> <span>Carts</span>
                     </a>
-                </li> -->
+                </li>
 
                 <li class="submenu">
                     <a href="#">

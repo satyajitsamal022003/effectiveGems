@@ -14,11 +14,28 @@ use Illuminate\Support\Facades\Validator;
 
 class ManageWishlistController extends Controller
 {
-    public function aWishlistData()
+    public function aWishlistData(Request $request)
+    {
+        return view('admin.wishlist.frontlist');
+    }
+
+    public function getWishlistData()
     {
         $Wishlist = Wishlist::with(['userDetails', 'productDetails'])->orderBy('id', 'desc')->get();
-        return view('admin.wishlist.frontlist', compact('Wishlist'));
+
+        $wishlistData = $Wishlist->map(function ($wishlistItem) {
+            return [
+                'product_id' => $wishlistItem->product_id,
+                'product_name' => optional($wishlistItem->productDetails)->productName ?? 'N/A',
+                'user_count' => Wishlist::where('product_id', $wishlistItem->product_id)->count(),
+                'estimated_amount' => Wishlist::where('product_id', $wishlistItem->product_id)->count() * (optional($wishlistItem->productDetails)->priceB2C ?? 0)
+            ];
+        })->unique('product_id')->values(); // Ensure unique products
+
+        return response()->json(['data' => $wishlistData]);
     }
+
+
 
     public function WishlistData($product_id = null)
     {

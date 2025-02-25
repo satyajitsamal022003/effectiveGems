@@ -28,7 +28,7 @@
                                     <tr>
                                         <th><input type="checkbox" id="selectAll"></th>
                                         <th>Sl No.</th>
-                                        <th>User ID</th>
+                                        <th>User ID/Ip</th>
                                         <th>Email</th>
                                         <th>Mobile</th>
                                         <th>Created At</th>
@@ -37,13 +37,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @foreach ($Cart as $index => $Cartdata)
+                                    @foreach ($CartItems as $index => $Cartdata)
                                     <tr>
                                         <td><input type="checkbox" class="cart-checkbox" value="{{ $Cartdata->id }}"></td>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ optional($Cartdata->userDetails)->user_id ?? 'N/A' }}</td>
-                                        <td>{{ optional($Cartdata->userDetails)->email ?? 'N/A' }}</td>
-                                        <td>{{ optional($Cartdata->userDetails)->mobile ?? 'N/A' }}</td>
+                                        <td>{{ $Cartdata->cart->userDetails->userid ?? $Cartdata->cart->ip }}</td>
+                                        <td>{{ $Cartdata->cart->userDetails->email ?? 'N/A' }}</td>
+                                        <td>{{ $Cartdata->cart->userDetails->mobile ?? 'N/A' }}</td>
+
                                         <td>{{ optional($Cartdata->created_at)->format('d-m-Y H:i') }}</td>
                                         <td>
                                             <div class="onoffswitch">
@@ -57,7 +58,7 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteCart({{ $Cartdata->id }})">Remove</button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteCart({{ $Cartdata->id }})">Cancel</button>
                                         </td>
                                     </tr>
                                     @endforeach

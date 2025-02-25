@@ -3,7 +3,6 @@
 @section('content')
 <div class="page-wrapper">
     <div class="content container-fluid">
-        <!-- Page Header -->
         <div class="page-header">
             <div class="row">
                 <div class="col">
@@ -24,30 +23,13 @@
                             <table id="CartTable" class="datatable table table-striped">
                                 <thead>
                                     <tr>
-                                        <th class="no-sort">Sl No.</th>
+                                        <th>Sl No.</th>
                                         <th>Product Name</th>
                                         <th>No. Of People</th>
                                         <th>Estimated Amount</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach ($CartItems as $index => $CartItem)
-                                    @php
-                                    $userCount = $CartItems->where('product_id', $CartItem->product_id)->count();
-                                    $estimatedAmount = $userCount * (optional($CartItem->productDetails)->priceB2C ?? 0);
-                                    @endphp
-                                    <tr>
-                                        <td>{{ $index + 1 }}</td>
-                                        <td>
-                                            
-                                                {{ optional($CartItem->productDetails)->productName ?? 'N/A' }}
-                                            
-                                        </td>
-                                        <td>{{ $userCount }}</td>
-                                        <td>{{ (int) $estimatedAmount }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
+                                <tbody></tbody> <!-- Empty body, will be filled via AJAX -->
                             </table>
                         </div>
                     </div>
@@ -58,6 +40,7 @@
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/datatables/1.10.21/js/jquery.dataTables.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
 
 <script type="text/javascript">
@@ -65,17 +48,43 @@
         if ($.fn.DataTable.isDataTable('#CartTable')) {
             $('#CartTable').DataTable().destroy();
         }
-
-        $('#CartTable').DataTable({
-            "paging": true,
-            "ordering": true,
-            "info": true,
-            "columnDefs": [{
-                "orderable": false,
-                "targets": 'no-sort'
-            }]
+        // Initialize DataTable
+        var table = $('#CartTable').DataTable({
+            "processing": true,
+            "serverSide": false, // Set true if you need pagination from the backend
+            "ajax": {
+                "url": "{{ route('admin.cart.data') }}",
+                "type": "GET",
+                "dataSrc": function(json) {
+                    if (!json.data) {
+                        return []; // Prevents the 'undefined length' error
+                    }
+                    return json.data;
+                }
+            },
+            "columns": [{
+                    "data": null,
+                    "render": function(data, type, row, meta) {
+                        return meta.row + 1;
+                    }
+                },
+                {
+                    "data": "product_name",
+                    "render": function(data, type, row) {
+                        var url = `{{ route('admin.cart.details', ':product_id') }}`.replace(':product_id', row.product_id);
+                        return `<a href="${url}" class="text-primary">${data}</a>`;
+                    }
+                },
+                {
+                    "data": "user_count"
+                },
+                {
+                    "data": "estimated_amount"
+                }
+            ]
         });
 
+        // Delete cart item
         $(document).on('click', '.delete-cart-item', function() {
             var cartItemId = $(this).data('id');
             if (confirm('Are you sure you want to remove this item?')) {
@@ -89,7 +98,7 @@
                     success: function(response) {
                         if (response.success) {
                             toastr.success('Item removed successfully');
-                            location.reload();
+                            table.ajax.reload(); // Reload DataTable after deletion
                         } else {
                             toastr.error('Failed to remove item');
                         }

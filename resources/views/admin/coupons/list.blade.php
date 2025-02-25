@@ -30,7 +30,7 @@
                                         <tr>
                                             <th>Sl No.</th>
                                             <th>Coupon Name</th>
-                                            <th>Description</th>
+                                            <th>Coupon Code</th>
                                             <th>Type</th>
                                             <th>Value</th>
                                             <th>Start Date</th>
@@ -43,10 +43,10 @@
                                         @foreach ($coupons as $index => $coupon)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $coupon->name }}</td>
-                                                <td>{{ $coupon->description }}</td>
+                                                <td>{{ $coupon->name ?? '' }}</td>
+                                                <td>{{ $coupon->code ?? '' }}</td>
                                                 <td>{{ $coupon->type == 1 ? 'Flat' : 'Percentage' }}</td>
-                                                <td>{{ $coupon->value }}</td>
+                                                <td>{{ $coupon->value ?? '' }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($coupon->startDate)->format('d-m-Y') }}</td>
                                                 <td>{{ \Carbon\Carbon::parse($coupon->endDate)->format('d-m-Y') }}</td>
                                                 <td>
