@@ -230,16 +230,25 @@ class OrderController extends Controller
                     'subtotal' => $subtotal,
                     'order_id' => $orderId,
                 ]);
-
+               
                 if (!$userId && !$usermobile) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
                 } else if (!$userId && $usermobile && $usermobile->is_mobile_verified == 0) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
                 } else {
-                    return response()->json([
-                        'success' => true,
-                        'redirect_url' => route('razorpay.order', ['razorpayOrderId' => $razorpayOrder['id'], 'subtotal' => $subtotal, 'orderId' => $orderId])
-                    ]);
+                    if($request->orderType == 2){
+                        //COD
+                        $order->paymentMode = 'COD';
+                        $order->orderStatus = 'Placed';
+                        $order->transactionId = '';
+                        $order->save();
+                        return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
+                    } else {
+                        return response()->json([
+                            'success' => true,
+                            'redirect_url' => route('razorpay.order', ['razorpayOrderId' => $razorpayOrder['id'], 'subtotal' => $subtotal, 'orderId' => $orderId])
+                        ]);
+                    }
                     // return response()->json(['success' => true, 'message' => 'Mobile Number Verified successfully.']);
                 }
             } catch (\Throwable $th) {
