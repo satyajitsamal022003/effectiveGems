@@ -121,8 +121,6 @@
             <div class="col-md-10 mx-auto slider-container" id="announcement-slider">
                 <div class="slider-content">
                     <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
-                    <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
-                    <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
                 </div>
             </div>
             @endif
@@ -727,6 +725,7 @@
         content.innerHTML = content.innerHTML.repeat(-1); 
     });
 </script>
+@stack('scripts')
 </body>
 
 </html>
