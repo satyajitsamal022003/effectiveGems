@@ -678,7 +678,7 @@
 
                         <div class="total_order">
                             <h4>Subtotal</h4>
-                            <h6>₹<span id="total"> {{ $total }}</span></h6>
+                            <h6>₹<span id="total"> {{ $subtotal }}</span></h6>
 
                         </div>
                         <div class="total_order dvalue d-none">
@@ -692,7 +692,7 @@
                         </div>
                         <div class="total_order">
                             <h4>Total</h4>
-                            <h6>₹<span class="subTotal"> {{ $subtotal }}</span></h6>
+                            <h6>₹<span class="subTotal"> {{ $total }}</span></h6>
                         </div>
                     </div>
                 </div>

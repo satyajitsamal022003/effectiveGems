@@ -66,27 +66,37 @@ class OrderController extends Controller
 
         // Calculate subtotal
         $totalDelPrice = 0;
-        $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice) {
+        $foundCourierTypeId2 = false;
+        $subtotal =   $cartItems->sum(function ($item) use (&$totalDelPrice, &$foundCourierTypeId2) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
             $product = Product::find($item->product_id);
 
+            $deliveryPrice = 0;
+
             if ($courierType) {
                 $deliveryPrice = $courierType->courier_price;
-                if ($courierType->id == 3 || $courierType->id == 4 && $product->categoryId != 1) {
-                    $deliveryPrice = $deliveryPrice * $item->quantity;
+    
+                if ($courierType->id == 2) {
+                    if (!$foundCourierTypeId2) {
+                        $foundCourierTypeId2 = true; // Allow the first item to retain its delivery charge
+                    } else {
+                        $deliveryPrice = 0; // Other items with courierTypeId 2 have zero delivery charge
+                    }
+                } elseif ($courierType->id == 3 || ($courierType->id == 4 && $product->categoryId != 1)) {
+                    $deliveryPrice *= $item->quantity; // Multiply for quantity if applicable
                 }
             }
             $totalDelPrice += $deliveryPrice;
             $item->deliveryPrice = $deliveryPrice;
             if ($product->categoryId != 1) {
-                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
-                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+                $item->totalPrice = ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity;
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity;
             } else {
-                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
-                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+                $item->totalPrice = ($item->productDetails->priceB2C) * $item->quantity + $item->activation + $item->certificate;
+                return ($item->productDetails->priceB2C) * $item->quantity + $item->activation + $item->certificate;
             }
         });
-        $total = $subtotal - $totalDelPrice;
+        $total = $subtotal + $totalDelPrice;
         $states = State::all();
 
         $addressdata = UserAddress::where('user_id', $userId)->get();

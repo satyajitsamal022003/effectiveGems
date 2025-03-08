@@ -55,7 +55,7 @@ class CartController extends Controller
 
             // Determine delivery price
             if ($courierType) {
-                $deliveryPrice = $courierType->courier_price;
+                $deliveryPrice = $courierType->courier_price; 
 
                 // Check if the current item has courierTypeId of 2
                 if ($courierType->id == 2) {

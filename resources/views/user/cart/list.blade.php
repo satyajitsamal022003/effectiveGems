@@ -234,7 +234,7 @@
                 $(`#courierPrice-${id}`).text(response.itemDeliveryPrice);
 
                 $('#itemTotal-' + id).text(response.itemTotal);
-                // toastr.success(response.message);
+                // toastr.success(response.message); 
             },
             error: function(xhr, status, error) {
                 // toastr.error("An error occurred: " + error);
