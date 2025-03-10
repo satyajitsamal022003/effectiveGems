@@ -8,7 +8,7 @@
             @csrf
             <div class="col-lg-7 col-md-7 col-12">
                 <div class="checkout-main-form">
-                    <input type="hidden" name="amount" class="amount" value="{{ $subtotal }}">
+                    <input type="hidden" name="amount" class="amount" value="{{ $total }}">
                     <!--customer area start-->
                     @if (!Auth::guard('euser')->check())
                     <div class="customer-email">
