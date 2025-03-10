@@ -60,7 +60,7 @@ class OrderController extends Controller
         // Base query to fetch orders and eager load order items and their related products
         $query = Order::with(['items.productDetails'])
             ->leftJoin('eusers', 'eusers.id', '=', 'orders.userid')
-            ->select('orders.*', 'eusers.userid as user_id'); 
+            ->select('orders.*', 'eusers.userid as user_id', 'eusers.email as user_email', 'eusers.mobile as user_phone'); 
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {
@@ -103,6 +103,8 @@ class OrderController extends Controller
             $order->state = State::find($order->state)->stateName;
             $order->country = "India";
             $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
+            $order->email = $order->email ?? $order->user_email;
+            $order->phoneNumber = $order->phoneNumber ?? $order->user_phone;
             // You can add extra details here if needed
             foreach ($order->items as $key => $item) {
                 $item->productDetails->image = asset($item->productDetails->image1);
@@ -130,7 +132,7 @@ class OrderController extends Controller
         // Base query to fetch orders and eager load order items and their related products
         $query = Order::where('orderType','2')->with(['items.productDetails'])
             ->leftJoin('eusers', 'eusers.id', '=', 'orders.userid')
-            ->select('orders.*', 'eusers.userid as user_id'); 
+            ->select('orders.*', 'eusers.userid as user_id', 'eusers.email as user_email', 'eusers.mobile as user_phone'); 
 
         // Apply search filtering if needed
         if (!empty($searchValue)) {
@@ -173,6 +175,8 @@ class OrderController extends Controller
             $order->state = State::find($order->state)->stateName;
             $order->country = "India";
             $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
+            $order->email = $order->email ?? $order->user_email;
+            $order->phoneNumber = $order->phoneNumber ?? $order->user_phone;
             // You can add extra details here if needed
             foreach ($order->items as $key => $item) {
                 $item->productDetails->image = asset($item->productDetails->image1);
@@ -200,7 +204,7 @@ class OrderController extends Controller
         // Base query to fetch orders and eager load order items and their related products
         $query = Order::with(['items.productDetails'])
             ->leftJoin('eusers', 'eusers.id', '=', 'orders.userid')
-            ->select('orders.*', 'eusers.userid as user_id'); 
+            ->select('orders.*', 'eusers.userid as user_id', 'eusers.email as user_email', 'eusers.mobile as user_phone'); 
 
 
         // Apply search filtering if needed
@@ -241,6 +245,8 @@ class OrderController extends Controller
             $order->state = State::find($order->state)->stateName;
             $order->country = "India";
             $order->name = $order->firstName . " " . $order->middleName  . " " . $order->lastName;
+            $order->email = $order->email ?? $order->user_email;
+            $order->phoneNumber = $order->phoneNumber ?? $order->user_phone;
             // You can add extra details here if needed
             foreach ($order->items as $key => $item) {
                 $item->productDetails->image = asset($item->productDetails->image1);

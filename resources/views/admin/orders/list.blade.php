@@ -547,9 +547,8 @@
                 modal.find('#modalOrderDate').text(order.orderDate);
                 modal.find('#modalCustId').text(order.userId || 'N/A');
                 modal.find('#modalCustName').text(order.name || 'N/A');
-                // Assuming `order` is the data you posted above
-                modal.find('#modalCustEmail').text(order.email || 'N/A');
-                modal.find('#modalCustMobile').text(order.phoneNumber || 'N/A');
+                modal.find('#modalCustEmail').text(order.email ? order.email : (order.user_email || 'N/A'));
+                modal.find('#modalCustMobile').text(order.phoneNumber ? order.phoneNumber : (order.user_phone || 'N/A'));
 
                 // Delivery Address
                 let deliveryAddress =
