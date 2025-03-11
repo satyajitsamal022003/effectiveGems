@@ -344,6 +344,7 @@ class OrderController extends Controller
 
 
         $otpCreatedAt = session('otp_created_at');
+        $randomPassword = Str::random(8);
         if (session('otp') == $request->otp && session('mobile') == $request->mobile) {
             if (now()->diffInMinutes($otpCreatedAt) > 5) {
                 return response()->json(['success' => false, 'message' => 'OTP has expired.']);
@@ -352,15 +353,29 @@ class OrderController extends Controller
             
             $orderdata = Order::where('id',session('order_id'))->first();
            //    return $orderdata->orderType;
-            if($orderdata && $orderdata->orderType == '2'){ //COD
+            if($orderdata && $orderdata->orderType == '2'&&$user){ //COD
                 $order = Order::find(session('order_id'));
                 $order->paymentMode = 'COD';
                 $order->orderStatus = 'Placed';
                 $order->transactionId = '';
                 $order->save();
+                Auth::guard('euser')->login($user);
                 return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
-                // return redirect()->route('order.placed');
+            }elseif($orderdata && $orderdata->orderType == '2'){
+                $order = Order::find(session('order_id'));
+                $order->paymentMode = 'COD';
+                $order->orderStatus = 'Placed';
+                $order->transactionId = '';
+                $order->save();
+                $newUser = Euser::create([
+                    'mobile' => $request->mobile,
+                    'password' => Hash::make($randomPassword),
+                    'is_mobile_verified' => 1
+                ]);
+                Auth::guard('euser')->login($newUser);
+                return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
             }
+
             if ($user) {
                 $user->update(['is_mobile_verified' => 1]);
                 Auth::guard('euser')->login($user);
@@ -377,7 +392,7 @@ class OrderController extends Controller
                 }
             }
 
-            $randomPassword = Str::random(8);
+           
             $mobile = $request->mobile;
 
             $newUser = Euser::create([
