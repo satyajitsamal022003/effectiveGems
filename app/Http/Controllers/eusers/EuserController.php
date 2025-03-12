@@ -30,24 +30,44 @@ class EuserController extends Controller
         return redirect()->route('eusers.login')->with('message', 'Logged out successfully!');
     }
 
-    public function dashboard()
+    public function dashboard(Request $request)
     {
         $user = Auth::guard('euser')->user();
-        $orderCount = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed'])->count();
+        $ip = $request->getClientIp();
+        $orderCount = Order::where(function ($query) use ($user, $ip) {
+            $query->where('userId', $user->id)
+                  ->orWhere(function ($q) use ($ip) {
+                      $q->whereNull('userId')
+                        ->where('ip', $ip);
+                  });
+        })
+        ->whereNotIn('orderStatus', ['Failed'])
+        ->count();
+
         $wishlistcount = Wishlist::where('user_id', $user->id)->count();
         return view('eusers.dashboard', compact('user', 'orderCount' ,'wishlistcount'));
     }
 
     public function myorderlist(Request $request)
     {
+        $ip = $request->getClientIp();
         $user = Auth::guard('euser')->user();
-        $query = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed']);
+
+        $query = Order::where(function ($query) use ($user, $ip) {
+            $query->where('userId', $user->id)
+                  ->orWhere(function ($q) use ($ip) {
+                      $q->whereNull('userId')
+                        ->where('ip', $ip);
+                  });
+        })
+        ->whereNotIn('orderStatus', ['Failed']);
+
 
         if ($request->has('orderStatus') && !empty($request->orderStatus)) {
             $query->where('orderStatus', $request->orderStatus); 
         }
 
-        $orders = $query->paginate(10);
+        $orders = $query->paginate(10); 
 
         if ($request->ajax()) {
             return view('eusers.myorders.order_table', compact('orders'))->render();
@@ -60,9 +80,6 @@ class EuserController extends Controller
     public function ordersview($id)
     {
         $order = Order::with(['items.productDetails'])->find($id);
-        if ($order->userId !== Auth::guard('euser')->user()->id) {
-            abort(403, 'Unauthorized action.');
-        }
 
         return view('eusers.myorders.view', compact('order'));
     }
