@@ -122,6 +122,9 @@ class OrderController extends Controller
         if (Auth::guard('euser')->check()) {
             $euser = Auth::guard('euser')->user();
             $userId = $euser->id;
+            $phoneNumber = $euser->mobile;
+        }else{
+            $phoneNumber = $request->phoneNumber;
         }
 
         $ip = $request->getClientIp();
@@ -132,7 +135,7 @@ class OrderController extends Controller
             $order->ip = $ip;
         }
 
-        $usermobile = Euser::where('mobile', $request->phoneNumber)->first();
+        $usermobile = Euser::where('mobile', $phoneNumber)->first();
 
 
         $order->email = $request->email;
@@ -241,12 +244,16 @@ class OrderController extends Controller
                     'order_id' => $orderId,
                 ]);
                
-                if (!$userId && !$usermobile) {
+                if (!$userId || !$usermobile) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
                 } else if (!$userId && $usermobile && $usermobile->is_mobile_verified == 0) {
                     return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
-                } else {
-                    $user = Euser::where('mobile', $request->phoneNumber)->first();
+                }
+                else if ($userId && (!$usermobile || empty($usermobile->mobile))) {
+                    return response()->json(['otp_required' => true, 'message' => 'Please verify your mobile number.']);
+                }
+                 else {
+                    $user = Euser::where('mobile', $phoneNumber)->first();
                     $randomPassword = Str::random(8);
                     if($request->orderType == 2){
                         //COD
@@ -254,9 +261,10 @@ class OrderController extends Controller
                             $order->paymentMode = 'COD';
                             $order->orderStatus = 'Placed';
                             $order->transactionId = '';
-                            $order->userId = $user->id;
+                            $order->userId = $userId;
                             $order->save();
-                            Auth::guard('euser')->login($user);
+                            $cart = Cart::where("userId", $userId)->first();
+                            $cart->delete();
                             return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
                         }else{
                             $newUser = Euser::create([
@@ -270,6 +278,8 @@ class OrderController extends Controller
                             $order->userId = $newUser->id;
                             $order->save();
                             Auth::guard('euser')->login($newUser);
+                            $cart = Cart::where("userId", $newUser->id)->first();
+                            $cart->delete();
                             return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
                         }
                     } else {
@@ -278,7 +288,6 @@ class OrderController extends Controller
                             'redirect_url' => route('razorpay.order', ['razorpayOrderId' => $razorpayOrder['id'], 'subtotal' => $subtotal, 'orderId' => $orderId])
                         ]);
                     }
-                    // return response()->json(['success' => true, 'message' => 'Mobile Number Verified successfully.']);
                 }
             } catch (\Throwable $th) {
                 dd($th);
@@ -356,6 +365,12 @@ class OrderController extends Controller
             'otp' => 'required|digits:6',
         ]);
 
+        $userId = null;
+        if (Auth::guard('euser')->check()) {
+            $euser = Auth::guard('euser')->user();
+            $userId = $euser->id;
+        }
+
         if(session()->has('order_id')){
             $order_id = session('order_id');
             $orderdata = Order::where('id',$order_id)->update(['phoneNumber'=>$request->mobile]);
@@ -369,18 +384,34 @@ class OrderController extends Controller
                 return response()->json(['success' => false, 'message' => 'OTP has expired.']);
             }
             $user = Euser::where('mobile', $request->mobile)->first();
-            
+
             $orderdata = Order::where('id',session('order_id'))->first();
            //    return $orderdata->orderType;
-            if($orderdata && $orderdata->orderType == '2'&&$user){ //COD
+            if($orderdata && $orderdata->orderType == '2' && $user){ //COD
                 $order = Order::find(session('order_id'));
                 $order->paymentMode = 'COD';
                 $order->orderStatus = 'Placed';
                 $order->transactionId = '';
+                $order->userId = $user->id;
                 $order->save();
                 Auth::guard('euser')->login($user);
                 return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
-            }elseif($orderdata && $orderdata->orderType == '2'){
+            }elseif($orderdata && $orderdata->orderType == '2' && !$user && $userId){
+                $updateUser = Euser::where('id', $userId)->update([
+                    'mobile' => $request->mobile,
+                    'is_mobile_verified' => 1
+                ]);                
+                $order = Order::find(session('order_id'));
+                $order->paymentMode = 'COD';
+                $order->orderStatus = 'Placed';
+                $order->transactionId = '';
+                $order->userId = $userId;
+                $order->save();
+                $cart = Cart::where("userId", $userId)->first();
+                $cart->delete();
+                return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
+            }
+            elseif($orderdata && $orderdata->orderType == '2'){
                 $newUser = Euser::create([
                     'mobile' => $request->mobile,
                     'password' => Hash::make($randomPassword),
@@ -392,6 +423,8 @@ class OrderController extends Controller
                 $order->transactionId = '';
                 $order->userId = $newUser->id;
                 $order->save();
+                $cart = Cart::where("userId", $newUser->id)->first();
+                $cart->delete();
                 Auth::guard('euser')->login($newUser);
                 return response()->json(['success' => true, 'message' => 'Order Placed.','redirect_url'=> route('order.placed')]);
             }

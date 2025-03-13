@@ -107,8 +107,6 @@ class RazorpayController extends Controller
             $cart = Cart::where("ip", $ip)->first();
             $cartId = $cart->id;
         }
-        // $cart = Cart::where("ip", $ip)->first();
-        // $cartItems = CartItem::where("cart_id", $cart->id)->delete();
         $cart->delete();
         try {
             $attributes = array(
