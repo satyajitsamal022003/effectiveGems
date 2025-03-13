@@ -34,15 +34,7 @@ class EuserController extends Controller
     {
         $user = Auth::guard('euser')->user();
         $ip = $request->getClientIp();
-        $orderCount = Order::where(function ($query) use ($user, $ip) {
-            $query->where('userId', $user->id)
-                  ->orWhere(function ($q) use ($ip) {
-                      $q->whereNull('userId')
-                        ->where('ip', $ip);
-                  });
-        })
-        ->whereNotIn('orderStatus', ['Failed'])
-        ->count();
+        $orderCount = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed'])->count();
 
         $wishlistcount = Wishlist::where('user_id', $user->id)->count();
         return view('eusers.dashboard', compact('user', 'orderCount' ,'wishlistcount'));
@@ -52,16 +44,7 @@ class EuserController extends Controller
     {
         $ip = $request->getClientIp();
         $user = Auth::guard('euser')->user();
-
-        $query = Order::where(function ($query) use ($user, $ip) {
-            $query->where('userId', $user->id)
-                  ->orWhere(function ($q) use ($ip) {
-                      $q->whereNull('userId')
-                        ->where('ip', $ip);
-                  });
-        })
-        ->whereNotIn('orderStatus', ['Failed']);
-
+        $query = Order::where('userId', $user->id)->whereNotIn('orderStatus', ['Failed']);
 
         if ($request->has('orderStatus') && !empty($request->orderStatus)) {
             $query->where('orderStatus', $request->orderStatus); 
