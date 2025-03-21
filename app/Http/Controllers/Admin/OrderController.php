@@ -15,6 +15,7 @@ use App\Mail\OrderinvoiceDetails;
 use App\Models\Couriername;
 use App\Models\Setting;
 use App\Models\State;
+use Illuminate\Support\Facades\DB;
 
 class OrderController extends Controller
 {
@@ -348,10 +349,16 @@ class OrderController extends Controller
 
     protected function sendOrderStatusEmail(Order $order, $orderApproved, $cancellationReason = null)
     {
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return;
+        }
+
         if ($orderApproved == 1) {
-            Mail::to($order->email)->send(new OrderStatusUpdated($order, 'approved'));
+            Mail::to($email)->send(new OrderStatusUpdated($order, 'approved'));
         } else {
-            Mail::to($order->email)->send(new OrderStatusUpdated($order, 'canceled', $cancellationReason));
+            Mail::to($email)->send(new OrderStatusUpdated($order, 'canceled', $cancellationReason));
         }
     }
 
@@ -378,11 +385,16 @@ class OrderController extends Controller
         $order->orderStatus = 'Requested ';
         $order->save();
 
-        // Send the email using the Mailable
-        Mail::to($order->email)->send(new OrderRequestToCustomer($order, $message));
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return response()->json(['message' => 'User email not found'], 404);
+        }
+    
+        Mail::to($email)->send(new OrderRequestToCustomer($order, $message));
 
         return response()->json(['message' => 'Request sent successfully!']);
-    }
+    } 
 
     public function courierdetails(Request $request)
     {
@@ -410,13 +422,19 @@ class OrderController extends Controller
 
         $order->save();
 
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return response()->json(['message' => 'User email not found'], 404);
+        }
+
         $message = "Here are your courier details:\n"
             . "Dispatch Date: " . $courierDetails['dispatchDate'] . "\n"
             . "Courier Name: " . $courierDetails['courierName'] . "\n"
             . "Reference No: " . $courierDetails['referenceNo'] . "\n"
             . "Estimated Date of Delivery: " . $courierDetails['estimateDeliveryDate'];
 
-        Mail::to($order->email)->send(new OrderCourierDetails($order, $message));
+        Mail::to($email)->send(new OrderCourierDetails($order, $message));
 
         return response()->json(['message' => 'Courier Details Added Successfully!']);
     }
@@ -441,11 +459,17 @@ class OrderController extends Controller
 
         $order->save();
 
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return response()->json(['message' => 'User email not found'], 404);
+        }
+
         $message = "Here are your Delivery details:\n"
             . "Delivery Date: " . $deliveryDetails['deliverydate'] . "\n"
             . "Receiver Name: " . $deliveryDetails['receivedby'] . "\n";
 
-        Mail::to($order->email)->send(new OrderdeliveryDetails($order, $message));
+        Mail::to($email)->send(new OrderdeliveryDetails($order, $message));
 
         return response()->json(['message' => 'Order Details Added Successfully!']);
     }
@@ -474,8 +498,14 @@ class OrderController extends Controller
         // Save the order details in the database
         $order->save();
 
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return response()->json(['message' => 'User email not found'], 404);
+        }
+
         // Send the email with the attached invoice PDF
-        Mail::to($order->email)->send(new OrderinvoiceDetails($order, $filename));
+        Mail::to($email)->send(new OrderinvoiceDetails($order, $filename));
 
         return response()->json(['message' => 'Order Details and Invoice Added Successfully!']);
     }
@@ -494,8 +524,14 @@ class OrderController extends Controller
         $order->orderStatus = 'Approved';
         $order->save();
 
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return redirect()->back()->with('message', 'User email not found');
+        }
+
         // Optionally, send an email to confirm acceptance
-        Mail::to($order->email)->send(new OrderStatusUpdated($order, 'approved'));
+        Mail::to($email)->send(new OrderStatusUpdated($order, 'approved'));
 
         return redirect()->back()->with('message', 'Order has been approved.');
     }
@@ -513,8 +549,14 @@ class OrderController extends Controller
         $order->orderStatus = 'Cancelled ';
         $order->save();
 
+        $email = $order->email ?? DB::table('eusers')->where('id', $order->userId)->value('email');
+
+        if (!$email) {
+            return redirect()->back()->with('message', 'User email not found');
+        }
+
         // Optionally, send an email to confirm cancellation
-        Mail::to($order->email)->send(new OrderStatusUpdated($order, 'canceled'));
+        Mail::to($email)->send(new OrderStatusUpdated($order, 'canceled'));
 
         return redirect()->back()->with('message', 'Order has been canceled.');
     }
