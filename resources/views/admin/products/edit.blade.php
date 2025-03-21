@@ -628,6 +628,23 @@
     CKEDITOR.replace('description4');
     CKEDITOR.replace('description5');
 
+    CKEDITOR.replace('description1', {
+    extraAllowedContent: 'iframe[*]'
+    });
+    CKEDITOR.replace('description2', {
+        extraAllowedContent: 'iframe[*]'
+    });
+    CKEDITOR.replace('description3', {
+        extraAllowedContent: 'iframe[*]'
+    });
+    CKEDITOR.replace('description4', {
+        extraAllowedContent: 'iframe[*]'
+    });
+    CKEDITOR.replace('description5', {
+        extraAllowedContent: 'iframe[*]'
+    });
+
+
     $(document).ready(function() {
         $('#productvariant').select2({
             placeholder: '--Select--',
