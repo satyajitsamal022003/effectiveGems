@@ -330,8 +330,7 @@ Effective Gems')
                                 <div class="space-between">
                                     <a href="{{ route('user.productdetails', $related->id) }}"
                                         class="as_btn_cart"><span>View Details</span></a>
-                                    <a href="javascript:;" class="enquire_btn" data-bs-toggle="modal"
-                                        data-bs-target="#enquire_modal"><span>Order Now</span></a>
+                                    <a href="javascript:;" class="enquire_btn" onclick="buyNow({{ $related->id }})"><span>Order Now</span></a>
                                 </div>
                             </div>
                         </div>
