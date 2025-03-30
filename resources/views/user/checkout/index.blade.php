@@ -534,7 +534,7 @@
                                 <div class="form-check">
                                     <input class="form-check-input" type="radio" name="orderType" id="cash_on_delivery" value="2">
                                     <label class="form-check-label" for="cash_on_delivery">
-                                        Cash on Delivery
+                                        <strong>Cash on Delivery(COD)</strong>
                                     </label>
                                 </div>
                                 <p>After clicking “Pay now”, you will be redirected to Razorpay Secure (UPI, Cards,
@@ -882,6 +882,31 @@
 
 
 <script>
+    const updateTotalWithCod = () => {
+    let isCOD = $('#cash_on_delivery').is(':checked');
+    let subtotal = parseFloat($('#total').text()); // Get the updated subtotal from response
+    let deliveryCharges = parseFloat($('#deliveryCharges').text());
+    let codCharge = 30;
+    let totalAmount = subtotal + deliveryCharges;
+
+    if (isCOD) {
+        totalAmount += codCharge;
+        if (!$('.codCharge').length) {
+            $('.total_order:last').before(`
+                <div class="total_order codCharge">
+                    <h4>COD Charges applied</h4>
+                    <h6>₹30</h6>
+                </div>
+            `);
+        }
+    } else {
+        $('.codCharge').remove();
+    }
+
+    $('.subTotal').text(totalAmount);
+    $('.amount').val(totalAmount);
+};
+
     const removeFromCart = (cartItemId) => {
 
         // var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());
@@ -901,6 +926,8 @@
                     $('.amount').val(response.subtotal);
                     $('#deliveryCharges').text(response.totalDelPrice);
                     $('#total').text(response.total);
+
+                    updateTotalWithCod();
 
                     // toastr.success(response.message);
                 },
@@ -938,6 +965,8 @@
                 $('#itemTotal-' + id).text(response.itemTotal);
                 $('#deliveryCharges').text(response.totalDelPrice);
                 $('#itemDelivery-' + id).text(response.itemDeliveryPrice);
+
+                updateTotalWithCod();
 
                 // $('#quantity-' + id).text(newQuantity);
                 // toastr.success(response.message);
@@ -983,6 +1012,10 @@
         });
 
     }
+
+    $(document).ready(function () {
+        $('input[name="orderType"]').change(updateTotalWithCod);
+    });
 
     function applyCoupon() {
         const couponCode = $('input[name="couponCode"]').val(); // Get the coupon code from the input

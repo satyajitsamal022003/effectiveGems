@@ -110,12 +110,22 @@ class IndexController extends Controller
         $testimonials = Testimonial::where('status', 1)->get();
         $categories = Category::where('status', 1)->orderByRaw("CASE WHEN sortOrder = 0 OR sortOrder IS NULL THEN 1 ELSE 0 END")
             ->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->get();
-        $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->orderBy('sortOrderPopular', 'asc')->orderBy('created_at', 'asc')->paginate(16);
+        $popularproducts = Product::where('status', 1)->where('sortOrderPopularStatus', 1)->orderBy('sortOrderPopular', 'asc')->orderBy('created_at', 'asc')->paginate(16);
         $banners = Banner::where('status', 1)->orderBy('sort_order')->get();
 
         $faqs = Faq::where('is_active', 1)->get();
 
         return view('user.index', compact('categories', 'popularproducts', 'testimonials', 'banners', 'faqs'));
+    }
+    
+    public function popularproducts(){
+        $popularproducts = Product::where('status', 1)->where('sortOrderPopularStatus',1)->orderBy('sortOrderPopular', 'asc')->paginate(16);
+        return view('user.popularproducts', compact('popularproducts'));
+    }
+
+    public function testimonials(){
+        $testimonials = Testimonial::where('status', 1)->paginate(9);
+        return view('user.testimonials', compact('testimonials'));
     }
 
     public function categorywiseproduct($id, $search = null)
@@ -613,7 +623,7 @@ class IndexController extends Controller
 
 
         $relatedProducts = Product::where('id', '!=', $prodid)->where('categoryId', $productdetails->categoryId)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->paginate(16);
-        $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->paginate(16);
+        $popularproducts = Product::where('status', 1)->where('sortOrderPopularStatus', 1)->paginate(16);
         $variants = [];
         $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
         if ($productdetails->variant)
@@ -646,7 +656,7 @@ class IndexController extends Controller
 
 
         $relatedProducts = Product::where('id', '!=', $productdetails->id)->where('categoryId', $productdetails->categoryId)->where('status', 1)->orderBy('sortOrder', 'asc')->orderBy('created_at', 'asc')->paginate(16);
-        $popularproducts = Product::where('status', 1)->where('sortOrderPopular', 1)->paginate(16);
+        $popularproducts = Product::where('status', 1)->where('sortOrderPopularStatus', 1)->paginate(16);
         $variants = [];
         $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
         if ($productdetails->variant)

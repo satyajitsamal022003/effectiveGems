@@ -16,6 +16,9 @@
                                     <span>₹{{ $item->productDetails->priceB2C * $item->quantity + $item->activation + $item->certificate }}</span>
                                     <span>Activation Charge : ₹{{ $item->activation }}</span>
                                     <span>Certificate Charge : ₹{{ $item->certificate }}</span>
+                                    @if($order->paymentMode=='COD')
+                                    <span>COD Charge : ₹30</span>
+                                    @endif
                                 </div>
                             </div>
                         </div>

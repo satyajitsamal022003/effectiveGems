@@ -119,6 +119,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::delete('/delete-product/{id}', [ProductController::class, 'deleteproduct'])->name('admin.deleteproduct');
     Route::post('admin/productOnTop', [ProductController::class, 'productOnTop'])->name('admin.productOnTop');
     Route::post('admin/productOnStatus', [ProductController::class, 'productOnStatus'])->name('admin.productOnStatus');
+    Route::post('admin/sortOrderPopularStatus', [ProductController::class, 'sortOrderPopularStatus'])->name('admin.sortOrderPopularStatus');
     Route::post('admin/getSubCategory', [ProductController::class, 'getSubCategory'])->name('admin.getSubCategory');
     Route::get('/product-edit/{id}', [ProductController::class, 'editproduct'])->name('admin.editproduct');
     Route::post('/update-product/{id}', [ProductController::class, 'updateproduct'])->name('admin.editproductdata');
@@ -187,6 +188,8 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('coupon.applyCoupon');
 Route::get('/', [IndexController::class, 'index'])->name('user.index');
 Route::get('/category-products/{id}', [IndexController::class, 'categorywiseproduct'])->name('user.categorywiseproduct');
+Route::get('/popular-products', [IndexController::class, 'popularproducts'])->name('user.popularproducts');
+Route::get('/all-testimonials', [IndexController::class, 'testimonials'])->name('user.testimonials');
 Route::get('/category-product/{slug}', [IndexController::class, 'categorywiseproductSlug'])->name('user.categorywiseproductSlug');
 Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name('user.subCategory');
 Route::get('/sub-categories/{slug}', [IndexController::class, 'subCategorySlug'])->name('user.subCategorySlug');

@@ -633,6 +633,49 @@ class ProductController extends Controller
         }
     }
 
+    public function sortOrderPopularStatus(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'productId' => 'required|exists:product,id',
+                'sortOrderPopularStatus' => 'required|in:0,1,2'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $product = Product::findOrFail($request->productId);
+            $product->sortOrderPopularStatus = $request->sortOrderPopularStatus;
+            $product->save();
+
+            $statusMessages = [
+                0 => 'inactive',
+                1 => 'active',
+                2 => 'deleted'
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Popular Status updated Successfully',
+                'data' => [
+                    'status' => $product->sortOrderPopularStatus,
+                    'status_text' => $statusMessages[$product->sortOrderPopularStatus] ?? 'unknown'
+                ]
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Product popular update failed: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update product popular: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function getSubCategory(Request $request)
     {
         try {

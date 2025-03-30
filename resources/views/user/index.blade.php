@@ -69,7 +69,7 @@
                         <div class="inline-header" data-aos="zoom-in" data-aos-duration="1500">
                             <h1 class="as_heading">Popular Products</h1>
                             <div class="text-center" data-aos="zoom-in">
-                                <a href="popular-product.html" class="as_btn">view more</a>
+                                <a href="{{route('user.popularproducts')}}" class="as_btn">view more</a>
                             </div>
                         </div>
                         <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
@@ -249,14 +249,14 @@
 
     <!--testimonial start-->
     @if ($testimonials->count() > 0)
-        <section class="as_customer_wrapper as_padderBottom40 as_padderTop40">
+        <section class="as_customer_wrapper as_padderBottom40 as_padderTop40"> 
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="inline-header" data-aos="zoom-in" data-aos-duration="1500">
                             <h1 class="as_heading">What My Clients Say</h1>
                             <div class="text-center">
-                                <a href="" class="as_btn">View More</a>
+                                <a href="{{route('user.testimonials')}}" class="as_btn">View More</a>
                             </div>
                         </div>
 

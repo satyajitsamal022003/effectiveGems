@@ -61,6 +61,7 @@
                                             <th>B2C Price</th>
                                             <th class="no-sort">On Top</th>
                                             <th class="no-sort">Sort</th>
+                                            <th class="no-sort">Popular Status</th>
                                             <th class="no-sort">Status</th>
                                             <th class="no-sort">Action</th>
                                         </tr>
@@ -219,6 +220,27 @@
             });
         }
 
+        function sortOrderPopularStatus(productId) {
+            var isChecked = $('#sortOrderPopularStatus' + productId).is(':checked');
+            var sortOrderPopularStatus = isChecked ? 1 : 0;
+
+            $.ajax({
+                type: "POST",
+                url: "{{ route('admin.sortOrderPopularStatus') }}",
+                data: {
+                    '_token': '{{ csrf_token() }}',
+                    'productId': productId,
+                    'sortOrderPopularStatus': sortOrderPopularStatus
+                },
+                success: function(response) {
+                    toastr.success(response.message);
+                },
+                error: function(xhr, status, error) {
+                    toastr.error('An error occurred: ' + error);
+                }
+            });
+        }
+
         $(document).ready(function() {
             if ($.fn.DataTable.isDataTable('#ProductTable')) {
                 $('#ProductTable').DataTable().destroy();
@@ -284,6 +306,20 @@
                     {
                         data: 'sortOrderSubCategory',
                         name: 'sortOrderSubCategory',
+                    },
+                    {
+                        data: 'sortOrderPopularStatus',
+                        name: 'sortOrderPopularStatus',
+                        orderable: false,
+                        searchable: false,
+                        render: function(data, type, full, meta) {
+                            return `
+                                <div class="onoffswitch">
+                                    <input type="checkbox" class="onoffswitch-checkbox" id="sortOrderPopularStatus${full.id}" 
+                                    ${data ? 'checked' : ''} onchange="sortOrderPopularStatus(${full.id})">
+                                    <label class="onoffswitch-label" for="sortOrderPopularStatus${full.id}"></label>
+                                </div>`;
+                        }
                     },
                     {
                         data: 'status',
