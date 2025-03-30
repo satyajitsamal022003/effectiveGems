@@ -10,7 +10,7 @@
                     <h3 class="page-title">Manage Activation</h3>
                     <ul class="breadcrumb">
                         <li class="breadcrumb-item"><a href="{{route('admin.dashboard')}}">Dashboard</a></li>
-                        <li class="breadcrumb-item active">Manage Activation</li>
+                        <li class="breadcrumb-item active">Manage-Activation</li>
                     </ul>
                 </div>
                 <div class="panel-heading col-md-2">
