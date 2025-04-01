@@ -325,13 +325,15 @@ $(window).on("load", function () {
 });
 
 $(document).ready(function () {
-    const handleQuantityChange = (quantity) => {
+    const handleQuantityChange = (quantity) => { debugger
         const productCategory = parseInt($("#productCategory").val());
         const courierType = parseInt($("#courierTypeId").val());
         const courierPrice = parseInt($("#courierPrice").val());
         const delPriceDisplay = $("#delivery-cost");
         const priceDisplay = $("#product-price-total");
         const productPrice = parseInt($("#productPrice").val());
+        var ringType = $('input[name="ring_type"]:checked').val() || 'none';
+        var ringPrice = ringType === 'silver' ? 1000 : 0;
         let deliveryPrice = 0;
 
         // Calculate delivery price based on courier type
@@ -352,7 +354,7 @@ $(document).ready(function () {
                 parseInt($("#certificationCheckbox").data("price")) || 0;
         }
 
-        const totalPrice = productPrice * quantity + deliveryPrice + extraPrice;
+        const totalPrice = productPrice * quantity + deliveryPrice + extraPrice + ringPrice;
         priceDisplay.text(totalPrice);
     };
 
@@ -360,6 +362,11 @@ $(document).ready(function () {
         const count = $("#quantityDd").val();
         handleQuantityChange(count);
     });
+    $('[name="ring_type"]').change(() => {
+        const count = $("#quantityDd").val();
+        handleQuantityChange(count);
+    });
+    
     $(".minus").click(function () {
         var $input = $(this).parent().find("input");
         var count = parseInt($input.val()) - 1;

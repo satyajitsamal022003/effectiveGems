@@ -141,7 +141,7 @@ Effective Gems')
                                 )->first();
                                 @endphp
 
-                                @if (!($activation && $activation->id == 2) || !($Certification && $Certification->id == 2))
+                                {{-- @if (!($activation && $activation->id == 2) || !($Certification && $Certification->id == 2))
                                 <div class="extra-checkbox" data-aos="fade-up">
                                     @if (!($activation && $activation->id == 2))
                                     <div class="data-check">
@@ -167,10 +167,70 @@ Effective Gems')
                                     @endif
 
                                 </div>
+                                @endif --}}
+
+                                <div class="extra-checkbox" data-aos="fade-up">
+                                    @if (!($activation && $activation->id == 2))
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="activationCheckbox" name="is_act" value="1" data-price="{{ $activation->amount ?? 0 }}">
+                                        <label class="form-check-label" for="activationCheckbox">
+                                            Activation (+{{ $activation->amount ?? 'N/A' }})
+                                        </label>
+                                    </div>
+                                    @endif
+                                    @if (!($Certification && $Certification->id == 2))
+                                    <div class="form-check mb-2">
+                                        <input class="form-check-input" type="checkbox" id="certificationCheckbox" name="is_cert" value="1" data-price="{{ $Certification->amount ?? 0 }}">
+                                        <label class="form-check-label" for="certificationCheckbox">
+                                            Certification (+{{ $Certification->amount ?? 'N/A' }})
+                                        </label>
+                                    </div>
+                                    @endif
+                                </div>
+                                @if ($is_gemStone)
+                                <div class="extra-checkbox border-top d-flex pt-3 mt-3">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ring_type" id="noRing" value="none" checked>
+                                        <label class="form-check-label" for="noRing">No Ring</label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ring_type" id="silverRing" value="silver" data-price="1000">
+                                        <label class="form-check-label" style="white-space: nowrap" for="silverRing">
+                                            <i class='fas fa-coins p-1' style='font-size:25px;color:rgb(214, 207, 207)'></i>Silver Ring (+₹1000)
+                                        </label>
+                                    </div>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="ring_type" id="goldRing" value="gold">
+                                        <label class="form-check-label" style="white-space: nowrap" for="goldRing">
+                                            <i class='fas fa-coins p-1' style='font-size:25px;color:rgb(219, 196, 66)'></i>Gold Ring
+                                        </label>
+                                    </div>
+                                </div>
                                 @endif
-
-
-
+                                
+                                <!-- Gold Ring Contact Button (hidden by default) -->
+                                <div id="goldRingContact" class="mt-2" style="display: none;">
+                                    <a href="https://wa.me/+917328835585" class="btn btn-success" target="_blank">
+                                        <i class="fab fa-whatsapp"></i> Contact Support for Gold Ring
+                                    </a>
+                                </div>
+                                
+                                <!-- Activation details section (hidden by default) -->
+                                <div id="activationDetails" class="extra-checkbox mb-3" style="display: none;">
+                                    <h4 class="h5 mb-3">Activation Details</h4>
+                                    <div class="mb-1">
+                                        <label for="name" class="form-label">Name</label>
+                                        <input type="text" class="form-control" id="name" name="activation_name" placeholder="Enter name">
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="gotra" class="form-label">Gotra</label>
+                                        <input type="text" class="form-control" id="gotra" name="activation_gotra" placeholder="Enter gotra">
+                                    </div>
+                                    <div class="mb-1">
+                                        <label for="dob" class="form-label">Date of Birth</label>
+                                        <input type="date" class="form-control" id="dob" name="activation_dob">
+                                    </div>
+                                </div>
 
                                 <div class="total-price-details" data-aos="fade-up">
                                     <span>Total :</span>
@@ -451,6 +511,17 @@ Effective Gems')
         }
         var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
         var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
+        var ringType = $('input[name="ring_type"]:checked').val() || 'none';
+        var ringPrice = ringType === 'silver' ? 1000 : 0;
+        let activation_name = document.getElementById('name').value;
+        let activation_gotra = document.getElementById('gotra').value;
+        let activation_dob = document.getElementById('dob').value;
+        if (isActive == 1) {
+            if (!activation_name || !activation_gotra || !activation_dob) {
+                alert("Please fill in all activation details.");
+                return false;
+            }
+        }
         $.ajax({
             type: "POST",
             url: "{{ route('addToCart') }}",
@@ -460,6 +531,11 @@ Effective Gems')
                 quantity: quantity,
                 isActive: isActive,
                 isCert: isCert,
+                ring_type: ringType,
+                ring_price: ringPrice,
+                activation_name: activation_name,
+                activation_gotra: activation_gotra,
+                activation_dob: activation_dob,
             },
             success: function(response) {
                 $(".cartCount").text(response.totalCartItems);
@@ -488,7 +564,17 @@ Effective Gems')
         }
         var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
         var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
-
+        var ringType = $('input[name="ring_type"]:checked').val() || 'none';
+        var ringPrice = ringType === 'silver' ? 1000 : 0;
+        let activation_name = document.getElementById('name').value;
+        let activation_gotra = document.getElementById('gotra').value;
+        let activation_dob = document.getElementById('dob').value;
+        if (isActive == 1) {
+            if (!activation_name || !activation_gotra || !activation_dob) {
+                alert("Please fill in all activation details.");
+                return false;
+            }
+        }
         $.ajax({
             type: "POST",
             url: "{{ route('addToCart') }}",
@@ -498,6 +584,11 @@ Effective Gems')
                 quantity: quantity,
                 isActive: isActive,
                 isCert: isCert,
+                ring_type: ringType,
+                ring_price: ringPrice,
+                activation_name: activation_name,
+                activation_gotra: activation_gotra,
+                activation_dob: activation_dob,
             },
             success: function(response) {
                 $(".cartCount").text(response.totalCartItems);
@@ -510,4 +601,46 @@ Effective Gems')
             },
         });
     };
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Show/hide activation details when checkbox is clicked
+        const activationCheckbox = document.getElementById('activationCheckbox');
+        const activationDetails = document.getElementById('activationDetails');
+        
+        if (activationCheckbox && activationDetails) {
+            activationCheckbox.addEventListener('change', function() {
+                activationDetails.style.display = this.checked ? 'block' : 'none';
+            });
+        }
+
+        // Handle ring selection changes
+        const noRing = document.getElementById('noRing');
+        const silverRing = document.getElementById('silverRing');
+        const goldRing = document.getElementById('goldRing');
+        const goldRingContact = document.getElementById('goldRingContact');
+
+        // Add price to silver ring label
+        silverRing.addEventListener('change', function() {
+            if (this.checked) {
+                // You can add your logic here to update the total price
+                console.log('Silver Ring selected - ₹1000 added');
+                goldRingContact.style.display = 'none';
+            }
+        });
+
+        // Show WhatsApp button for gold ring
+        goldRing.addEventListener('change', function() {
+            if (this.checked) {
+                goldRingContact.style.display = 'block';
+            }
+        });
+
+        // Hide WhatsApp button when no ring or silver ring is selected
+        noRing.addEventListener('change', function() {
+            if (this.checked) {
+                goldRingContact.style.display = 'none';
+            }
+        });
+    });
 </script>

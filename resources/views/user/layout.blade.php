@@ -119,8 +119,8 @@
     <!--header start-->
     <div class="as_main_wrapper">
         <section class="as_header_wrapper">
-            @if ($annoument_text && $annoument_text->announcement_text)
-            <div class="col-md-10 mx-auto slider-container" id="announcement-slider">
+            @if ($annoument_text && $annoument_text->announcement_text && $annoument_text->announcement_status)
+            <div class="col-md-12 mx-auto slider-container" id="announcement-slider">
                 <div class="slider-content">
                     <span class="slider-item">{{ $annoument_text->announcement_text }}</span>
                 </div>
@@ -750,7 +750,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const content = document.querySelector('.slider-content');
-        content.innerHTML = content.innerHTML.repeat(-1); 
+        const text = content.innerHTML;
+        
+        content.innerHTML = text + " &nbsp; " + text ;
     });
 </script>
 @stack('scripts')

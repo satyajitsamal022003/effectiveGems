@@ -666,8 +666,9 @@ class IndexController extends Controller
         $couriertype = Couriertype::where('id', $productdetails->courierTypeId)->first();
         if ($productdetails->variant)
             $variants = Product::whereIn("id", json_decode($productdetails->variant))->select("variantName", "priceB2C", "productName","id as prodid")->get();        // dd(count($variants));
-
-        return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype",'isInWishlist'));
+    
+        $is_gemStone = optional($productdetails->category)->categoryName == "Gemstones" ? 1 : 0;
+        return view('user.details.product', compact('productdetails', 'relatedProducts', 'popularproducts', 'variants', "couriertype",'isInWishlist','is_gemStone'));
     }
 
     public function getProductsForCategory($categoryId)

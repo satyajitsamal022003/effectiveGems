@@ -183,13 +183,19 @@ class CartController extends Controller
             $cartItem->quantity = $quantity;
             $cartItem->is_act_selected = $req->isActive;
             $cartItem->is_cert_selected = $req->isCert;
+            $cartItem->ring_type = $req->ring_type;
+            $cartItem->ring_price = $req->ring_price;
             if ($req->isActive == 1) {
                 $product = Product::find($product_id);
                 if ($product->activationId != 1 || $product->activationId != 2) {
                     $activation = Activations::find($product->activationId);
                     $cartItem->activation = $activation->amount == "Free" ? 0 : $activation->amount;
-                } else
+                    $cartItem->activation_name = $req->activation_name;
+                    $cartItem->activation_gotra = $req->activation_gotra;
+                    $cartItem->activation_dob = $req->activation_dob;
+                } else{
                     $cartItem->activation = 0;
+                }
             }
             if ($req->isCert == 1) {
                 $product = Product::find($product_id);

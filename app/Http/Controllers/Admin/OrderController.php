@@ -578,6 +578,15 @@ class OrderController extends Controller
         return view('admin.settings', compact('setting'));
     }
 
+    public function toggleStatus(Request $request)
+    {
+        $setting = Setting::first();
+        $setting->announcement_status = !$setting->announcement_status; // Toggle between 0 and 1
+        $setting->save();
+
+        return response()->json(['status' => $setting->announcement_status]);
+    }
+
     public function storesetting(Request $request)
     {
         // Validate the request

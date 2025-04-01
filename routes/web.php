@@ -183,6 +183,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 
     //settings
     Route::get('/edit-setting', [AdminOrderController::class, 'addsetting'])->name('admin.settings');
+    Route::post('/settings/toggle-status', [AdminOrderController::class, 'toggleStatus'])->name('settings.toggleStatus');
     Route::post('/store-setting', [AdminOrderController::class, 'storesetting'])->name('admin.storesettings');
 });
 Route::post('/apply-coupon', [CouponController::class, 'applyCoupon'])->name('coupon.applyCoupon');

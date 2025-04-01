@@ -89,8 +89,29 @@
                                     <div class="row">
                                         <div class="col-xl-6">
                                             <div class="form-group">
-                                                <label>Announcement Text <span class="text-danger">*</span></label>
+                                                <label>Announcement Text</label>
                                                 <input class="form-control" name="announcement_text" placeholder="Announcement Text" value="{{ $setting->announcement_text ?? '' }}">
+                                            </div>
+                                            <div>
+                                                <label>Announcement Status </label>
+                                                <div class="d-flex my-2">
+                                                    <div class="form-check mr-5">
+                                                        <input class="form-check-input" type="radio" id="statusActive" name="announcement_status" value="1"
+                                                            {{ $setting->announcement_status ? 'checked' : '' }}>
+                                                        <label class="form-check-label text-success fw-semibold" for="statusActive">
+                                                            <i class="bi bi-check-circle-fill"></i> Active
+                                                        </label>
+                                                    </div>
+                                            
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="radio" id="statusInactive" name="announcement_status" value="0"
+                                                            {{ !$setting->announcement_status ? 'checked' : '' }}>
+                                                        <label class="form-check-label text-danger fw-semibold" for="statusInactive">
+                                                            <i class="bi bi-x-circle-fill"></i> Inactive
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                
                                             </div>
                                             <div class="form-group">
                                                 <label>Heading 1 <span class="text-danger">*</span></label>
@@ -158,6 +179,29 @@
         if (event.target.files.length > 0) {
             reader.readAsDataURL(event.target.files[0]);
         }
+    });
+</script>
+
+<script>
+    $(document).ready(function () {
+        $('input[name="announcement_status"]').change(function () {
+            let status = $(this).val();
+
+            $.ajax({
+                url: "{{ route('settings.toggleStatus') }}", // Laravel route
+                type: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    announcement_status: status
+                },
+                success: function (response) {
+                    alert('Status updated successfully!');
+                },
+                error: function () {
+                    alert('Something went wrong!');
+                }
+            });
+        });
     });
 </script>
 @endsection
