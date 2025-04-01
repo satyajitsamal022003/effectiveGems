@@ -29,7 +29,7 @@
         href="{{ url('/') }}/user/assets/js/plugin/airdatepicker/datepicker.min.css" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/all.min.css?=5" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/mega-menu458e.css?=11.5" />
-    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/style552d.css?=50.2" />
+    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/style552d.css?=51.2" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/aos.css" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/easy-responsive-tabs.css?=7" />
     <!-- Owl carousel-->
