@@ -456,7 +456,7 @@
                                                         class="form-control" value="">
                                                 </div>
                                             </div>
-                                        </div>
+                                        </div> 
 
 
                                         <div class="form-group">
@@ -531,15 +531,17 @@
                                         Razorpay Secure (UPI, Cards, Wallets, NetBanking)
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="orderType" id="cash_on_delivery" value="2">
-                                    <label class="form-check-label" for="cash_on_delivery">
-                                        <strong>Cash on Delivery(COD)</strong>
-                                    </label>
+                                <div class="code-box">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="orderType" id="cash_on_delivery" value="2">
+                                        <label class="form-check-label" for="cash_on_delivery">
+                                            <strong>Cash on Delivery(COD)</strong>
+                                        </label>
+                                    </div>
+                                    <p class="mb-0">After clicking “Pay now”, you will be redirected to Razorpay Secure (UPI, Cards,
+                                        Wallets,
+                                        NetBanking) to complete your purchase securely.</p>
                                 </div>
-                                <p>After clicking “Pay now”, you will be redirected to Razorpay Secure (UPI, Cards,
-                                    Wallets,
-                                    NetBanking) to complete your purchase securely.</p>
 
                                 <div class="mt-3">
                                     <div class="panel-info">

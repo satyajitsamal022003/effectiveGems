@@ -2,39 +2,50 @@
 @section('content')
     {{-- @include('user.partials.banner') --}}
     @if ($banners->count() > 0)
-        @foreach ($banners as $banner)
-            <section class="as_banner_wrapper"
-                style="background-image: url('{{ asset($banner->image ? $banner->image : '/user/assets/images/banner.jpg') }}');">
-                <div class="container">
-                    <div class="row as_verticle_center">
-                        <div class="col-lg-6">
-                            <div class="as_banner_detail">
-                                <h1 data-aos="fade-right">{{ $banner->title }}</h1>
-                                <p>{{ $banner->description }}</p>
-                                @if ($banner->button_text && $banner->button_link)
-                                    <a href="{{ $banner->button_link }}" class="as_btn"
-                                        data-aos="zoom-in">{{ $banner->button_text }}</a>
-                                @endif
+        <section class="banner-section position-relative">
+            <div class="owl-carousel banner-owl right-dots">
+            @foreach ($banners as $banner)
+                <div class="banner-item" style="background-image: url('{{ asset($banner->image ? $banner->image : '/user/assets/images/banner.jpg') }}');">
+                    <div class="banner-text">
+                        <div class="container">
+                            <h1 class="main-head">{{ $banner->title }}</h1>
+                            <p>{{ $banner->description }}</p>
+                            <div class="inline-main-btn">
+                            <a href="{{ $banner->button_link }}" class="as_btn aos-init aos-animate" data-aos="zoom-in">{{ $banner->button_text }}   </a>
                             </div>
                         </div>
                     </div>
                 </div>
-            </section>
-        @endforeach
+            @endforeach
+            </div>
+        </section>
     @else
-        <section class="as_banner_wrapper" style="background-image: url('/user/assets/images/banner.jpg');">
-            <div class="container">
-                <div class="row as_verticle_center">
-                    <div class="col-lg-6">
-                        <div class="as_banner_detail">
-                            <h1 data-aos="fade-right">Buy High Quality Natural Gemstones At Wholesale Prices. B2B
-                                Marketplace</h1>
-                            <a href="#" class="as_btn" data-aos="zoom-in">Shop Now</a>
+    <section class="banner-section position-relative">
+        <div class="owl-carousel banner-owl right-dots">
+            <div class="banner-item" style="background-image: url(/user/assets/images/banner.jpg)">
+                <div class="banner-text">
+                    <div class="container">
+                        <h1 class="main-head">Buy High Quality Natural Gemstones At Wholesale Prices. B2B Marketplace</h1>
+                        <div class="inline-main-btn">
+                        <a href="#" class="as_btn aos-init aos-animate" data-aos="zoom-in">Shop Now</a>
                         </div>
                     </div>
                 </div>
             </div>
-        </section>
+            <!--banner item end-->
+            <div class="banner-item" style="background-image: url(/user/assets/images/banner.jpg)">
+                <div class="banner-text">
+                    <div class="container">
+                        <h2 class="main-head">Buy High Quality Natural Gemstones At Wholesale Prices. B2B Marketplace</h2>
+                        <div class="inline-main-btn">
+                            <a href="#" class="as_btn aos-init aos-animate" data-aos="zoom-in">Shop Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--banner item end-->
+        </div>
+    </section>
     @endif
 
 
@@ -75,7 +86,7 @@
                         <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
                             @foreach ($popularproducts as $popular)
                                 <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                                    <div class="as_product_box">
+                                    <div class="as_product_box {{ $popular->out_of_stock == 1 ? 'out-of-stock' : '' }}">
                                         <a href="{{ route('user.productdetails', $popular->id) }}" class="as_product_img">
                                             <img src="{{ asset($popular->image1 ?? 'defaultImage.jpeg') }}"
                                                 class="img-responsive" alt="product Image" />
@@ -92,8 +103,12 @@
                                             <div class="space-between">
                                                 <a href="{{ route('user.productdetails', $popular->id) }}"
                                                     class="as_btn_cart"><span>View Details</span></a>
-                                                <a href="javascript:;" class="enquire_btn" data-bs-toggle="modal"
-                                                    data-bs-target="#enquire_modal"><span>Order Now</span></a>
+                                                @if ($popular->out_of_stock == 1)
+                                                    <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
+                                                @else
+                                                    <a href="javascript:;" class="enquire_btn"
+                                                        onclick="buyNow({{ $popular->id }})"><span>Order Now</span></a>
+                                                @endif
                                             </div>
                                         </div>
                                     </div>
@@ -293,7 +308,7 @@
             <div class="inline-header as_padderBottom40" data-aos="zoom-in" data-aos-duration="1500">
                 <h1 class="as_heading">Frequently Asked Questions</h1>
                 <div class="text-center">
-                    <a href="" class="as_btn">View More</a>
+                    <a href="{{route('user.faqs')}}" class="as_btn">View More</a>
                 </div>
             </div>
 

@@ -190,6 +190,7 @@ Route::get('/', [IndexController::class, 'index'])->name('user.index');
 Route::get('/category-products/{id}', [IndexController::class, 'categorywiseproduct'])->name('user.categorywiseproduct');
 Route::get('/popular-products', [IndexController::class, 'popularproducts'])->name('user.popularproducts');
 Route::get('/all-testimonials', [IndexController::class, 'testimonials'])->name('user.testimonials');
+Route::get('/faqs', [IndexController::class, 'faqs'])->name('user.faqs');
 Route::get('/category-product/{slug}', [IndexController::class, 'categorywiseproductSlug'])->name('user.categorywiseproductSlug');
 Route::get('/sub-category/{id}', [IndexController::class, 'subCategory'])->name('user.subCategory');
 Route::get('/sub-categories/{slug}', [IndexController::class, 'subCategorySlug'])->name('user.subCategorySlug');

@@ -128,6 +128,11 @@ class IndexController extends Controller
         return view('user.testimonials', compact('testimonials'));
     }
 
+    public function faqs(){
+        $faqs = Faq::where('is_active', 1)->paginate(9);
+        return view('user.faqs', compact('faqs'));
+    }
+
     public function categorywiseproduct($id, $search = null)
     {
         // Pagination setup

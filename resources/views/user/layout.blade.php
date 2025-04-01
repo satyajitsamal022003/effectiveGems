@@ -32,6 +32,8 @@
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/style552d.css?=50.2" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/aos.css" />
     <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/easy-responsive-tabs.css?=7" />
+    <!-- Owl carousel-->
+    <link rel="stylesheet" type="text/css" href="{{ url('/') }}/user/assets/css/owl.carousel.min.css" />
     <!-- Fotorama -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.css" rel="stylesheet">
     <!-- favicon -->
@@ -494,6 +496,7 @@
     <script src="{{ url('/') }}/user/assets/js/custom.js"></script>
     <script src="{{ url('/') }}/user/assets/js/mega-menu.js"></script>
     <script src="{{ url('/') }}/user/assets/js/aos.js"></script>
+    <script src="{{ url('/') }}/user/assets/js/owl.carousel.min.js"></script>
     <script src="{{ url('/') }}/user/assets/js/easy-responsive-tabs.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.js"></script>
 
@@ -501,6 +504,31 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fotorama/4.6.4/fotorama.js"></script>
 
     <script src="../cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.7.0/vanilla-tilt.min.js"></script>
+
+    <!-- banner owl start -->
+    <script>
+    $(".banner-owl").owlCarousel({
+        autoplay: false,
+        dots: false,
+        nav: true,
+        loop: true,
+        margin: 15,
+        smartSpeed: 1520,
+
+        responsive: {
+            0: {
+                items: 1,
+            },
+            768: {
+                items: 1,
+            },
+            900: {
+                items: 1,
+            }
+        }
+    });
+    </script>
+    <!-- banner owl end -->
 
     <script>
         $.ajax({

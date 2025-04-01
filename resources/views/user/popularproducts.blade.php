@@ -25,7 +25,7 @@
                 <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
                     @foreach ($popularproducts as $product)
                         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                            <div class="as_product_box">
+                            <div class="as_product_box {{ $product->out_of_stock == 1 ? 'out-of-stock' : '' }}">
                                 <a href="{{ route('user.productdetails', $product->id) }}" class="as_product_img">
                                     <img src="{{ asset($product->image1 ?? 'defaultImage.jpeg') }}"
                                         alt="{{ $product->productName }}" class="img-responsive">

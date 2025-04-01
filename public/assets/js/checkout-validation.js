@@ -24,6 +24,10 @@ $(document).ready(function () {
                 isValid = false;
                 errorMessages.push(`${shippingFields[field]} is required`);
                 $field.addClass('is-invalid');
+            } else if (field === 'zipcode' && $field.val() && !/^\d{6}$/.test($field.val())) {
+                isValid = false;
+                errorMessages.push('Zip Code must be exactly 6 digits');
+                $field.addClass('is-invalid');
             } else {
                 $field.removeClass('is-invalid');
             }
@@ -75,6 +79,10 @@ $(document).ready(function () {
                 if ($field.length && !$field.val()) {
                     isValid = false;
                     errorMessages.push(`${billingFields[field]} is required`);
+                    $field.addClass('is-invalid');
+                } else if (field === 'billingzipcode' && $field.val() && !/^\d{6}$/.test($field.val())) {
+                    isValid = false;
+                    errorMessages.push('Billing Zip Code must be exactly 6 digits');
                     $field.addClass('is-invalid');
                 } else {
                     $field.removeClass('is-invalid');
@@ -185,8 +193,13 @@ $(document).ready(function () {
     });
 
     // Phone number input validation
-    $('input[type="tel"]').on('input', function () {
-        this.value = this.value.replace(/[^0-9]/g, '').substring(0, 10);
+    $('input[type="tel"], input[name="zipcode"], input[name="billingzipcode"]').on('input', function () {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if ($(this).is('[name="zipcode"], [name="billingzipcode"]')) {
+            this.value = this.value.substring(0, 6);
+        } else {
+            this.value = this.value.substring(0, 10);
+        }
     });
 
     // Initialize form state

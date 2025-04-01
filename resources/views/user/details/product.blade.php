@@ -185,12 +185,16 @@ Effective Gems')
 
                                 <!--button start-->
                                 <div class="main-btn mt-2 space-between justify-content-start" data-aos="zoom-in">
+                                @if ($productdetails->out_of_stock == 1)
+                                    <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
+                                @else
                                     <a href="javascript:;" onclick="return buyNow({{ $productdetails->id }})"
                                         class="as_btn"><span>Buy Now</span></a>
                                     <a href="javascript:;" class="as_btn-2 btn-res"
                                         onclick="return addToCart({{ $productdetails->id }})"><span>Add
                                             to Cart</span>
                                     </a>
+                                @endif
                                     <a href="javascript:;"
                                         class="wishlist-btn-details {{ $isInWishlist ? 'wishlist-active' : '' }}"
                                         title="Add to Wishlist"
@@ -312,7 +316,7 @@ Effective Gems')
                 <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
                     @foreach ($relatedProducts as $related)
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <div class="as_product_box">
+                        <div class="as_product_box {{ $related->out_of_stock == 1 ? 'out-of-stock' : '' }}">
                             <a href="{{ route('user.productdetails', $related->id) }}"
                                 class="as_product_img">
                                 <img src="{{ asset($related->image1 ?? 'defaultImage.jpeg') }}"
@@ -330,7 +334,12 @@ Effective Gems')
                                 <div class="space-between">
                                     <a href="{{ route('user.productdetails', $related->id) }}"
                                         class="as_btn_cart"><span>View Details</span></a>
-                                    <a href="javascript:;" class="enquire_btn" onclick="buyNow({{ $related->id }})"><span>Order Now</span></a>
+                                    @if ($related->out_of_stock == 1)
+                                        <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
+                                    @else
+                                        <a href="javascript:;" class="enquire_btn"
+                                            onclick="buyNow({{ $related->id }})"><span>Order Now</span></a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -359,7 +368,7 @@ Effective Gems')
                 <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
                     @foreach ($popularproducts as $popular)
                     <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                        <div class="as_product_box">
+                        <div class="as_product_box {{ $popular->out_of_stock == 1 ? 'out-of-stock' : '' }}">
                             <a href="{{ route('user.productdetails', $popular->id) }}"
                                 class="as_product_img">
                                 <img src="{{ asset($popular->image1 ?? 'defaultImage.jpeg') }}"
@@ -377,8 +386,12 @@ Effective Gems')
                                 <div class="space-between">
                                     <a href="{{ route('user.productdetails', $popular->id) }}"
                                         class="as_btn_cart"><span>View Details</span></a>
-                                    <a href="javascript:;" class="enquire_btn" data-bs-toggle="modal"
-                                        data-bs-target="#enquire_modal"><span>Order Now</span></a>
+                                    @if ($popular->out_of_stock == 1)
+                                        <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
+                                    @else
+                                        <a href="javascript:;" class="enquire_btn"
+                                            onclick="buyNow({{ $popular->id }})"><span>Order Now</span></a>
+                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -424,6 +437,18 @@ Effective Gems')
     const addToCart = (proId) => {
 
         var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());
+        var quantityContainer = $('#quantityDd');
+
+        if (!quantity) {
+        if (!$("#quantityError").length) {
+            $('<div id="quantityError" class="text-danger mt-2">Please select a size before proceeding.</div>').insertAfter("#quantityDd");
+        }
+        quantityContainer.css("border", "2px solid red");
+        return false;
+        } else {
+            $("#quantityError").remove();
+        quantityContainer.css("border", "");
+        }
         var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
         var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
         $.ajax({
@@ -449,6 +474,18 @@ Effective Gems')
     const buyNow = (proId) => {
 
         var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());
+        var quantityContainer = $('#quantityDd');
+
+        if (!quantity) {
+        if (!$("#quantityError").length) {
+            $('<div id="quantityError" class="text-danger mt-2">Please select a size before proceeding.</div>').insertAfter("#quantityDd");
+        }
+        quantityContainer.css("border", "2px solid red");
+        return false;
+        } else {
+            $("#quantityError").remove();
+        quantityContainer.css("border", "");
+        }
         var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
         var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
 

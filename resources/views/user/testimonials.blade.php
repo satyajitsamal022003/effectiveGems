@@ -11,7 +11,7 @@
                 <h1>Testimonials</h1>
                 <ul class="breadcrumb">
                     <li><a href="/">Home</a></li>
-                    <li>Testimonials</li>
+                    <li>Testimonials</li> 
                 </ul>
             </div>
         </div>

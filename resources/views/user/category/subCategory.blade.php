@@ -38,7 +38,7 @@
                 <div class="row mt-2" data-aos="fade-down" data-aos-duration="1500">
                     @foreach ($subcategoryproducts as $subcat)
                         <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
-                            <div class="as_product_box">
+                            <div class="as_product_box {{ $subcat->out_of_stock == 1 ? 'out-of-stock' : '' }}">
                                 <a href="{{ route('user.productdetails', $subcat->id) }}" class="as_product_img">
                                     <img src="{{ asset($subcat->image1 ?? 'defaultImage.jpeg') }}"
                                         alt="{{ $subcat->productName }}" class="img-responsive">
@@ -51,10 +51,14 @@
                                         <span>{{ $subcat->priceB2C }} / {{ $subcat->price_type }}</span>
                                     </span>
                                     <div class="space-between">
-                                        <a href="{{ route('user.productdetails', $subcat->id) }}"
-                                            class="as_btn_cart"><span>View Details</span></a>
-                                        <a href="javascript:;" class="enquire_btn"
-                                            onclick="buyNow({{ $subcat->id }})"><span>Order Now</span></a>
+                                            <a href="{{ route('user.productdetails', $subcat->id) }}"
+                                                class="as_btn_cart"><span>View Details</span></a>
+                                            @if ($subcat->out_of_stock == 1)
+                                                <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
+                                            @else
+                                                <a href="javascript:;" class="enquire_btn"
+                                                    onclick="buyNow({{ $subcat->id }})"><span>Order Now</span></a>
+                                            @endif
                                     </div>
                                 </div>
                             </div>
