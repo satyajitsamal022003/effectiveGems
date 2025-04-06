@@ -20,7 +20,7 @@ class Product extends Model
         'productHeading2', 'productHeading1', 'seoUrl', 'old_seo_url', 'sortOrder', 'sortOrderPopular','sortOrderPopularStatus', 'sortOrderCategory', 
         'sortOrderSubCategory', 'metaTitle', 'metaKeyword', 'metaDescription', 'metaImage', 'productDesc5', 'productDesc4', 'productDesc3', 
         'productDesc2', 'productDesc1', 'is_variant', 'variant', 'courierTypeId', 'activationId', 'certificationId', 
-        'out_of_stock', 'imageAlt', 'imageTitle', 'imageCaption', 'imageDesc', 'status', 'featured_product', 
+        'out_of_stock', 'imageAlt', 'imageTitle', 'imageCaption', 'imageDesc', 'status', 'buyingoption', 'featured_product', 
         'on_top', 'created_at', 'updated_at', 'default_product_heading4', 'default_product_description4'
     ];
 

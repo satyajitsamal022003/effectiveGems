@@ -96,8 +96,12 @@
                                         @if ($subcat->out_of_stock == 1)
                                             <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
                                         @else
-                                            <a href="javascript:;" class="enquire_btn"
-                                                onclick="buyNow({{ $subcat->id }})"><span>Order Now</span></a>
+                                            @if ($subcat->buyingoption == 2)
+                                                <a href="https://wa.me/+917328835585" class="enquire_btn"><span>Enquiry Now</span></a>
+                                            @else
+                                                <a href="javascript:;" class="enquire_btn"
+                                                    onclick="buyNow({{ $subcat->id }})"><span>Order Now</span></a>
+                                            @endif
                                         @endif
                                     </div>
                                 </div>

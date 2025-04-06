@@ -231,6 +231,15 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
+                                                        <div class="form-group">
+                                                            <label for="">Buying Options</label>
+                                                            <select class="form-control" id="buyingoption"
+                                                                name="buyingoption">
+                                                                <option value="">--Select--</option>
+                                                                <option value="1" {{ $product->buyingoption == 1 ? 'selected' : '' }}>Buy Now</option>
+                                                                <option value="2" {{ $product->buyingoption == 2 ? 'selected' : '' }}>Enquiry</option>
+                                                            </select>
+                                                        </div>
                                                         <div class="row">
                                                             <div class="col-xl-12">
                                                                 <div class="row">

@@ -228,6 +228,15 @@
                                                                     @endforeach
                                                                 </select>
                                                             </div>
+                                                            <div class="form-group">
+                                                                <label for="">Buying Options</label>
+                                                                <select class="form-control" id="buyingoption"
+                                                                    name="buyingoption">
+                                                                    <option value="">--Select--</option>
+                                                                    <option value="1">Buy Now</option>
+                                                                    <option value="2">Enquiry</option>
+                                                                </select>
+                                                            </div>
 
                                                             <div class="row">
                                                                 <div class="col-xl-12">

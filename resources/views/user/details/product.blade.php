@@ -248,12 +248,16 @@ Effective Gems')
                                 @if ($productdetails->out_of_stock == 1)
                                     <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
                                 @else
-                                    <a href="javascript:;" onclick="return buyNow({{ $productdetails->id }})"
-                                        class="as_btn"><span>Buy Now</span></a>
-                                    <a href="javascript:;" class="as_btn-2 btn-res"
-                                        onclick="return addToCart({{ $productdetails->id }})"><span>Add
-                                            to Cart</span>
-                                    </a>
+                                    @if ($productdetails->buyingoption == 2)
+                                        <a href="https://wa.me/+917328835585" class="enquire_btn"><span>Enquiry Now</span></a>
+                                    @else
+                                        <a href="javascript:;" onclick="return buyNow({{ $productdetails->id }})"
+                                            class="as_btn"><span>Buy Now</span></a>
+                                        <a href="javascript:;" class="as_btn-2 btn-res"
+                                            onclick="return addToCart({{ $productdetails->id }})"><span>Add
+                                                to Cart</span>
+                                        </a>
+                                    @endif
                                 @endif
                                     <a href="javascript:;"
                                         class="wishlist-btn-details {{ $isInWishlist ? 'wishlist-active' : '' }}"
@@ -397,8 +401,12 @@ Effective Gems')
                                     @if ($related->out_of_stock == 1)
                                         <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
                                     @else
-                                        <a href="javascript:;" class="enquire_btn"
-                                            onclick="buyNow({{ $related->id }})"><span>Order Now</span></a>
+                                        @if ($related->buyingoption == 2)
+                                                <a href="https://wa.me/+917328835585" class="enquire_btn"><span>Enquiry Now</span></a>
+                                        @else
+                                            <a href="javascript:;" class="enquire_btn"
+                                                onclick="buyNow({{ $related->id }})"><span>Order Now</span></a>
+                                        @endif
                                     @endif
                                 </div>
                             </div>
@@ -449,8 +457,12 @@ Effective Gems')
                                     @if ($popular->out_of_stock == 1)
                                         <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
                                     @else
+                                        @if ($popular->buyingoption == 2)
+                                            <a href="https://wa.me/+917328835585" class="enquire_btn"><span>Enquiry Now</span></a>
+                                        @else
                                         <a href="javascript:;" class="enquire_btn"
-                                            onclick="buyNow({{ $popular->id }})"><span>Order Now</span></a>
+                                        onclick="buyNow({{ $popular->id }})"><span>Order Now</span></a>
+                                        @endif
                                     @endif
                                 </div>
                             </div>
@@ -607,6 +619,7 @@ Effective Gems')
         // Show/hide activation details when checkbox is clicked
         const activationCheckbox = document.getElementById('activationCheckbox');
         const activationDetails = document.getElementById('activationDetails');
+        const buyingOption = {{ $productdetails->buyingoption }};
         
         if (activationCheckbox && activationDetails) {
             activationCheckbox.addEventListener('change', function() {
@@ -619,6 +632,12 @@ Effective Gems')
         const silverRing = document.getElementById('silverRing');
         const goldRing = document.getElementById('goldRing');
         const goldRingContact = document.getElementById('goldRingContact');
+        const totalPriceDetails = document.querySelector('.total-price-details');
+
+        if (buyingOption === 2 && totalPriceDetails) {
+            totalPriceDetails.style.display = 'none';
+            return; // No need to run rest of the code
+        }
 
         // Add price to silver ring label
         silverRing.addEventListener('change', function() {
@@ -627,6 +646,7 @@ Effective Gems')
                 console.log('Silver Ring selected - ₹1000 added');
                 goldRingContact.style.display = 'none';
                 $('.action-btn-group').css('display', 'block');
+                totalPriceDetails.style.removeProperty('display');
             }
         });
 
@@ -635,6 +655,7 @@ Effective Gems')
             if (this.checked) {
                 goldRingContact.style.display = 'block';
                 $('.action-btn-group').css('display', 'none');
+                totalPriceDetails.style.display = 'none';
             }
         });
 
@@ -642,6 +663,8 @@ Effective Gems')
         noRing.addEventListener('change', function() {
             if (this.checked) {
                 goldRingContact.style.display = 'none';
+                $('.action-btn-group').css('display', 'block');
+                totalPriceDetails.style.removeProperty('display');
             }
         });
     });
