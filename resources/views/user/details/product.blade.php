@@ -244,7 +244,7 @@ Effective Gems')
 
 
                                 <!--button start-->
-                                <div class="main-btn mt-2 space-between justify-content-start" data-aos="zoom-in">
+                                <div class="main-btn mt-2 space-between justify-content-start action-btn-group" data-aos="zoom-in">
                                 @if ($productdetails->out_of_stock == 1)
                                     <button type="button" style="border-radius: 25px;" class="btn btn-secondary">Out of Stock</button>
                                 @else
@@ -626,6 +626,7 @@ Effective Gems')
                 // You can add your logic here to update the total price
                 console.log('Silver Ring selected - ₹1000 added');
                 goldRingContact.style.display = 'none';
+                $('.action-btn-group').css('display', 'block');
             }
         });
 
@@ -633,6 +634,7 @@ Effective Gems')
         goldRing.addEventListener('change', function() {
             if (this.checked) {
                 goldRingContact.style.display = 'block';
+                $('.action-btn-group').css('display', 'none');
             }
         });
 
