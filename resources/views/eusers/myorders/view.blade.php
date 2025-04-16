@@ -29,7 +29,7 @@
                                 <h3>Shipping Info</h3>
                                 <span>Name : {{ $order->firstName . ' ' . $order->lastName }}</span>
                                 <span>Phone Number :{{ $order->phoneNumber }}</span>
-                                <span>Delivered : 16-Feb-2024</span>
+                                <span>Delivery Status : {{ $order->orderStatus ?? '' }}</span>
                                 <span>Shipping Address :
                                     {{ $order->address }} </span>
                             </div>
