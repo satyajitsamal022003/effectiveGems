@@ -19,7 +19,7 @@ class CouponController extends Controller
      */
     public function index()
     {
-        $coupons = Coupon::all();
+        $coupons = Coupon::orderBy('created_at', 'desc')->get();
         return view("admin.coupons.list", compact('coupons'));
     }
 
@@ -70,6 +70,8 @@ class CouponController extends Controller
             'description' => $request->description,
             'value' => $request->value,
             'type' => $request->type,
+            'min_quantity' => $request->min_quantity,
+            'is_combo' => $request->is_combo,
         ]);
 
         return redirect()->route('coupons.index')->with('message', 'Coupon created successfully!');
@@ -201,6 +203,11 @@ class CouponController extends Controller
     public function applyCoupon(Request $req)
     {
         // Find the cart using cartId
+
+        if (empty($req->couponName)) {
+            return response()->json([], 204); // Stop here with 204 No Content
+        }
+    
         $cart = Cart::find($req->cartId);
         if (!$cart) {
             return response()->json(['message' => 'Cart not found'], 404);
@@ -231,24 +238,39 @@ class CouponController extends Controller
         }
 
         $totalDelPrice = 0;
-        $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice) {
+        $foundCourierTypeId2 = false;
+        $subtotal = $cartItems->sum(function ($item) use (&$totalDelPrice, &$foundCourierTypeId2) {
             $courierType = Couriertype::find($item->productDetails->courierTypeId);
             $product = Product::find($item->product_id);
+            $deliveryPrice = 0;
 
-            $deliveryPrice = $courierType ? $courierType->courier_price : 0;
-            if ($courierType && ($courierType->id == 3 || $courierType->id == 4) && $product->categoryId != 1) {
-                $deliveryPrice *= $item->quantity;
+            if ($courierType) {
+                $deliveryPrice = $courierType->courier_price;
+    
+                if ($courierType->id == 2) {
+                    if (!$foundCourierTypeId2) {
+                        $foundCourierTypeId2 = true;
+                    } else {
+                        $deliveryPrice = 0;
+                    }
+                } elseif ($courierType->id == 3 || ($courierType->id == 4 && $product->categoryId != 1)) {
+                    $deliveryPrice *= $item->quantity;
+                }
             }
 
             $totalDelPrice += $deliveryPrice;
-            $item->deliveryPrice = $deliveryPrice;
 
-            return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            if ($product->categoryId != 1) {
+                return ($item->productDetails->priceB2C + $item->activation + $item->certificate) * $item->quantity + $deliveryPrice;
+            } else {
+                return ($item->productDetails->priceB2C) * $item->quantity + $deliveryPrice + $item->activation + $item->certificate;
+            }
         });
 
         $total = $subtotal - $totalDelPrice;
         $discount = 0;
         $totalApplicableAmount = 0;
+        $productSpecificDiscount = 0;
 
         // Whole site discount
         if ($coupon->wholeSite) {
@@ -258,10 +280,56 @@ class CouponController extends Controller
                 $discount = min($coupon->value, $total);
             }
         } else {
-            // Initialize product/category/subcategory discount calculation
             $productIds = !empty($coupon->products) ? explode(',', $coupon->products) : [];
+            $isApplicable = false;
+
+            if ($coupon->is_combo && !empty($productIds)) {
+                $productQuantities = [];
+        
+                // Count quantities of each product in the combo
+                foreach ($cartItems as $item) {
+                    if (in_array($item->product_id, $productIds)) {
+                        if (!isset($productQuantities[$item->product_id])) {
+                            $productQuantities[$item->product_id] = 0;
+                        }
+                        $productQuantities[$item->product_id] += $item->quantity;
+                    }
+                }
+        
+                // Ensure all combo products are present
+                $comboCount = PHP_INT_MAX;
+                foreach ($productIds as $productId) {
+                    $qty = $productQuantities[$productId] ?? 0;
+                    $comboCount = min($comboCount, floor($qty / $coupon->min_quantity));
+                }
+        
+                if ($comboCount > 0) {
+                    $isApplicable = true;
+                    // Calculate total value of one combo set
+                    $comboTotal = 0;
+                    foreach ($cartItems as $item) {
+                        if (in_array($item->product_id, $productIds)) {
+                            $comboTotal += $item->productDetails->priceB2C * $coupon->min_quantity;
+                        }
+                    }
+        
+                    if ($coupon->type == 2) {
+                        $discount = ($comboTotal * $coupon->value / 100) * $comboCount;
+                    } else {
+                        $discount = $coupon->value * $comboCount;
+                    }
+                }
+        
+                if (!$isApplicable) {
+                    return response()->json(['message' => 'Combo coupon not applicable'], 422);
+                }
+            } 
+            else {
+            // Initialize product/category/subcategory discount calculation
+            
             $categoryIds = !empty($coupon->categories) ? explode(',', $coupon->categories) : [];
             $subCategoryIds = !empty($coupon->subCategories) ? explode(',', $coupon->subCategories) : [];
+
 
             foreach ($cartItems as $item) {
                 $product = Product::find($item->product_id);
@@ -269,31 +337,73 @@ class CouponController extends Controller
             
                 // Check if coupon applies to products
                 if (in_array($item->product_id, $productIds)) {
-                    $totalApplicableAmount += $itemTotal;
+                    if ($item->quantity >= $coupon->min_quantity) {
+                        $isApplicable = true;
+                        if ($coupon->type == 2) {
+                            $productSpecificDiscount += ($itemTotal * $coupon->value) / 100;
+                        } else {
+                            $productSpecificDiscount += $coupon->value;
+                        }
+                    }
                 }
             
                 // Check if coupon applies to categories
                 if (in_array($product->categoryId, $categoryIds)) {
+                    $isApplicable = true;
                     $totalApplicableAmount += $itemTotal;
                 }
             
                 // Check if coupon applies to subcategories
                 if (in_array($product->subCategoryId, $subCategoryIds)) {
+                    $isApplicable = true;
                     $totalApplicableAmount += $itemTotal;
                 }
             }
 
-            // Apply discount on total applicable amount
-            if ($coupon->type == 2) {
-                $discount = ($totalApplicableAmount * $coupon->value) / 100;
-            } else {
-                $discount = min($coupon->value * $cartItems->sum('quantity'), $totalApplicableAmount);
+
+            if (!$isApplicable) {
+                return response()->json(['message' => 'Coupon not applicable'], 422);
             }
+
+            // Apply discount on total applicable amount
+            if (!empty($productIds)) {
+                // For product-specific coupons, use the calculated productSpecificDiscount
+                $discount = $productSpecificDiscount;
+            } else {
+                // For category/subcategory coupons, use the original logic
+                if ($coupon->type == 2) {
+                    $discount = ($totalApplicableAmount * $coupon->value) / 100;
+                } else {
+                    $discount = min($coupon->value, $totalApplicableAmount);
+                }
+            }
+         }
+        }
+
+        $isCOD = $req->has('isCOD') && $req->isCOD == 1;
+
+        if ($isCOD) {
+            session(['isCOD' => true]);
+        } else {
+            session()->forget('isCOD');
+            session()->forget('cod_applied');
         }
 
         // Calculate final total
         $finalSubtotal = max(0, $total - $discount);
         $finalAmount = $finalSubtotal + $totalDelPrice;
+
+        if ($isCOD) {
+            $finalAmount += 30;
+            session(['cod_applied' => true]);
+        }
+
+
+        session(['coupon' => [
+            'code' => $coupon->code,
+            'discount' => $discount,
+        ]]);
+
 
         return response()->json([
             'total' => $total,

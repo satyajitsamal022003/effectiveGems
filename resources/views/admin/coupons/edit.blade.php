@@ -85,6 +85,14 @@
                                                                             value="{{ old('value', $coupon->value) }}">
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-12">
+
+                                                                    <div class="form-group">
+                                                                        <label>Quantity</label>
+                                                                        <input type="number" min="1" class="form-control" placeholder="Minimum Quantity"
+                                                                            name="min_quantity" {{ $isDisabled }} value="{{ old('min_quantity', $coupon->min_quantity) }}">
+                                                                    </div>
+                                                                </div>
 
                                                             </div>
 
@@ -123,6 +131,7 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+
 
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
@@ -176,6 +185,13 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="is_combo" id="is_combo" value="1"  {{ $isDisabled }}  
+                                                                        <?= $coupon->is_combo == 1 ? 'checked' : '' ?>>
+                                                                    <label class="form-check-label" for="is_combo">Is Combo</label>
+                                                                </div>
+
                                                             </div>
 
                                                             <!-- Date fields -->

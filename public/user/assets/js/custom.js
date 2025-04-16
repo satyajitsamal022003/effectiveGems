@@ -325,7 +325,7 @@ $(window).on("load", function () {
 });
 
 $(document).ready(function () {
-    const handleQuantityChange = (quantity) => { debugger
+    const handleQuantityChange = (quantity) => {
         const productCategory = parseInt($("#productCategory").val());
         const courierType = parseInt($("#courierTypeId").val());
         const courierPrice = parseInt($("#courierPrice").val());

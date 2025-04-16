@@ -455,4 +455,13 @@ class CartController extends Controller
             ]);
         }
     }
+
+        public function destroyCoupon(Request $request)
+        {
+            // Destroy the coupon session
+            session()->forget('coupon');
+
+            // Return a response indicating success
+            return response()->json(['message' => 'Coupon removed successfully']);
+        }
 }

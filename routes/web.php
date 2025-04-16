@@ -212,6 +212,17 @@ Route::post('/remove-from-cart', [CartController::class, 'removeFromCart'])->nam
 Route::post('/change-quantity', [CartController::class, 'changeQuantity'])->name('changeQuantity');
 Route::post('/change-settings', [CartController::class, 'changeAddSettings'])->name('changeAddSettings');
 Route::get('/view-cart', [CartController::class, 'viewCart'])->name('viewCart');
+Route::post('/destroy-coupon', [CartController::class, 'destroyCoupon'])->name('destroyCoupon');
+Route::post('/set-cod-session', function (\Illuminate\Http\Request $request) {
+    if ($request->isCOD == 'true' || $request->isCOD === true) {
+        session(['isCOD' => true]);
+    } else {
+        session()->forget('isCOD');
+        session()->forget('cod_applied'); // Remove cod charge if it was applied
+    }
+    return response()->json(['status' => 'updated']);
+});
+
 
 // RazorPay
 Route::get('razorpay', [RazorpayController::class, 'createOrder'])->name('razorpay.order');

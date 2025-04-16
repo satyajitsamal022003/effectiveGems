@@ -882,7 +882,6 @@
     </div>
 </div>
 
-
 <script>
     const updateTotalWithCod = () => {
     let isCOD = $('#cash_on_delivery').is(':checked');
@@ -904,6 +903,18 @@
     } else {
         $('.codCharge').remove();
     }
+
+    $.ajax({
+        type: 'POST',
+        url: '/set-cod-session', // Create this route/controller
+        data: {
+            _token: $('meta[name="csrf-token"]').attr('content'),
+            isCOD: isCOD
+        },
+        success: function () {
+            applyCoupon();
+        }
+    });
 
     $('.subTotal').text(totalAmount);
     $('.amount').val(totalAmount);
@@ -941,6 +952,8 @@
 
     };
     const changeQuantity = (id, operation, selectedQuantity) => {
+        let couponApplied = {{ session('coupon') ? 'true' : 'false' }};
+
         var quantity = parseFloat($(`input[id="quantity-${id}"], select[id="quantity-${id}"]`).val());
         var newQuantity = operation == 2 ? quantity + 1 : quantity - 1;
 
@@ -969,6 +982,23 @@
                 $('#itemDelivery-' + id).text(response.itemDeliveryPrice);
 
                 updateTotalWithCod();
+
+                if (couponApplied === true || couponApplied === 'true') {
+                // Make an AJAX request to remove the coupon session
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('destroyCoupon') }}",
+                    data: {
+                        _token: "{{ csrf_token() }}",
+                    },
+                    success: function(removeResponse) {
+                        location.reload(); // Refresh the page after coupon is removed
+                    },
+                    error: function(xhr, status, error) {
+                        alert("Error removing coupon: " + error);
+                    }
+                });
+            }
 
                 // $('#quantity-' + id).text(newQuantity);
                 // toastr.success(response.message);
@@ -1022,6 +1052,7 @@
     function applyCoupon() {
         const couponCode = $('input[name="couponCode"]').val(); // Get the coupon code from the input
         const cartId = "{{ $cartId }}"; // Get the cart ID
+        const isCOD = $('#cash_on_delivery').is(':checked');
 
         $.ajax({
             type: "POST",
@@ -1030,6 +1061,7 @@
                 _token: "{{ csrf_token() }}", // CSRF token for security
                 couponName: couponCode, // Send the coupon code
                 cartId: cartId, // Send the cart ID
+                isCOD: isCOD ? 1 : 0
             },
             success: function(response) {
                 if (response.discount === 0) {

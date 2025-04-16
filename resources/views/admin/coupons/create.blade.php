@@ -57,7 +57,7 @@
                                                                 <textarea class="form-control" placeholder="Description" name="description">{{ old('description') }}</textarea>
                                                             </div>
                                                             <div class="row">
-                                                                <div class="col-6">
+                                                            <div class="col-6">
                                                                     <div class="form-group">
                                                                         <label>Type</label>
 
@@ -79,6 +79,7 @@
                                                                     </div>
 
                                                                 </div>
+
                                                                 <div class="col-6">
 
                                                                     <div class="form-group">
@@ -87,7 +88,6 @@
                                                                             name="value">{{ old('value') }}</input>
                                                                     </div>
                                                                 </div>
-
                                                             </div>
 
                                                             <!-- Checkboxes for products, categories, wholeSite, and subCategories -->
@@ -122,6 +122,13 @@
                                                                         </select>
                                                                     </div>
                                                                 </div>
+                                                                <div class="col-12" id="minQuantityField" style="display: none;">
+                                                                    <div class="form-group">
+                                                                        <label>Quantity</label>
+                                                                        <input type="number" min="1" class="form-control" placeholder="Quantity"
+                                                                            name="min_quantity">{{ old('min_quantity') }}</input>
+                                                                    </div>
+                                                                    </div>
 
                                                                 <div class="form-check">
                                                                     <input class="form-check-input" type="checkbox"
@@ -167,6 +174,12 @@
                                                                             @endforeach
                                                                         </select>
                                                                     </div>
+                                                                </div>
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="checkbox"
+                                                                        name="is_combo" id="is_combo" value="1">
+                                                                    <label class="form-check-label"
+                                                                        for="is_combo">Is Combo</label>
                                                                 </div>
 
                                                             </div>
@@ -231,6 +244,13 @@
                 intialiseSelect2('productList');
             } else {
                 $('#variant-container').slideUp();
+            }
+        });
+        $('#products').on('change', function () {
+            if ($(this).is(':checked')) {
+                $('#minQuantityField').slideDown(); // or .show()
+            } else {
+                $('#minQuantityField').slideUp(); // or .hide()
             }
         });
         $('#categories').on('change', function() {
