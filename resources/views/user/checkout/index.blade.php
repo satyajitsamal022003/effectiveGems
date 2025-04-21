@@ -1037,6 +1037,7 @@
                 $('#total').text(response.total);
                 // $('#quantity-' + id).text(newQuantity);
                 // toastr.success(response.message);
+                updateTotalWithCod();
             },
             error: function(xhr, status, error) {
                 // toastr.error("An error occurred: " + error);
