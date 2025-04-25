@@ -7,9 +7,10 @@
             <div class="order-details-item mb-3">
                 <div class="row">
                     @foreach ($order->items as $item)
+                    @php($imagePath = $item->productDetails->image1 ?? 'defaultImage.jpeg')
                         <div class="col-lg-3 col-md-4 col-12">
                             <div class="details_text">
-                                <img src="../assets/images/product-img-2.jpg" alt="image" class="details-pro-img">
+                                <img src="{{ asset($imagePath) }}" alt="image" class="details-pro-img">
                                 <div class="pro-text">
                                     <h3>{{ $item->productDetails->productName }}</h3>
                                     <span>Quantity :{{ $item->quantity }}</span>
@@ -22,7 +23,7 @@
                                 </div>
                             </div>
                         </div>
-                    @endforeach
+                    @endforeach 
                     <div class="col-lg-3 col-md-4 col-12">
                         <div class="details_text">
                             <div class="pro-text">
