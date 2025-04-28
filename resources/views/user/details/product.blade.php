@@ -404,8 +404,12 @@ Effective Gems')
                                         @if ($related->buyingoption == 2)
                                                 <a href="https://wa.me/+917328835585" class="enquire_btn"><span>Enquiry Now</span></a>
                                         @else
+                                            @if($related->categoryId == 1)
+                                            <a href="{{ route('user.productdetails', $related->id) }}" class="enquire_btn"><span>Order Now</span></a>
+                                            @else
                                             <a href="javascript:;" class="enquire_btn"
-                                                onclick="buyNow({{ $related->id }})"><span>Order Now</span></a>
+                                                onclick="relandpopbuyNow({{ $related->id }})"><span>Order Now</span></a>
+                                            @endif
                                         @endif
                                     @endif
                                 </div>
@@ -461,7 +465,7 @@ Effective Gems')
                                             <a href="https://wa.me/+917328835585" class="enquire_btn"><span>Enquiry Now</span></a>
                                         @else
                                         <a href="javascript:;" class="enquire_btn"
-                                        onclick="buyNow({{ $popular->id }})"><span>Order Now</span></a>
+                                        onclick="relandpopbuyNow({{ $popular->id }})"><span>Order Now</span></a>
                                         @endif
                                     @endif
                                 </div>
@@ -476,7 +480,7 @@ Effective Gems')
 </section>
 @endif
 <!--Popular Products end-->
-@endsection
+@endsection 
 <script>
     const addToWishlist = (proId, element) => {
 
@@ -613,6 +617,51 @@ Effective Gems')
             },
         });
     };
+
+    const relandpopbuyNow = (proId) => {
+
+        var quantity = parseFloat($('input[name="quantity"], select[name="quantity"]').val());
+        var quantityContainer = $('#quantityDd');
+
+        var isActive = $('input[name="is_act"]').is(':checked') ? $('input[name="is_act"]').val() : 0;
+        var isCert = $('input[name="is_cert"]').is(':checked') ? $('input[name="is_cert"]').val() : 0;
+        var ringType = $('input[name="ring_type"]:checked').val() || 'none';
+        var ringPrice = ringType === 'silver' ? 1000 : 0;
+        let activation_name = document.getElementById('name').value;
+        let activation_gotra = document.getElementById('gotra').value;
+        let activation_dob = document.getElementById('dob').value;
+        if (isActive == 1) {
+            if (!activation_name || !activation_gotra || !activation_dob) {
+                alert("Please fill in all activation details.");
+                return false;
+            }
+        }
+        $.ajax({
+            type: "POST",
+            url: "{{ route('addToCart') }}",
+            data: {
+                _token: "{{ csrf_token() }}",
+                product_id: proId,
+                quantity: quantity,
+                isActive: isActive,
+                isCert: isCert,
+                ring_type: ringType,
+                ring_price: ringPrice,
+                activation_name: activation_name,
+                activation_gotra: activation_gotra,
+                activation_dob: activation_dob,
+            },
+            success: function(response) {
+                $(".cartCount").text(response.totalCartItems);
+                // alert(response.message);
+                window.location.href = '/checkout';
+                // toastr.success(response.message);
+            },
+            error: function(xhr, status, error) {
+                // toastr.error("An error occurred: " + error);
+            },
+        });
+        };
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
